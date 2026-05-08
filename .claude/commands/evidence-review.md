@@ -70,14 +70,14 @@
 
 ## 输出目录概览
 
-> 目录结构定义在 [AgentMapping.md](../rules/AgentMapping.md) 中，EvidenceAnalyzer 主要输出至 `05 - 📎 证据材料`
+> 目录结构定义在 [AgentMapping.md](../rules/AgentMapping.md) 中，EvidenceAnalyzer 主要输出至 `03 - 我方证据`
 
 | 目录 | 负责Agent | 典型输出 |
 | ------ | --------- | -------- |
-| `05 - 📎 证据材料` | EvidenceAnalyzer | 质证意见书、补充证据建议、证据缺口分析 |
-| `03 - 🔍 法律研究` | Researcher | 相关法条检索报告 |
-| `06 - 📝 法律文书` | Writer | 质证意见书、证据目录 |
-| `10 - 📊 综合报告` | Summarizer | 证据质证综合报告 |
+| `03 - 我方证据` | EvidenceAnalyzer | 质证意见书、补充证据建议、证据缺口分析 |
+| `02 - 法律研究` | Researcher | 相关法条检索报告 |
+| `05 - 我方法律文书` | Writer | 质证意见书、证据目录 |
+| `10 - 综合报告` | Summarizer | 证据质证综合报告 |
 
 > 文件命名和格式标准详见 [OutputStandards.md](../rules/OutputStandards.md)
 

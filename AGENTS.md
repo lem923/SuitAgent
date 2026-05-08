@@ -37,6 +37,35 @@ SuitAgent 是面向律师的诉讼辅助系统，通过10个专业Agent处理诉
 - **生成 docx**：套用 `.claude/skills/docx/china_law_firm_template.md` 的格式参数
 - **措辞规则细节**：详见 `cn-firm-documents` skill 的 `references/client-doc-style-rules.md`
 
+## 案件目录结构（v3.0+ 统一方案）
+
+每个案件文件夹的标准布局：
+
+```
+[案件文件夹]/
+├── matter.yaml              ← 结构化操作数据（当事人/案号/阶段/关键日期/文件夹规约）
+├── matter_dashboard.md      ← 人读案件看板（取代旧 案件信息.md）
+├── AGENTS.md                ← per-case agent 边界与保密硬约束
+├── 工时记录.md              ← 工时与费用核算
+├── 00 - 客户提供/
+├── 01 - 委托材料/
+├── 02 - 法律研究/
+│   └── 案件分析/            ← 子目录（DocAnalyzer/IssueIdentifier/Strategist 落盘）
+├── 03 - 我方证据/           ← EvidenceAnalyzer 默认落盘
+├── 04 - 对方证据/
+├── 05 - 我方法律文书/       ← Writer 主要落盘
+├── 06 - 对方法律文书/
+├── 07 - 法院法律文书/
+├── 08 - 庭审笔录/
+├── 09 - 参考文件/
+├── 10 - 综合报告/           ← Reporter / Summarizer 落盘
+└── 99 - 复盘沉淀/
+```
+
+**权威定义**：[`.claude/rules/AgentMapping.md`](.claude/rules/AgentMapping.md)
+**新案件搭建**：调起 `new-case` skill
+**已存在案件迁移**（旧 12 层 → 新统一方案）：用户在本机用 `cn-litigation-case-folder-organizer` skill 跑迁移（见 `tmp/案件迁移说明.md`）
+
 ## 外部 skill 桥接
 
 SuitAgent 的部分 Agent 不内嵌方法论，而是调起外部 skill 作为 single source of truth。安装/同步这些 skill 到本机才能让对应 Agent 完整工作。

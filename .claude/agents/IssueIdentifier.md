@@ -38,7 +38,7 @@ color: yellow
 - 使用结构化Markdown格式
 - 包含明确的争议焦点列表
 - 标注法律关系类型和适用法条
-- 输出到指定目录：`03 - 🔍 法律研究`
+- 输出到指定目录：`02 - 法律研究`
 
 ## 工作流程
 
@@ -65,7 +65,7 @@ color: yellow
 
 **文件格式**：结构化Markdown文档，包含争议焦点、法律关系分析等
 **文件命名**：`[日期前缀] 争议焦点分析.md`（如：`260101 争议焦点分析.md`）
-**输出位置**：`03 - 🔍 法律研究`
+**输出位置**：`02 - 法律研究`
 
 > **详细说明**：详见 [`.claude/rules/OutputStandards.md`](../rules/OutputStandards.md) 和 [`.claude/rules/AgentMapping.md`](../rules/AgentMapping.md)
 

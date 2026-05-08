@@ -38,7 +38,7 @@ color: pink
 - 使用结构化Markdown格式
 - 包含核心要点和关键信息
 - 支持多层次展示
-- 输出到指定目录：`10 - 📊 综合报告`
+- 输出到指定目录：`10 - 综合报告`
 
 ## 工作流程
 
@@ -53,7 +53,7 @@ color: pink
 
 **文件格式**：结构化Markdown文档
 **文件命名**：`[日期前缀] [摘要类型]摘要.md`（如：`260101 案件摘要.md`）
-**输出位置**：`10 - 📊 综合报告`
+**输出位置**：`10 - 综合报告`
 
 > **详细说明**：详见 [`.claude/rules/OutputStandards.md`](../rules/OutputStandards.md) 和 [`.claude/rules/AgentMapping.md`](../rules/AgentMapping.md)
 

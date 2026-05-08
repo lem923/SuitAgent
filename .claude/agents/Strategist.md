@@ -39,7 +39,7 @@ color: orange
 - 使用结构化Markdown格式
 - 包含完整的SWOT分析
 - 提供多套策略方案供选择
-- 输出到指定目录：`02 - 📄 案件分析`
+- 输出到指定目录：`02 - 法律研究/案件分析`
 
 ## 工作流程
 
@@ -67,7 +67,7 @@ Strategist输出文件必须遵循以下规范：
 
 **文件格式**：结构化Markdown文档，包含SWOT分析、策略方案、风险评估等
 **文件命名**：`[日期前缀] 应诉策略方案.md`（如：`260101 应诉策略方案.md`）
-**输出位置**：`02 - 📄 案件分析`
+**输出位置**：`02 - 法律研究/案件分析`
 
 > **详细说明**：详见 [`.claude/rules/OutputStandards.md`](.claude/rules/OutputStandards.md) 和 [`.claude/rules/AgentMapping.md`](.claude/rules/AgentMapping.md)
 

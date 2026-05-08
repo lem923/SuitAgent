@@ -39,7 +39,7 @@ color: green
 - 使用结构化Markdown格式
 - 包含明确的质证结论（三性分析）
 - 提供具体的补充建议
-- 输出到指定目录：`05 - 📎 证据材料`
+- 输出到指定目录：默认 `03 - 我方证据`；分析对方提交的证据时落 `04 - 对方证据`（按证据归属判定）
 
 ## 支持的任务类型
 
@@ -63,7 +63,7 @@ EvidenceAnalyzer输出文件必须遵循以下规范：
 
 **文件格式**：结构化Markdown文档，包含质证意见、证据分析等
 **文件命名**：`[日期前缀] [文档类型].md`（如：`260101 质证意见书.md`）
-**输出位置**：`05 - 📎 证据材料`
+**输出位置**：`03 - 我方证据`（我方证据）/ `04 - 对方证据`（对方证据，含质证意见）
 
 > **详细说明**：详见 [`.claude/rules/OutputStandards.md`](.claude/rules/OutputStandards.md) 和 [`.claude/rules/AgentMapping.md`](.claude/rules/AgentMapping.md)
 

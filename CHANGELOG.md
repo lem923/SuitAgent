@@ -5,6 +5,46 @@
 
 ---
 
+## [v1.3.0] - 2026-05-08 — Phase 2A: 案件目录结构统一
+
+### 🏗️ 重构 (Refactored, BREAKING)
+
+- **目录结构由 12 层带 emoji 改为 11 numbered slots（无 emoji）+ 4 root level 文件**：吸收 cn-litigation-case-folder-organizer skill 的 14-slot 方案为基础，叠加 SuitAgent 12 层中"综合报告"slot 与"工时记录"作为补强。SuitAgent 项目内外案件结构统一
+- **新结构布局**：
+  - root level: `matter.yaml` / `matter_dashboard.md` / `AGENTS.md` / `工时记录.md`
+  - numbered slots: `00 - 客户提供` / `01 - 委托材料` / `02 - 法律研究`（含 `案件分析/` 子目录）/ `03 - 我方证据` / `04 - 对方证据` / `05 - 我方法律文书` / `06 - 对方法律文书` / `07 - 法院法律文书` / `08 - 庭审笔录` / `09 - 参考文件` / `10 - 综合报告` / `99 - 复盘沉淀`
+- **`AgentMapping.md` 全文重写为 v3.0**：包含完整新结构定义、Agent 输出映射、与旧结构的迁移对照表
+- **9 个 agent 文件路径硬编码全部更新**：DocAnalyzer / EvidenceAnalyzer / IssueIdentifier / Researcher / Strategist / Writer / Reporter / Summarizer / Scheduler
+- **`Scheduler` 不再使用 numbered slot**：结构化期限合并入 root `matter.yaml`，工时记录提到 root `工时记录.md`
+- **`new-case` skill 升级**：生成新结构（matter triplet + 工时记录.md root + 11 numbered + `02 - 法律研究/案件分析/` 子目录），停止生成旧 `[案件编号] 案件信息.md` 与 `[案件编号].yaml`
+- **per-case `AGENTS.md` 引入**：每个案件根目录拥有自己的 agent 边界文件，明确 client identifier 保密硬约束、文件操作禁区、索引规约。这是 14-slot 方案吸收来的关键能力，旧 SuitAgent 缺失
+
+### ➕ 新增 (Added)
+
+- `99 - 复盘沉淀/` slot：结案后的复盘笔记、归档心得、工作流改进
+- `04 - 对方证据/` 与 `06 - 对方法律文书/` 的拆分：原 `07 - 📥 对方提交` 合并 slot 不利于精确归档
+- `AGENTS.md` 顶层文件新增"案件目录结构（v3.0+ 统一方案）"小节
+- `OutputStandards.md` 标准输出表更新：Scheduler 持续维护文件指向 root level
+
+### 📋 仓库外配套（Phase 2A 不入仓）
+
+- `tmp/cn-litigation-case-folder-organizer_补丁.md`：organizer skill 的同步补丁（加 slot 10 + 工时记录.md 处理逻辑），用户本机复制到 skill 路径
+- `tmp/案件迁移说明.md`：260507 / 260508 真实案件从旧 12 层迁移到新结构的具体指令
+- `tmp/per-case_AGENTS.md_template.md`：每个新案件根目录 AGENTS.md 的模板
+
+### ⚠️ 破坏性变更 (Breaking)
+
+- **真实案件 260507 / 260508 当前为旧 12 层结构**：commit 一推，agent 在这两个案子上跑会找不到新路径。**必须先用 organizer skill 跑迁移**（见 `tmp/案件迁移说明.md`）
+- **`案件信息.md` 被 matter triplet 替代**：Phase 2A 不主动删除现有案件的 `案件信息.md`（让 organizer 在迁移时同步），但 new-case 不再生成
+- **`00 - 📅 日程管理/[案件编号].yaml` 被 root `matter.yaml` 替代**
+- **依赖 organizer skill 完成同步迁移**：未跑迁移的案件不应被 SuitAgent agent 写入
+
+### 🚫 不在 Phase 2A 范围（留给后续 phase）
+
+- ContractReviewer / JiubufaAnalyst / JudgmentReviewer 三个新 agent → Phase 2B/2C
+- Workflow.md 路由机制深度改造 → Phase 4
+- 命名规范统一 → Phase 3
+
 ## [v1.2.0] - 2026-05-08 — Phase 1: 合并冗余
 
 ### 🔄 重构 (Refactored)

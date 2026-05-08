@@ -40,7 +40,7 @@ color: purple
 - 使用结构化Markdown格式
 - 包含法条原文和解读
 - 列出相关判例及裁判要旨
-- 输出到指定目录：`03 - 🔍 法律研究`
+- 输出到指定目录：`02 - 法律研究`
 
 ## 工作流程
 
@@ -56,7 +56,7 @@ color: purple
 
 **文件格式**：结构化Markdown文档，包含法律研究报告、法条解读等
 **文件命名**：`[日期前缀] 法律研究报告.md`（如：`260101 法律研究报告.md`）
-**输出位置**：`03 - 🔍 法律研究`、`11 - 📚 参考文件`
+**输出位置**：`02 - 法律研究`、`09 - 参考文件`
 
 > **详细说明**：详见 [`.claude/rules/OutputStandards.md`](../rules/OutputStandards.md) 和 [`.claude/rules/AgentMapping.md`](../rules/AgentMapping.md)
 

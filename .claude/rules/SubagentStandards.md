@@ -187,7 +187,7 @@ description: 专业的证据分析器，用于质证、证据审查和补充建�
 - 使用结构化Markdown格式
 - 包含明确的质证结论
 - 提供具体的补充建议
-- 输出到指定目录：`05 - 📎 证据材料`
+- 输出到指定目录：`03 - 我方证据`
 
 ## 工作流程
 1. **接收证据**：分析新证据或现有证据
@@ -201,7 +201,7 @@ EvidenceAnalyzer输出文件必须遵循以下规范：
 
 **文件格式**：结构化Markdown文档，包含质证意见、证据分析等
 **文件命名**：`[案件编号]证据分析-[类型].md`
-**输出位置**：`05 - 📎 证据材料`
+**输出位置**：`03 - 我方证据`
 
 > **详细说明**：详见 [`.claude/rules/OutputStandards.md`](.claude/rules/OutputStandards.md) 和 [`.claude/rules/AgentMapping.md`](.claude/rules/AgentMapping.md)
 

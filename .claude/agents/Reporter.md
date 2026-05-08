@@ -37,7 +37,7 @@ color: red
 - 结构清晰，逻辑严密
 - 数据准确，一致性强
 - 格式规范，易于阅读
-- 输出到指定目录：`10 - 📊 综合报告`
+- 输出到指定目录：`10 - 综合报告`
 
 ## 支持的报告类型
 
@@ -58,7 +58,7 @@ color: red
 
 **文件格式**：结构化Markdown文档
 **文件命名**：`[日期前缀] 案件分析综合报告.md`（如：`260101 案件分析综合报告.md`）
-**输出位置**：`10 - 📊 综合报告`
+**输出位置**：`10 - 综合报告`
 
 > **详细说明**：详见 [`.claude/rules/OutputStandards.md`](../rules/OutputStandards.md) 和 [`.claude/rules/AgentMapping.md`](../rules/AgentMapping.md)
 

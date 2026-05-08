@@ -39,28 +39,29 @@ color: blue
 
 ## 输出要求
 
-- 使用结构化Markdown格式
-- 同时生成.yaml结构化数据文件
+- 结构化期限数据写入 `matter.yaml`（root level）的关键日期与里程碑字段
+- 工时与费用追加到 `工时记录.md`（root level）
+- 期限提醒类一次性 .md 报告写入 `02 - 法律研究/案件分析/`（如需归档）
 - 期限信息必须准确，考虑节假日因素
-- 输出到指定目录：`00 - 📅 日程管理`
 
 ## 工作流程
 
 1. **接收案件要素**：DocAnalyzer传递的案件基本信息
 2. **创建管理文件**：生成[案件编号].yaml和[案件编号].md
 3. **期限初始化**：计算案件相关法定期限
-4. **工作区建立**：创建12层标准目录结构
+4. **工作区建立**：调起 new-case skill 创建标准案件目录结构（11 numbered slots + matter triplet + 工时记录.md）
 5. **状态记录**：标记案件初始状态
 6. **持续更新**：根据工作进展更新案件状态
 
 ## 📋 输出标准
 
-**文件格式**：Markdown文档 + YAML结构化数据
-**文件命名**：
-- 工时记录：`[案件编号]工时记录.md`（持续维护文件，无日期前缀）
-- 期限管理：`[案件编号].yaml`（结构化数据）
-- 期限提醒：`[日期前缀] 期限提醒.md`（一次性输出）
-**输出位置**：`00 - 📅 日程管理`
+**文件格式**：YAML 结构化数据 + Markdown
+**文件命名与位置**：
+- 工时记录：`工时记录.md`（root level，持续维护文件，无日期前缀）
+- 期限管理：`matter.yaml`（root level，对应字段更新；不再单独写 `[案件编号].yaml`）
+- 期限提醒：`[日期前缀] 期限提醒.md`（一次性输出，落 `02 - 法律研究/案件分析/`）
+
+**重要变更（v3.0+）**：Scheduler 不再使用独立的 numbered slot。结构化期限合并入 `matter.yaml`，工时记录提升到 root level。
 
 > **详细说明**：详见 [`.claude/rules/OutputStandards.md`](../rules/OutputStandards.md) 和 [`.claude/rules/AgentMapping.md`](../rules/AgentMapping.md)
 
