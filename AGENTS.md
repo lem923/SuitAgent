@@ -80,13 +80,12 @@ SuitAgent 的部分 Agent 不内嵌方法论，而是调起外部 skill 作为 s
 | `cn-contract-review-gov-tech-dev` | ContractReviewer | 政企技术采购 / 委托开发 / 系统集成合同审查 | 用户全局 skill 库 |
 | `cn-contract-review-gov-tech-licensing` | ContractReviewer | 专利 / 软著 / 技术许可合同审查 | 用户全局 skill 库 |
 | `cn-contract-review-labor-employment` | ContractReviewer | 劳动 / 劳务 / 竞业限制 / 保密协议审查 | 用户全局 skill 库 |
+| `cn-jiubufa-case-analysis` | JiubufaAnalyst | 要件审判九步法（请求权基础穷举 / 构成要件归入 / 举证责任矩阵 / 证据缺口清单 / 胜诉概率区间） | 用户全局 skill 库 |
+| `cn-judgment-analysis` | JudgmentReviewer | 判决书 IRAC 反向还原 / 程序瑕疵审查 / 再审与检察监督可行性研判 / 救济路径概率对比 | 用户全局 skill 库 |
 
 ### Advisory 依赖（推荐使用，缺失不阻塞）
 
-| Skill | 推荐被调起方 | 触发场景 |
-|-------|------------|---------|
-| `cn-jiubufa-case-analysis` | IssueIdentifier、Strategist | 深度争点结构分析（请求权基础穷举 / 要件归入 / 九步法底稿） |
-| `cn-judgment-analysis` | DocAnalyzer、Strategist | 判决书 IRAC 反向还原 / 程序瑕疵审查 / 再审与检察监督可行性研判 |
+（Phase 2C 之后 jiubufa / judgment-analysis 已升级为必需依赖；目前无 advisory 依赖项。本表保留作未来扩展位。）
 
 ### 与项目内置 skill 的关系
 

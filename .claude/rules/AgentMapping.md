@@ -1,6 +1,6 @@
 # Agent 目录映射与案件结构
 
-**版本**: v3.1
+**版本**: v3.2
 **最后更新**: 2026-05-08
 **说明**: 定义统一的案件目录结构（11 numbered slots + 4 root level files）与 Agent 输出映射关系
 
@@ -89,6 +89,16 @@ SuitAgent 采用四层架构：
 - **主要输出**: `02 - 法律研究/案件分析/`
 - **功能**：SWOT、策略制定、风险评估
 
+#### JiubufaAnalyst
+- **主要输出**: `02 - 法律研究/案件分析/`（九步法分析底稿、要件归入对照表、证据缺口清单）
+- **触发阈值**: 复杂案件（请求权基础 ≥ 3）/ 起诉答辩前置 / 再审监督评估前置
+- **功能**：调起 cn-jiubufa-case-analysis skill 完成 9 步结构化分析；不替代 IssueIdentifier 的轻量提取
+
+#### JudgmentReviewer
+- **主要输出**: `02 - 法律研究/案件分析/`（判决书审查报告、救济路径对比表、程序瑕疵清单）
+- **触发阈值**: post-judgment 阶段（用户问"能不能再审/上诉/监督/异议"）
+- **功能**：调起 cn-judgment-analysis skill 完成 IRAC 反向还原与救济路径概率评估；不与 Reviewer（QA agent）混淆
+
 ### 📝 输出层 — 文书生成与报告
 
 #### Writer
@@ -134,7 +144,7 @@ SuitAgent 采用四层架构：
 | `00 - 客户提供/` | DocAnalyzer（解析）、ContractReviewer（合同输入接收）、人工归档 |
 | `01 - 委托材料/` | Writer（生成委托文件） |
 | `02 - 法律研究/` (root of slot) | Researcher |
-| `02 - 法律研究/案件分析/` | DocAnalyzer、IssueIdentifier、Strategist、ContractReviewer |
+| `02 - 法律研究/案件分析/` | DocAnalyzer、IssueIdentifier、Strategist、ContractReviewer、JiubufaAnalyst、JudgmentReviewer |
 | `03 - 我方证据/` | EvidenceAnalyzer（我方部分） |
 | `04 - 对方证据/` | DocAnalyzer（解析对方证据）、EvidenceAnalyzer（对方部分） |
 | `05 - 我方法律文书/` | Writer |
@@ -167,6 +177,7 @@ SuitAgent 采用四层架构：
 
 | 版本 | 日期 | 更新内容 |
 | :--- | :--- | :--- |
+| v3.2 | 2026-05-08 | Phase 2C：新增 JiubufaAnalyst（九步法分析）+ JudgmentReviewer（判决书评审）两个方法论 agent，均输出到 `02 - 法律研究/案件分析/` |
 | v3.1 | 2026-05-08 | Phase 2B：新增 ContractReviewer agent（合同审查编排器），输入 `00 - 客户提供/`，输出 `02 - 法律研究/案件分析/` |
 | v3.0 | 2026-05-08 | Phase 2A 重构：12 层带 emoji → 11 numbered slots（无 emoji） + 4 root level 文件（matter triplet + 工时记录），新增 99 复盘沉淀，引入 per-case AGENTS.md |
 | v2.3 | 2026-01-01 | 明确文档职责边界，目录结构与映射关系 |

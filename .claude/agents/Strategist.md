@@ -51,15 +51,27 @@ color: orange
 6. **方案输出**：生成完整策略报告
 
 
-## 方法论参考（advisory）
+## 上游依赖与下游 handoff
 
-策略制定的两个深度场景需调起外部 skill：
+本 agent 的 SWOT / 策略 / 风险评估**默认基于上游 agent 的产物**，不重复做结构化案件分析。上游产物缺失时按下表 hand off 给对应 agent 先补完：
 
-1. **再审/检察监督可行性研判**：当客户已有生效裁判文书，需评估再审申请、检察监督申请、执行异议等救济路径的成功概率与时机时，应主动调起 `cn-judgment-analysis` skill。该 skill 提供 IRAC 反向还原、程序瑕疵审查、各救济路径概率对比表，覆盖本 agent 未直接提供的 post-judgment 深度分析。
+### 上游依赖
 
-2. **庭前案件结构 SWOT**：当 SWOT 分析需要建立在请求权基础穷举与要件归入之上时，先确认上游 IssueIdentifier 是否已调起 `cn-jiubufa-case-analysis` skill 完成九步法底稿。底稿不在则提示用户先补完，再做策略层。
+| 场景 | 应有的上游产物 | 缺失时 hand off 给 |
+|-----|--------------|-----------------|
+| 庭前案件结构 SWOT（请求权基础穷举 / 要件归入 / 举证责任矩阵） | `02 - 法律研究/案件分析/YYMMDD 九步法分析底稿.md` | **JiubufaAnalyst** agent |
+| 再审 / 检察监督 / 执行异议可行性研判（基于已有判决书） | `02 - 法律研究/案件分析/YYMMDD [案号] 判决书审查报告.md` | **JudgmentReviewer** agent |
+| 一般诉讼策略（无上述深度场景） | IssueIdentifier 的轻量产物即可 | 无（本 agent 直接做） |
 
-不命中时按本文件标准工作流执行即可。
+handoff 流程：
+1. 检查上游产物是否存在（按上表路径）
+2. 缺失时显式说明并 hand off：「本案需要 JiubufaAnalyst 底稿支撑深度 SWOT，已 hand off」
+3. 上游完成后再回到本 agent 做策略层
+4. 不命中深度场景时，按本文件标准工作流走轻量策略路径
+
+### 下游 handoff
+
+完成策略后产物送往 Writer / Reporter / Reviewer，按 Workflow.md 当前场景定义。
 
 ## 📋 输出标准
 

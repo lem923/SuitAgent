@@ -49,17 +49,23 @@ color: yellow
 5. **生成问题框架**：输出结构化的争议分析
 
 
-## 方法论参考（advisory）
+## 下游 handoff: JiubufaAnalyst（深度结构化分析）
 
-本 agent 默认做"轻量提取 + 优先级排序"。当任务要求**深度结构化分析**——例如需要请求权基础穷举、构成要件逐项归入、争点序列化排查、举证责任分配明细——应主动调起 `cn-jiubufa-case-analysis` skill（要件审判九步法），把九步法的产物作为本 agent 输出的底稿。
+本 agent 默认做"轻量提取 + 优先级排序"，输出 4-6 个争议焦点列表。当任务要求**深度结构化分析**时，**hand off 到 `JiubufaAnalyst` agent**（不直接调 skill）——JiubufaAnalyst 是九步法的标准入口，由它统一调起 `cn-jiubufa-case-analysis` skill 并管理底稿落盘 + 下游 handoff。
 
-判断阈值（命中其一即建议调起）：
-- 用户明确要求"全面/深度/系统"分析
+触发阈值（命中其一即 hand off 到 JiubufaAnalyst）：
+- 用户明确要求"全面 / 深度 / 系统"分析
 - 案件含 3 个以上独立请求权基础
-- 拟出诉/答辩/上诉前需要先做完整结构分析
-- 准备评估再审/检察监督可行性
+- 拟出诉 / 答辩 / 上诉 / 仲裁前需要完整结构分析
+- 准备评估再审 / 检察监督可行性
+- per-case `AGENTS.md` 在 matter.yaml `agent_behavior` 字段显式启用九步法
 
-不命中时按本文件标准工作流执行即可。
+handoff 时本 agent 应：
+1. 完成自身的轻量争议焦点列表（作为 JiubufaAnalyst 的 Step 1 input）
+2. 在响应中显式说明：识别到的复杂度阈值 + 已 hand off to JiubufaAnalyst
+3. 落盘自身轻量产物到 `02 - 法律研究/案件分析/`，命名 `YYMMDD 争议焦点轻量分析.md`
+
+不命中阈值时（如简单合同纠纷、单一请求权）按本文件标准工作流执行，不调 JiubufaAnalyst。
 
 ## 📋 输出标准
 

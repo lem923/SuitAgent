@@ -48,6 +48,39 @@
 
 ---
 
+### 🧩 JiubufaAnalyst Agent - 要件审判九步法分析师
+**触发关键词**:
+- 要件审判、九步法、要件分析、要件归入
+- 请求权基础、抗辩权基础、构成要件
+- 案件评估、胜诉率、胜诉概率、能不能赢、有没有戏、怎么打
+- 全面分析、深度分析、系统分析（结合诉讼/案件上下文）
+
+**路由规则**: 检测到上述任一关键词 + 案件复杂度阈值（请求权 ≥3 / 起诉答辩前置 / 再审监督评估前置）→ 立即调用 JiubufaAnalyst Agent
+
+**JiubufaAnalyst 内部流程（orchestrator 模式）**:
+- 调起 `cn-jiubufa-case-analysis` skill 完成 9 步结构化分析
+- 不替代 IssueIdentifier 的轻量提取（轻量场景 IssueIdentifier 即可）
+- 详见 `.claude/agents/JiubufaAnalyst.md` 的"触发阈值"
+
+---
+
+### 🔬 JudgmentReviewer Agent - 裁判文书深度审查器
+**触发关键词**:
+- 判决分析、裁定分析、调解书分析、裁判文书分析
+- 上诉策略、再审申请、检察监督、执行异议
+- 以鉴代审、胜败原因、裁判理由、法院认为、本院认为
+- 能不能再审、有没有监督价值、判得对不对
+
+**路由规则**: 检测到上述任一关键词 + post-judgment 阶段（已有生效裁判文书）→ 立即调用 JudgmentReviewer Agent
+
+**JudgmentReviewer 内部流程（orchestrator 模式）**:
+- 调起 `cn-judgment-analysis` skill 完成 5 步评审（文书画像 → 争议反向还原 → 证据认定拆解 → IRAC 重建 → 救济路径评估）
+- 上游接 DocAnalyzer 的事实抽取产物，不重复抽事实
+- **本 agent 不是质量审查器（Reviewer）**，是判决书的法律层评审
+- 详见 `.claude/agents/JudgmentReviewer.md` 的"触发阈值"
+
+---
+
 ### 🔍 Researcher Agent - 法律研究
 **触发关键词**:
 - "法律研究"、"法理研究"
@@ -243,12 +276,13 @@
 **工作流步骤**：
 1. **DocAnalyzer** (分析起诉状) → [内嵌验证]
 2. **IssueIdentifier** (识别争议焦点) → [内嵌验证]
-3. **Researcher** (法律检索) → [内嵌验证]
-4. **Strategist** (制定应诉策略) → [专项审查]
-5. **Writer** (起草答辩状) → [专项审查]
-6. **Reviewer** (自动触发，质量审查) → [跨Agent质量把关]
-7. **Summarizer** (生成摘要) → [内嵌验证]
-8. **Reporter** (整合报告) → [最终审查]
+3. **JiubufaAnalyst** (九步法深度结构化分析，仅在复杂阈值命中时触发) → [可选]
+4. **Researcher** (法律检索) → [内嵌验证]
+5. **Strategist** (制定应诉策略) → [专项审查]
+6. **Writer** (起草答辩状) → [专项审查]
+7. **Reviewer** (自动触发，质量审查) → [跨Agent质量把关]
+8. **Summarizer** (生成摘要) → [内嵌验证]
+9. **Reporter** (整合报告) → [最终审查]
 
 **预期输出**：争议焦点分析、法律检索报告、应诉策略方案、答辩状草稿、证据清单、完整案件报告
 
@@ -272,11 +306,12 @@
 **触发关键词**：庭审结束、分析庭审、调整策略
 
 **工作流步骤**：
-1. **DocAnalyzer** (庭审笔录分析)
-2. **EvidenceAnalyzer** (对比前后证据)
-3. **Strategist** (调整策略)
-4. **Summarizer** (庭审摘要)
-5. **Reporter** (阶段报告)
+1. **DocAnalyzer** (庭审笔录分析；如已下达判决书一并抽事实)
+2. **JudgmentReviewer** (判决书深度评审，仅在 post-judgment 阶段触发) → [可选]
+3. **EvidenceAnalyzer** (对比前后证据)
+4. **Strategist** (调整策略；如有 JudgmentReviewer 救济路径表则基于其选具体救济)
+5. **Summarizer** (庭审摘要)
+6. **Reporter** (阶段报告)
 
 ### 场景4：法律服务方案
 
@@ -316,12 +351,13 @@
 **工作流步骤**：
 1. **DocAnalyzer** (案件材料分析)
 2. **IssueIdentifier** (识别争议焦点)
-3. **Researcher** (法律检索)
-4. **EvidenceAnalyzer** (证据分析)
-5. **Writer** (起草起诉状)
-6. **Writer** (制作证据目录)
-7. **Summarizer** (案件摘要)
-8. **Reporter** (整合完整起诉包)
+3. **JiubufaAnalyst** (九步法深度结构化分析，复杂阈值命中时触发) → [可选]
+4. **Researcher** (法律检索)
+5. **EvidenceAnalyzer** (证据分析)
+6. **Writer** (起草起诉状)
+7. **Writer** (制作证据目录)
+8. **Summarizer** (案件摘要)
+9. **Reporter** (整合完整起诉包)
 
 **预期输出**：案件争议焦点分析、法律检索报告、起诉状草稿、证据目录、案件分析摘要、完整起诉材料包
 
@@ -364,6 +400,27 @@
 - 签署前必查清单（agent 响应内嵌）
 
 **特色**：自动识别合同类型并分流到 4 个专门 skill 之一；多类目命中时显式提示次类目补充审查路径
+
+### 场景9：判决书深度评估（含再审/监督可行性）
+
+**描述**：客户已收到生效裁判文书（判决/裁定/调解书），需评估上诉/再审/检察监督/执行异议的成功概率与时机
+
+**触发关键词**：能不能再审、判得对不对、要不要上诉、有没有监督价值、判决分析、裁定分析
+
+**工作流步骤**：
+1. **DocAnalyzer** (判决书事实抽取：判项/证据/时间线/双方主张)
+2. **JudgmentReviewer** (5 步评审：文书画像 → 争议反向还原 → 证据认定拆解 → IRAC 重建 → 救济路径概率)
+3. **Strategist** (基于救济路径表选定具体救济，权衡时效与概率)
+4. **可选 - Writer** (按选定救济路径起草上诉状/再审申请书/检察监督申请书，调起 cn-litigation-drafting skill 模板 C/D/E)
+5. **Reviewer** (跨 agent 质量把关)
+
+**预期输出**：
+- 判决书审查报告（RED/ORANGE/YELLOW 三级问题清单）→ `02 - 法律研究/案件分析/YYMMDD [案号] 判决书审查报告.md`
+- 救济路径对比表（成功率 + 时效）→ `02 - 法律研究/案件分析/YYMMDD [案号] 救济路径对比表.md`
+- 时效预警（≤30 天救济期限红色加粗）
+- 可选：选定路径的诉讼文书草稿 → `05 - 我方法律文书/`
+
+**特色**：JudgmentReviewer 主动核查各救济路径的法定时效（民事 15 日上诉、再审 6 月、检察监督 2 年），客户接近时效届满时在响应顶部红色预警
 
 ## 路由执行流程
 
@@ -408,9 +465,11 @@
 |-------|----------|---------------|
 | Writer | cn-litigation-drafting / cn-firm-documents | — |
 | ContractReviewer | cn-contract-review-universal / -gov-tech-dev / -gov-tech-licensing / -labor-employment | — |
-| IssueIdentifier | — | cn-jiubufa-case-analysis |
-| Strategist | — | cn-jiubufa-case-analysis（间接，通过 IssueIdentifier 底稿）/ cn-judgment-analysis |
-| DocAnalyzer | — | cn-judgment-analysis（处理判决书时） |
+| **JiubufaAnalyst** | **cn-jiubufa-case-analysis** | — |
+| **JudgmentReviewer** | **cn-judgment-analysis** | — |
+| IssueIdentifier | — | hand off to JiubufaAnalyst（深度场景） |
+| Strategist | — | hand off to JiubufaAnalyst（庭前 SWOT 深度场景）/ JudgmentReviewer（再审/监督场景） |
+| DocAnalyzer | — | hand off to JudgmentReviewer（判决书 post-judgment 场景） |
 
 详细说明见 `AGENTS.md` 的"外部 skill 桥接"段。
 

@@ -5,6 +5,40 @@
 
 ---
 
+## [v1.5.0] - 2026-05-08 — Phase 2C: 建 JiubufaAnalyst + JudgmentReviewer agents
+
+### ➕ 新增 (Added)
+
+- **`.claude/agents/JiubufaAnalyst.md`**：要件审判九步法分析师（orchestrator 模式），调起 `cn-jiubufa-case-analysis` skill 完成 9 步结构化分析（请求权基础穷举 → 构成要件归入 → 举证责任矩阵 → 证据缺口清单 → 胜诉概率区间）
+- **`.claude/agents/JudgmentReviewer.md`**：裁判文书深度审查器（orchestrator 模式），调起 `cn-judgment-analysis` skill 完成 5 步评审（文书画像 → 争议反向还原 → 证据认定拆解 → IRAC 重建 → 救济路径概率评估）。**与 SuitAgent 既有 `Reviewer`（QA 质量审查器）功能完全不同**——两者命名相似但职能正交：JudgmentReviewer 是法律层评审；Reviewer 是 cross-agent QA
+- **新工作流场景 9（判决书深度评估）**：DocAnalyzer → JudgmentReviewer → Strategist → 可选 Writer（按选定救济路径起草上诉/再审/监督文书）
+- **救济路径时效预警**：JudgmentReviewer 必查项，对各路径法定时效（民事 15 日上诉、再审 6 月、检察监督 2 年、执行异议 15 日）主动核查并在响应中预警
+
+### 🔄 调整 (Changed)
+
+- **IssueIdentifier.md / Strategist.md / DocAnalyzer.md** 的 Phase 1 advisory 升级为"hand off to agent"模式：不再直接调 skill，改为按阈值 hand off 给对应 orchestrator agent（JiubufaAnalyst / JudgmentReviewer）
+  - `IssueIdentifier`：深度场景 → hand off to **JiubufaAnalyst**
+  - `DocAnalyzer`：post-judgment 场景 → hand off to **JudgmentReviewer**
+  - `Strategist`：庭前 SWOT 深度场景 → 期待上游 JiubufaAnalyst 底稿；再审/监督场景 → hand off to JudgmentReviewer
+- **Workflow.md 工作流场景 1 / 3 / 6 升级**：在 IssueIdentifier 后插入 JiubufaAnalyst 节点（复杂阈值命中时触发）；DocAnalyzer 后插入 JudgmentReviewer 节点（post-judgment 时触发）
+- **AgentMapping.md v3.2**：分析层加 JiubufaAnalyst + JudgmentReviewer；反向映射 `02 - 法律研究/案件分析/` 列加两个新 agent
+- **OutputStandards.md v1.5**：标准输出表加 JiubufaAnalyst + JudgmentReviewer 行
+- **AGENTS.md 必需依赖表**：`cn-jiubufa-case-analysis` 与 `cn-judgment-analysis` 从 Advisory 升级为**必需依赖**（被两个新 agent 必需调起）
+
+### 📐 设计要点
+
+- **JiubufaAnalyst 不替代 IssueIdentifier**：轻量场景下 IssueIdentifier 的 4-6 个争议点列表已足够；只有触发阈值（请求权 ≥3 / 起诉答辩前置 / 再审监督评估前置）命中时才 hand off 到 JiubufaAnalyst
+- **JudgmentReviewer 不替代 DocAnalyzer**：纯归档/检索/事实摘录由 DocAnalyzer 完成；post-judgment 法律层评审才 hand off
+- **JudgmentReviewer 与 Reviewer 命名说明**：两 agent 文件顶部均明示"职能不同"以避免协作者混淆
+- **per-case AGENTS.md 控制开关**：每案 matter.yaml 的 `agent_behavior` 字段可关闭九步法 / 判决书评审等深度功能（默认全开）
+- **search-first 强约束**：JudgmentReviewer 涉及法定时效引用必须 web_search 核对现行有效版本（参 CLAUDE.md），不凭训练数据
+
+### 🚫 不在 Phase 2C
+
+- 改 cn-jiubufa-case-analysis / cn-judgment-analysis skill 内容（read-only + 框架良好）
+- 实质性 Workflow 路由机制重构（→ Phase 4，本 Phase 仅做加 trigger 关键词与场景节点的浅层调整）
+- 命名规范统一（Reviewer / JudgmentReviewer 命名相近但暂不改 → Phase 3 决定）
+
 ## [v1.4.0] - 2026-05-08 — Phase 2B: 建 ContractReviewer agent
 
 ### ➕ 新增 (Added)
