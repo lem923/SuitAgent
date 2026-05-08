@@ -1,6 +1,6 @@
 # Agent输出标准规范
 
-**版本**: 1.3
+**版本**: 1.4
 **最后更新**: 2026-05-08
 **说明**: 定义所有Agent输出文件的命名规范、格式标准和质量要求（注：Agent目录映射关系详见 AgentMapping.md）
 
@@ -56,6 +56,7 @@
 | **Researcher** | 一次性 | `YYMMDD 法律研究报告.md` | 法律研究成果 |
 | **Strategist** | 一次性 | `YYMMDD 应诉策略方案.md` | 策略分析结果 |
 | **Writer** | 一次性 | `YYMMDD [文书类型].md` | 各类法律文书 |
+| **ContractReviewer** | 一次性 | `YYMMDD [合同名] 审查报告.md` + `YYMMDD [合同名] 红线版.docx` | 合同审查报告与红线版 |
 | **Summarizer** | 一次性 | `YYMMDD [摘要类型]摘要.md` | 各类摘要报告 |
 | **Reporter** | 一次性 | `YYMMDD [报告类型]报告.md` | 综合分析报告 |
 | **Scheduler** | 持续维护 | `工时记录.md`（root level） | 工时记录文档（不加日期，案件根目录） |
@@ -369,6 +370,7 @@ AGENTS.md
 
 | 版本 | 日期 | 更新内容 |
 | :--- | :--- | :--- |
+| v1.4 | 2026-05-08 | Phase 2B：新增 ContractReviewer 标准输出行 |
 | v1.3 | 2026-05-08 | Phase 2A 同步：Scheduler 持续维护文件迁到案件根目录（matter.yaml + 工时记录.md），不再单独 `[案件编号].yaml` |
 | v1.2 | 2026-01-01 | 明确文档职责边界，专注于文件命名和格式标准，目录映射移至AgentMapping.md |
 | v1.1 | 2026-01-01 | 新增日期前缀强制要求，区分一次性输出文件和持续维护文件 |

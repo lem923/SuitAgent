@@ -70,12 +70,16 @@ SuitAgent 是面向律师的诉讼辅助系统，通过10个专业Agent处理诉
 
 SuitAgent 的部分 Agent 不内嵌方法论，而是调起外部 skill 作为 single source of truth。安装/同步这些 skill 到本机才能让对应 Agent 完整工作。
 
-### 必需依赖（缺失则 Writer 退化为兜底手工模式）
+### 必需依赖（缺失则对应 agent 退化为兜底手工模式）
 
 | Skill | 被依赖方 | 用途 | 来源 |
 |-------|---------|------|------|
 | `cn-litigation-drafting` | Writer | 诉讼文书起草（起诉状/答辩状/上诉状/再审/检察监督/代理词/质证意见书/财产保全/证据清单/仲裁/反诉等 11 类） | 用户全局 skill 库 |
 | `cn-firm-documents` | Writer | 律所对外/对客户文书（律师函/委托代理协议/授权委托书/法律意见书/谈话笔录/调解协议/离婚协议审阅/刑事格式文书等） | 用户全局 skill 库 |
+| `cn-contract-review-universal` | ContractReviewer | 通用商事合同审查（买卖/租赁/服务/框架/M&A/股权等，兜底） | 用户全局 skill 库 |
+| `cn-contract-review-gov-tech-dev` | ContractReviewer | 政企技术采购 / 委托开发 / 系统集成合同审查 | 用户全局 skill 库 |
+| `cn-contract-review-gov-tech-licensing` | ContractReviewer | 专利 / 软著 / 技术许可合同审查 | 用户全局 skill 库 |
+| `cn-contract-review-labor-employment` | ContractReviewer | 劳动 / 劳务 / 竞业限制 / 保密协议审查 | 用户全局 skill 库 |
 
 ### Advisory 依赖（推荐使用，缺失不阻塞）
 

@@ -1,6 +1,6 @@
 # Agent 目录映射与案件结构
 
-**版本**: v3.0
+**版本**: v3.1
 **最后更新**: 2026-05-08
 **说明**: 定义统一的案件目录结构（11 numbered slots + 4 root level files）与 Agent 输出映射关系
 
@@ -97,6 +97,12 @@ SuitAgent 采用四层架构：
 - **特殊场景**: 法律意见书 / 代理方案 / 风险评估 → `02 - 法律研究/案件分析/` 或 `10 - 综合报告/`
 - **功能**：调起 cn-litigation-drafting / cn-firm-documents skill 起草文书
 
+#### ContractReviewer
+- **主要输出**: `02 - 法律研究/案件分析/`（审查报告 + 红线 DOCX）
+- **输入接收位**: `00 - 客户提供/`（待审合同原件）
+- **特殊场景**: 客户要求"代理方案 / 法律意见书"形式 → 调起 cn-firm-documents skill，落 `02/案件分析/` 或 `10 - 综合报告/`
+- **功能**：合同类型识别 + 自动分流到 4 个 cn-contract-review-* skill；不审查我方主动起草的新文书（那是 Writer 的事）
+
 #### Reporter
 - **主要输出**: `10 - 综合报告/`
 - **功能**：整合所有内容生成综合报告
@@ -125,10 +131,10 @@ SuitAgent 采用四层架构：
 | `matter_dashboard.md` (root) | 人读 / Scheduler（关键日期更新可同步） |
 | `AGENTS.md` (root) | 案件创建时定稿 / 所有 agent（读） |
 | `工时记录.md` (root) | Scheduler、承办律师 |
-| `00 - 客户提供/` | DocAnalyzer（解析）、人工归档 |
+| `00 - 客户提供/` | DocAnalyzer（解析）、ContractReviewer（合同输入接收）、人工归档 |
 | `01 - 委托材料/` | Writer（生成委托文件） |
 | `02 - 法律研究/` (root of slot) | Researcher |
-| `02 - 法律研究/案件分析/` | DocAnalyzer、IssueIdentifier、Strategist |
+| `02 - 法律研究/案件分析/` | DocAnalyzer、IssueIdentifier、Strategist、ContractReviewer |
 | `03 - 我方证据/` | EvidenceAnalyzer（我方部分） |
 | `04 - 对方证据/` | DocAnalyzer（解析对方证据）、EvidenceAnalyzer（对方部分） |
 | `05 - 我方法律文书/` | Writer |
@@ -161,6 +167,7 @@ SuitAgent 采用四层架构：
 
 | 版本 | 日期 | 更新内容 |
 | :--- | :--- | :--- |
+| v3.1 | 2026-05-08 | Phase 2B：新增 ContractReviewer agent（合同审查编排器），输入 `00 - 客户提供/`，输出 `02 - 法律研究/案件分析/` |
 | v3.0 | 2026-05-08 | Phase 2A 重构：12 层带 emoji → 11 numbered slots（无 emoji） + 4 root level 文件（matter triplet + 工时记录），新增 99 复盘沉淀，引入 per-case AGENTS.md |
 | v2.3 | 2026-01-01 | 明确文档职责边界，目录结构与映射关系 |
 | v2.2 | 2026-01-01 | 整合 v2.1 与案件模板使用指南 |

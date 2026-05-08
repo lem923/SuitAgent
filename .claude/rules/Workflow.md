@@ -29,6 +29,25 @@
 
 ---
 
+### 📑 ContractReviewer Agent - 合同审查编排器
+**触发关键词**:
+- 合同审查、合同审阅、合同修改、红线审查、合同风险评估、签署前检查、合同把关
+- 看一下这份合同、这合同有什么问题、合同有没有坑、帮我把把关
+- 审查雇佣合同、审查劳动合同、审查竞业、审查保密协议
+- 审查技术许可、审查专利授权、审查软著许可
+- 审查政府采购、审查 SI / 委托开发、审查信息化项目合同
+
+**路由规则**: 检测到上述任一关键词 → 立即调用 ContractReviewer Agent
+
+**ContractReviewer 内部分流（orchestrator 模式）**:
+- 政企技术采购 / 委托开发 → `cn-contract-review-gov-tech-dev` skill
+- 专利 / 软著 / 技术许可 → `cn-contract-review-gov-tech-licensing` skill
+- 劳动 / 雇佣 / 竞业 → `cn-contract-review-labor-employment` skill
+- 其他商事合同（兜底）→ `cn-contract-review-universal` skill
+- 详见 `.claude/agents/ContractReviewer.md` 的"自动路由判断逻辑"
+
+---
+
 ### 🔍 Researcher Agent - 法律研究
 **触发关键词**:
 - "法律研究"、"法理研究"
@@ -327,6 +346,25 @@
 
 **特色功能**：自动模板选择（公司/个人）、Word格式输出、占位符映射、批量生成
 
+### 场景8：合同审查
+
+**描述**：审查既有合同的风险、合规问题、商业不利条款；输出 REDLINE/ORANGE/YELLOW 报告与红线 DOCX
+
+**触发关键词**：审查合同、合同把关、红线审查、签署前检查、合同有什么问题
+
+**工作流步骤**：
+1. **DocAnalyzer** (合同解析：双方主体、标的、金额、期限、争议解决条款) → 落 `02 - 法律研究/案件分析/`
+2. **ContractReviewer** (合同类型识别 + 路由到对应 cn-contract-review-* skill) → skill 完成 4-stage（Prepare/Review/Discuss/Execute/Learn）
+3. **Reviewer** (跨 agent 质量把关) → 必要时返工
+4. **可选 - Writer** (仅当用户明确要求"重新拟定一份"时触发，起草修订版)
+
+**预期输出**：
+- 审查报告（REDLINE/ORANGE/YELLOW 分级）→ `02 - 法律研究/案件分析/YYMMDD [合同名] 审查报告.md`
+- 红线 DOCX（execute 阶段产出）→ `02 - 法律研究/案件分析/YYMMDD [合同名] 红线版.docx`
+- 签署前必查清单（agent 响应内嵌）
+
+**特色**：自动识别合同类型并分流到 4 个专门 skill 之一；多类目命中时显式提示次类目补充审查路径
+
 ## 路由执行流程
 
 ### 路由优先级规则
@@ -369,6 +407,7 @@
 | Agent | 必需 skill | Advisory skill |
 |-------|----------|---------------|
 | Writer | cn-litigation-drafting / cn-firm-documents | — |
+| ContractReviewer | cn-contract-review-universal / -gov-tech-dev / -gov-tech-licensing / -labor-employment | — |
 | IssueIdentifier | — | cn-jiubufa-case-analysis |
 | Strategist | — | cn-jiubufa-case-analysis（间接，通过 IssueIdentifier 底稿）/ cn-judgment-analysis |
 | DocAnalyzer | — | cn-judgment-analysis（处理判决书时） |

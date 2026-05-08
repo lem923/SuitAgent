@@ -5,6 +5,38 @@
 
 ---
 
+## [v1.4.0] - 2026-05-08 — Phase 2B: 建 ContractReviewer agent
+
+### ➕ 新增 (Added)
+
+- **`.claude/agents/ContractReviewer.md`**：合同审查编排器（orchestrator 模式），thin wrapper 分流 4 个 cn-contract-review-* skill
+  - 政企技术采购 / 委托开发 / 系统集成 → `cn-contract-review-gov-tech-dev`
+  - 专利 / 软著 / 技术许可 → `cn-contract-review-gov-tech-licensing`
+  - 劳动 / 劳务 / 竞业 / 保密 → `cn-contract-review-labor-employment`
+  - 其他商事合同（买卖 / 租赁 / 服务 / 框架 / M&A / 股权等，兜底） → `cn-contract-review-universal`
+- **新工作流场景 8（合同审查）**：DocAnalyzer（合同解析）→ ContractReviewer（路由 skill）→ Reviewer（质量把关）→ 可选 Writer（修订重签）
+- **`Workflow.md` 触发关键词扩充**：合同审查、合同审阅、红线审查、签署前检查、合同把关、看一下这份合同、合同有没有坑等
+- **`AGENTS.md` 必需依赖表**：ContractReviewer 的 4 个 cn-contract-review-* skill 全部纳入
+
+### 🔄 调整 (Changed)
+
+- `AgentMapping.md` v3.1：输出层加 ContractReviewer 段；反向映射 `00 - 客户提供/`（合同输入）与 `02 - 法律研究/案件分析/`（审查产出）补 ContractReviewer
+- `OutputStandards.md` v1.4：标准输出表加 ContractReviewer 行（`YYMMDD [合同名] 审查报告.md` + `YYMMDD [合同名] 红线版.docx`）
+- `Workflow.md` "外部 skill 桥接" 表加 ContractReviewer 必需依赖
+
+### 📐 设计要点
+
+- **与 Writer 边界划分**：Writer = 我方主动起草新文书；ContractReviewer = 审查既有合同（对方草拟 / 第三方拟 / 我方旧合同复审）。客户要求"重新拟一份"时先 ContractReviewer 审查 → 用户确认 → 再调 Writer
+- **多类目命中**：合同同时含技术许可 + 劳动条款时按主类目优先调起，并显式提示次类目可能需要补充审查
+- **两种工作模式**：matter 内审查（推荐）+ 独立审查（无诉讼上下文，需先用 new-case 建独立 matter）
+- **memory.md 不归 SuitAgent 管辖**：cn-contract-review-* skill 的 Prepare/Learn 阶段读写 `memory.md`（在 skill 路径内，本机），ContractReviewer 不接管
+- **execute 阶段输出 redirect**：cn-contract-review-* skill 默认输出到 `/mnt/user-data/outputs/`，ContractReviewer 必须把红线 DOCX 移动到案件 slot
+
+### 🚫 不在 Phase 2B
+
+- JiubufaAnalyst / JudgmentReviewer 两个新 agent → Phase 2C
+- 改 4 个 cn-contract-review-* skill 内容（read-only + 框架良好）
+
 ## [v1.3.0] - 2026-05-08 — Phase 2A: 案件目录结构统一
 
 ### 🏗️ 重构 (Refactored, BREAKING)
