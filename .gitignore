@@ -45,6 +45,12 @@ status/
 # 案件目录（格式：YYMM... 当事人 案由，必定包含中文，与其他纯英文目录区分）
 [0-9][0-9][0-9][0-9]*/
 
+# 案件草稿/中间产物（可能含 client identifier，禁止上传）
+tmp/
+
+# Claude Code 本地 worktree（不入仓）
+.claude/worktrees/
+
 # 输入输出目录（由 skill 运行时使用）
 input/
 output/
@@ -62,6 +68,7 @@ output/
 
 # 模板文件（律所专用模板）
 .claude/skills/md2word/assets/templates/剑桥颐华律所模板.docx
+.claude/skills/docx/china_law_firm_template.md
 
 # MinerU OCR 归档文件
 .claude/skills/mineru-ocr/archive/

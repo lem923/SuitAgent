@@ -28,6 +28,15 @@ SuitAgent 是面向律师的诉讼辅助系统，通过10个专业Agent处理诉
 - ALWAYS prefer editing an existing file to creating a new one.
 - NEVER proactively create documentation files (*.md) unless requested.
 
+## 律所文件起草规范（对客户文书）
+
+涉及律所对客户的代理方案、法律意见书、风险评估等正式文书：
+
+- **措辞克制**：避免胜负宣告、不堆砌强断言、派生金额用范围词
+- **封面排版**：参考律所样本（仿宋三号 + 宋体 22pt 标题），阶段+文书类型合并为单行
+- **生成 docx**：套用 `.claude/skills/docx/china_law_firm_template.md` 的格式参数
+- **措辞规则细节**：详见 `cn-firm-documents` skill 的 `references/client-doc-style-rules.md`
+
 ## 规范文件索引（按需查阅）
 
 | 目录 | 何时查阅 |
