@@ -73,6 +73,18 @@ DocAnalyzer处理PDF文档时，必须遵循统一PDF处理规范。
 - OCR识别准确率：> 95%
 - 关键字段准确率：100%
 
+
+## 方法论参考（advisory）
+
+DocAnalyzer 处理判决书/裁定书/调解书时，**仅做事实抽取与结构化**（当事人、案号、判项、证据列表、时间线）。判决书的**裁判逻辑反向还原、IRAC 重构、程序瑕疵审查、救济路径研判**不在本 agent 范围——这些需调起 `cn-judgment-analysis` skill 处理，DocAnalyzer 把抽取的事实作为该 skill 的 input。
+
+触发场景（命中其一即提示用户调起 cn-judgment-analysis）：
+- 用户上传判决书/裁定书并询问"能不能再审/上诉/监督"
+- 用户要求分析法院裁判理由是否成立
+- 案件进入 post-judgment 阶段（败诉方咨询救济路径）
+
+纯粹的判决书归档/检索/事实摘录任务不必调起 skill。
+
 ## 📋 输出标准
 
 DocAnalyzer输出文件必须遵循以下规范：

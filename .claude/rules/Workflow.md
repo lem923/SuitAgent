@@ -13,23 +13,19 @@
 
 ## 立即路由规则表
 
-### 📝 Writer Agent - 文书起草
+### 📝 Writer Agent - 文书起草编排器（orchestrator 模式）
 **触发关键词**:
-- "写起诉状"、"起草起诉状"
-- "写答辩状"、"起草答辩状"
-- "写代理词"、"起草代理词"
-- "写上诉状"、"起草上诉状"
-- "写申请书"、"起草申请书"
-- "写质证意见"、"起草质证意见"
-- "写法律意见书"、"起草法律意见书"
-- "写证据目录"、"制作证据目录"
-- "写委托合同"、"起草委托合同"
-- "写授权委托书"、"起草授权委托书"
-- "写谈话笔录"、"起草谈话笔录"
-- "写催款函"、"起草催款函"
-- "写法律文书"、"起草法律文书"
+- 诉讼文书：写/起草 起诉状、答辩状、上诉状、再审申请、检察监督申请、代理词、质证意见、财产保全申请、证据清单、仲裁申请书、反诉状
+- 律所对客户文书：写/起草 律师函、催款函、委托合同、委托代理协议、授权委托书、谈话笔录、法律意见书、调解协议、离婚协议、刑事格式文书
+- 通用：写/起草 法律文书
 
-**路由规则**: 检测到上述任一关键词 → 立即调用Writer Agent
+**路由规则**: 检测到上述任一关键词 → 立即调用 Writer Agent
+
+**Writer 内部分流（orchestrator）**:
+- 诉讼文书 → Writer 调起 `cn-litigation-drafting` skill（必需依赖）
+- 律所对客户文书 → Writer 调起 `cn-firm-documents` skill（必需依赖）
+- 详见 `.claude/agents/Writer.md` 的"文书路由表"
+
 
 ---
 
@@ -364,6 +360,20 @@
 | **代理词起草** | 庭前或庭后起草代理词 |
 | **案件进展总结** | 阶段性总结汇报 |
 | **风险评估报告** | 专门的风险评估 |
+
+
+## 外部 skill 桥接（v2.1）
+
+部分 Agent 不内嵌方法论，而是 orchestrate 到外部 skill。Workflow 路由表的逻辑只到 Agent 层；具体 skill 调起由 Agent 自身决定。
+
+| Agent | 必需 skill | Advisory skill |
+|-------|----------|---------------|
+| Writer | cn-litigation-drafting / cn-firm-documents | — |
+| IssueIdentifier | — | cn-jiubufa-case-analysis |
+| Strategist | — | cn-jiubufa-case-analysis（间接，通过 IssueIdentifier 底稿）/ cn-judgment-analysis |
+| DocAnalyzer | — | cn-judgment-analysis（处理判决书时） |
+
+详细说明见 `AGENTS.md` 的"外部 skill 桥接"段。
 
 ## 配置维护
 

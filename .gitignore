@@ -70,6 +70,9 @@ output/
 .claude/skills/md2word/assets/templates/剑桥颐华律所模板.docx
 .claude/skills/docx/china_law_firm_template.md
 
+# 律所专用 skill（含具体律所名/客户对接文书规则，本地保留不入仓）
+cn-firm-documents/
+
 # MinerU OCR 归档文件
 .claude/skills/mineru-ocr/archive/
 

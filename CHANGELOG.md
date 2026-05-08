@@ -1,9 +1,39 @@
 # 变更记录
 
-> Last updated: 2026-04-02
+> Last updated: 2026-05-08
 > 所有对用户或其他协作者有影响的变更都会在此记录。使用 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/) 格式。
 
 ---
+
+## [v1.2.0] - 2026-05-08 — Phase 1: 合并冗余
+
+### 🔄 重构 (Refactored)
+
+- **Writer agent 重写为 orchestrator 模式**：删除内嵌的 13 类文书模板与质量红线，改为路由分流
+  - 诉讼文书 → 调起 `cn-litigation-drafting` skill（必需依赖）
+  - 律所对客户文书 → 调起 `cn-firm-documents` skill（必需依赖）
+  - Writer 自身只负责上下文承接、文件落盘、命名规范、DOCX 生成
+- **方法论 single source of truth 上移到 skill 层**：起草标准、质量红线、模板结构由各 skill 统一维护，agent 不再各自维护一份
+
+### ➕ 新增 (Added)
+
+- **方法论 advisory 引用**：三个 agent 加上"方法论参考"段，明确深度场景下推荐调起的外部 skill
+  - `IssueIdentifier.md`：深度争点结构分析 → `cn-jiubufa-case-analysis` skill
+  - `Strategist.md`：再审/检察监督可行性研判 → `cn-judgment-analysis` skill
+  - `DocAnalyzer.md`：判决书 IRAC 反向还原 → `cn-judgment-analysis` skill
+- **AGENTS.md 新增"外部 skill 桥接"段**：登记必需依赖（cn-litigation-drafting / cn-firm-documents）与 advisory 依赖（cn-jiubufa-case-analysis / cn-judgment-analysis），交付者据此知道项目对外部 skill 的依赖关系
+- **Workflow.md 新增"外部 skill 桥接"小节**：路由表层补充"哪个 agent 该调哪个 skill"的对照表
+- **.gitignore 新增 `cn-firm-documents/`**：律所专用 skill（含具体律所名/对客户文书规则），与 `china_law_firm_template.md` 同性质私有
+
+### 📋 配套补强（Phase 1 仓库外）
+
+- 准备 `tmp/cn-litigation-drafting_SKILL_proposed.md`：cn-litigation-drafting skill 的提案稿，新增 11 项中尚缺的 6 类模板（代理词 F、质证意见书 G、财产保全 H、证据清单 I、仲裁申请书 J、反诉状 K）；用户本机复制到 `~/Library/Application Support/Claude/.../skills/cn-litigation-drafting/SKILL.md` 即生效
+- 6 类律所对客户文书（律师函、委托代理协议、授权委托书、谈话笔录、法律意见书、调解协议）已 verbatim 桥接到 `cn-firm-documents` skill 的现有 references；不再在 SuitAgent 内重复维护
+
+### ⚠️ 破坏性变更 (Breaking)
+
+- **Writer agent 不再独立工作**：失去内嵌模板，必须依赖 cn-litigation-drafting + cn-firm-documents skill。两 skill 缺失时退化到兜底手工模式（必须在响应中显式警告）
+- **AGENTS.md 中的"外部 skill 桥接"是新合规节点**：交付项目给协作者时必须确保这两个 skill 在他们机器上能解析到
 
 ## [v1.1.0] - 2026-04-02
 

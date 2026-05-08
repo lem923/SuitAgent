@@ -37,6 +37,33 @@ SuitAgent 是面向律师的诉讼辅助系统，通过10个专业Agent处理诉
 - **生成 docx**：套用 `.claude/skills/docx/china_law_firm_template.md` 的格式参数
 - **措辞规则细节**：详见 `cn-firm-documents` skill 的 `references/client-doc-style-rules.md`
 
+## 外部 skill 桥接
+
+SuitAgent 的部分 Agent 不内嵌方法论，而是调起外部 skill 作为 single source of truth。安装/同步这些 skill 到本机才能让对应 Agent 完整工作。
+
+### 必需依赖（缺失则 Writer 退化为兜底手工模式）
+
+| Skill | 被依赖方 | 用途 | 来源 |
+|-------|---------|------|------|
+| `cn-litigation-drafting` | Writer | 诉讼文书起草（起诉状/答辩状/上诉状/再审/检察监督/代理词/质证意见书/财产保全/证据清单/仲裁/反诉等 11 类） | 用户全局 skill 库 |
+| `cn-firm-documents` | Writer | 律所对外/对客户文书（律师函/委托代理协议/授权委托书/法律意见书/谈话笔录/调解协议/离婚协议审阅/刑事格式文书等） | 用户全局 skill 库 |
+
+### Advisory 依赖（推荐使用，缺失不阻塞）
+
+| Skill | 推荐被调起方 | 触发场景 |
+|-------|------------|---------|
+| `cn-jiubufa-case-analysis` | IssueIdentifier、Strategist | 深度争点结构分析（请求权基础穷举 / 要件归入 / 九步法底稿） |
+| `cn-judgment-analysis` | DocAnalyzer、Strategist | 判决书 IRAC 反向还原 / 程序瑕疵审查 / 再审与检察监督可行性研判 |
+
+### 与项目内置 skill 的关系
+
+| 项目内置 skill (`.claude/skills/*`) | 用途 |
+|-----------|------|
+| `docx` / `pptx` / `xlsx` / `pdf` / `mineru-ocr` / `md2word` | 文件格式处理工具层（Writer / DocAnalyzer / Reporter 调起） |
+| `new-case` | 案件目录脚手架生成（待 Phase 2 与 cn-litigation-case-folder-organizer 协调） |
+
+外部 skill 的引用路径在各 Agent 文件的"方法论参考"段中显式声明，不要硬编码本机绝对路径。
+
 ## 规范文件索引（按需查阅）
 
 | 目录 | 何时查阅 |
