@@ -5,6 +5,67 @@
 
 ---
 
+## [v1.9.0] - 2026-05-09 — Phase 6: 4 个 legal skill 内置到项目（含 BREAKING）
+
+### ⚠️ 破坏性变更 (Breaking)
+
+- **4 个核心 legal skill 直接内置到 `.claude/skills/`**：克隆仓库即可用，无需另行从用户全局 skill 库同步
+  - `cn-litigation-drafting`（11 模板版，A-K）：从 Phase 1 提案稿迁入
+  - `cn-jiubufa-case-analysis`（SKILL.md + 3 references）：从用户全局 skill 库迁入
+  - `cn-judgment-analysis`（SKILL.md）：从用户全局 skill 库迁入
+  - `cn-contract-review`（v1.8.0+ 统一版，92 个 .md）：从 `tmp/cn-contract-review_unified_proposed/` 迁入
+- 仅 `cn-firm-documents` 因含具体律所名/对客户文书规则，**保持外置**
+- 用户本机用户级 4 个旧 cn-contract-review-* specialized skill 与 4 个内置 skill 同名同位时，须手动废旧（保留 30 天备份后删）
+
+### 🔧 Skill 内 Chris 标识 scrub
+
+为支持公开 GitHub 发布与同事 fork，`cn-contract-review` 内 86 个含 "Chris" 字面的文件已批量 scrub：
+- `personal-preferences.md`：标题"当前审查人：Chris" → "默认审查偏好（项目继承自原作者，可由实际审查人覆盖）"
+- 80 个 contract-types/*.md 第 8 行 v1 marker：`chris-patterns` → `personal-preferences`
+- 4 个框架文件 v1 marker：`v1.1 待 Chris 复核` → `v1.1 待项目维护者复核`
+- LICENSE.txt：Copyright 由 `Chris (lem923/SuitAgent fork)` 改为 `SuitAgent contributors`
+
+**保留**：所有具体方法偏好（背靠背付款 / 通知送达 / 数据安全 / CNAS-CMA / 跨境法域选择等）作为项目默认设置；**默认审查偏好继承自原作者 Chris 的实战经验**，接手者可在 `personal-preferences.md` 覆盖。
+
+### 📋 License 处理
+
+`cn-contract-review` 是**双 license** skill（详见 `.claude/skills/cn-contract-review/NOTICE.md`）：
+- 60 个继承自 contract-copilot v1.5.1 的文件：受 **CC BY-NC 4.0** 约束（保留原 LICENSE.txt 作为下位许可）
+- 26 个 SuitAgent contributors 原创文件 + NOTICE.md：受**项目根 LICENSE（GNU AGPL v3）**约束
+
+其他 3 内置 skill（`cn-litigation-drafting` / `cn-jiubufa-case-analysis` / `cn-judgment-analysis`）全部受项目根 AGPL v3 约束，各 SKILL.md 末尾加 License 注释指向项目根 LICENSE。
+
+### 🔄 调整 (Changed)
+
+- **AGENTS.md**：
+  - "外部 skill 桥接" 必需依赖表 6 行 → 1 行（仅保留 `cn-firm-documents` 外置）
+  - "项目内置 skill 关系"表加 4 行（cn-litigation-drafting / cn-contract-review / cn-jiubufa-case-analysis / cn-judgment-analysis）
+  - skill 直接调用对照表标注每个 skill 的"项目内置/外置"位置
+- **Workflow.md**：skill 桥接表加"位置"列（项目内置 vs 外置）
+- **AgentMapping.md** v3.4：新增"项目内置 4 个 legal skill"段
+- **4 个 orchestrator agent**（Writer / ContractReviewer / JiubufaAnalyst / JudgmentAnalyzer）：必需依赖描述加项目内置路径标注
+- **README.md**：
+  - "外部 skill 依赖" 段重写为"skill 依赖"
+  - 项目内置 skill 表（5 行：4 内置 legal + docx 系列工具）
+  - 外置 skill 表（2 行：cn-firm-documents + cn-litigation-case-folder-organizer）
+  - 每行加 License 列
+  - 变更轨迹加 v1.9.0
+- **CHANGELOG.md** v1.9.0 BREAKING
+
+### 📐 设计要点
+
+- **公开 GitHub 暴露 cn-contract-review 完整方法论**：80+ 个 contract-types/ + 14 类合同审查口径全部进入公开仓库；CC BY-NC 4.0 限制商业再分发，AGPL v3 要求 fork 同样开源
+- **同事 fork 易用性**：内置后 clone 即用；`personal-preferences.md` 标题改为"默认审查偏好"便于同事改名为自己的口径
+- **License 兼容性**：项目根 AGPL v3 与 contract-copilot 上游 CC BY-NC 4.0 在同一文件不能合并 → 通过 NOTICE.md 显式分组保留各自约束
+- **git log author 字段**：本次 commit 仍以 `Chris <hetsong@gmail.com>` 签署（git 历史无法匿名）；skill 文件内不出现"Chris"
+
+### 🚫 不在 Phase 6
+
+- 用户本机废旧 4 个旧 cn-contract-review-* specialized + cn-litigation-drafting / cn-jiubufa-case-analysis / cn-judgment-analysis 全局 skill（用户本机操作；建议先备份再删）
+- v1.1 本土化校对（80 个 content 文件中 contract-copilot 继承的 60 个）—— 留待实战触发后逐项校对
+
+---
+
 ## [v1.8.0] - 2026-05-09 — Phase 5: 合同审查 skill 统一（4 → 1，含 BREAKING）
 
 ### ⚠️ 破坏性变更 (Breaking)

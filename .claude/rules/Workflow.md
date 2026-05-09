@@ -481,12 +481,13 @@
 
 部分 Agent 不内嵌方法论，而是 orchestrate 到外部 skill。Workflow 路由表的逻辑只到 Agent 层；具体 skill 调起由 Agent 自身决定。
 
-| Agent | 必需 skill | Advisory skill |
-|-------|----------|---------------|
-| Writer | cn-litigation-drafting / cn-firm-documents | — |
-| ContractReviewer | cn-contract-review（v1.8.0+ 统一版） | — |
-| **JiubufaAnalyst** | **cn-jiubufa-case-analysis** | — |
-| **JudgmentAnalyzer** | **cn-judgment-analysis** | — |
+| Agent | 必需 skill | 位置 | Advisory skill |
+|-------|----------|----|---------------|
+| Writer | cn-litigation-drafting | **项目内置** `.claude/skills/cn-litigation-drafting/` | — |
+| Writer | cn-firm-documents | **外置**（用户全局 skill 库） | — |
+| ContractReviewer | cn-contract-review（v1.8.0+ 统一版） | **项目内置** `.claude/skills/cn-contract-review/` | — |
+| **JiubufaAnalyst** | **cn-jiubufa-case-analysis** | **项目内置** `.claude/skills/cn-jiubufa-case-analysis/` | — |
+| **JudgmentAnalyzer** | **cn-judgment-analysis** | **项目内置** `.claude/skills/cn-judgment-analysis/` | — |
 | IssueIdentifier | — | hand off to JiubufaAnalyst（深度场景） |
 | Strategist | — | hand off to JiubufaAnalyst（庭前 SWOT 深度场景）/ JudgmentAnalyzer（再审/监督场景） |
 | DocAnalyzer | — | hand off to JudgmentAnalyzer（判决书 post-judgment 场景） |

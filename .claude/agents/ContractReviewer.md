@@ -7,7 +7,7 @@ color: magenta
 
 # ContractReviewer - 合同审查编排器（orchestrator）
 
-合同审查方法论本身**不在本 agent 内**——交给统一的 `cn-contract-review` skill 作为 single source of truth（**必需依赖**）。
+合同审查方法论本身**不在本 agent 内**——交给统一的 `cn-contract-review` skill 作为 single source of truth（**必需依赖，项目内置 `.claude/skills/cn-contract-review/`**）。
 
 skill 内部按 **14 类合同**自动路由（在 skill 自身的 SKILL.md 中定义路由规则；本 agent 不复制路由逻辑）：
 

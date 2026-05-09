@@ -68,17 +68,13 @@ SuitAgent 是面向律师的诉讼辅助系统，通过 13 个专业 agent 处�
 
 ## 外部 skill 桥接
 
-SuitAgent 的部分 Agent 不内嵌方法论，而是调起外部 skill 作为 single source of truth。安装/同步这些 skill 到本机才能让对应 Agent 完整工作。
+SuitAgent 的 4 个 orchestrator agent 不内嵌方法论，而是调起 skill 作为 single source of truth。v1.9.0+ 起，4 个核心 legal skill **直接内置于 `.claude/skills/`**（克隆仓库即可用），仅 `cn-firm-documents` 因含律所专用模板保持外置。
 
-### 必需依赖（缺失则对应 agent 退化为兜底手工模式）
+### 必需依赖（外置；缺失则对应 agent 退化为兜底手工模式）
 
 | Skill | 被依赖方 | 用途 | 来源 |
 |-------|---------|------|------|
-| `cn-litigation-drafting` | Writer | 诉讼文书起草（起诉状/答辩状/上诉状/再审/检察监督/代理词/质证意见书/财产保全/证据清单/仲裁/反诉等 11 类） | 用户全局 skill 库 |
-| `cn-firm-documents` | Writer | 律所对外/对客户文书（律师函/委托代理协议/授权委托书/法律意见书/谈话笔录/调解协议/离婚协议审阅/刑事格式文书等） | 用户全局 skill 库 |
-| `cn-contract-review` | ContractReviewer | **统一合同审查 skill（v1.8.0+）**：覆盖 14 类合同（通用商事 / 买卖 / 租赁 / 服务 / 知识产权与技术许可 / 担保 / 借贷赠与 / 互联网协议 / 婚姻家事 / 劳动雇佣 / 房地产 / 建设工程 / 公司投资 / 政企采购程序）；4-stage workflow（Prepare→Review→Discuss→Execute→Learn）；REDLINE/ORANGE/YELLOW + fallback 三档（目标/可签/底线）；playbook + personal-preferences 机制 | 用户全局 skill 库（取代旧 4 个 cn-contract-review-* specialized） |
-| `cn-jiubufa-case-analysis` | JiubufaAnalyst | 要件审判九步法（请求权基础穷举 / 构成要件归入 / 举证责任矩阵 / 证据缺口清单 / 胜诉概率区间） | 用户全局 skill 库 |
-| `cn-judgment-analysis` | JudgmentAnalyzer | 判决书 IRAC 反向还原 / 程序瑕疵审查 / 再审与检察监督可行性研判 / 救济路径概率对比 | 用户全局 skill 库 |
+| `cn-firm-documents` | Writer | 律所对外/对客户文书（律师函/委托代理协议/授权委托书/法律意见书/谈话笔录/调解协议/离婚协议审阅/刑事格式文书等）。**外置** —— 含具体律所名 / 对客户文书规则，律所专用，不入仓 | 用户全局 skill 库（外置） |
 
 ### Advisory 依赖（推荐使用，缺失不阻塞）
 
@@ -90,6 +86,10 @@ SuitAgent 的部分 Agent 不内嵌方法论，而是调起外部 skill 作为 s
 |-----------|------|
 | `docx` / `pptx` / `xlsx` / `pdf` / `mineru-ocr` / `md2word` | 文件格式处理工具层（Writer / DocAnalyzer / Reporter 调起） |
 | `new-case` | 案件目录脚手架生成（待 Phase 2 与 cn-litigation-case-folder-organizer 协调） |
+| **`cn-litigation-drafting`**（v1.9.0+ 内置） | Writer 调起；诉讼文书起草 11 类模板（起诉状 / 答辩状 / 上诉状 / 再审 / 检察监督 / 代理词 / 质证意见书 / 财产保全 / 证据清单 / 仲裁 / 反诉） |
+| **`cn-contract-review`**（v1.9.0+ 内置） | ContractReviewer 调起；统一合同审查 skill 覆盖 14 类（通用 / 买卖 / 租赁 / 服务 / 知识产权 / 担保 / 借贷赠与 / 互联网 / 婚姻家事 / 劳动 / 房地产 / 建设工程 / 公司投资 / 政企采购）；4-stage workflow + REDLINE/ORANGE/YELLOW + fallback 三档 + playbook 机制。**双 license**：详见 `.claude/skills/cn-contract-review/NOTICE.md` |
+| **`cn-jiubufa-case-analysis`**（v1.9.0+ 内置） | JiubufaAnalyst 调起；要件审判九步法（请求权基础穷举 / 构成要件归入 / 举证责任矩阵 / 证据缺口 / 胜诉概率区间） |
+| **`cn-judgment-analysis`**（v1.9.0+ 内置） | JudgmentAnalyzer 调起；判决书 IRAC 反向还原 + 程序瑕疵审查 + 救济路径概率对比 |
 
 外部 skill 的引用路径在各 Agent 文件的"方法论参考"段中显式声明，不要硬编码本机绝对路径。
 
@@ -102,10 +102,10 @@ SuitAgent 的部分 Agent 不内嵌方法论，而是调起外部 skill 作为 s
 
 | 用户提及的 skill | 调起的 agent |
 |------------------|------------|
-| `cn-litigation-drafting` / `cn-firm-documents` | Writer |
-| `cn-contract-review` | ContractReviewer |
-| `cn-jiubufa-case-analysis` | JiubufaAnalyst |
-| `cn-judgment-analysis` | JudgmentAnalyzer |
+| `cn-litigation-drafting`（项目内置）/ `cn-firm-documents`（外置） | Writer |
+| `cn-contract-review`（项目内置） | ContractReviewer |
+| `cn-jiubufa-case-analysis`（项目内置） | JiubufaAnalyst |
+| `cn-judgment-analysis`（项目内置） | JudgmentAnalyzer |
 | `cn-litigation-case-folder-organizer` | 不经 agent，由用户本机手动跑（保留人工确认） |
 | `new-case` | 不经 agent，由 Scheduler 在新案件场景中调起，或用户主动触发 |
 

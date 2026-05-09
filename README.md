@@ -12,7 +12,7 @@
 - [系统架构](#系统架构)
 - [13 个 Subagent](#13-个-subagent)
 - [案件目录结构](#案件目录结构)
-- [外部 skill 依赖](#外部-skill-依赖)
+- [skill 依赖](#skill-依赖)
 
 ---
 
@@ -159,17 +159,26 @@
 
 ---
 
-## 外部 skill 依赖
+## skill 依赖
 
-本项目的 4 个 orchestrator agent 不内嵌方法论，而是调起外部 skill 作为 single source of truth。安装/同步这些 skill 到本机才能让对应 agent 完整工作。
+本项目的 4 个 orchestrator agent 调起 skill 作为方法论 single source of truth。**v1.9.0+ 起，4 个核心 legal skill 直接内置于 `.claude/skills/`，克隆仓库即可用**；仅 `cn-firm-documents` 因含律所专用模板保持外置。
+
+### 项目内置 skill（克隆仓库即可用）
+
+| Skill | 路径 | 被依赖方 | 用途 | License |
+|-------|------|---------|------|---------|
+| `cn-litigation-drafting` | `.claude/skills/cn-litigation-drafting/` | Writer | 诉讼文书起草 11 类模板（起诉状 / 答辩状 / 上诉状 / 再审 / 检察监督 / 代理词 / 质证意见书 / 财产保全 / 证据清单 / 仲裁 / 反诉） | AGPL v3 |
+| `cn-contract-review` | `.claude/skills/cn-contract-review/` | ContractReviewer | 统一合同审查 skill 覆盖 14 类（通用 / 买卖 / 租赁 / 服务 / 知识产权 / 担保 / 借贷赠与 / 互联网 / 婚姻家事 / 劳动 / 房地产 / 建设工程 / 公司投资 / 政企采购）；4-stage workflow + REDLINE/ORANGE/YELLOW + fallback 三档 + playbook 机制 | **双 license**：60 个继承自 contract-copilot v1.5.1 的文件受 CC BY-NC 4.0；其余 26 个原创文件受项目根 AGPL v3。详见 `.claude/skills/cn-contract-review/NOTICE.md` |
+| `cn-jiubufa-case-analysis` | `.claude/skills/cn-jiubufa-case-analysis/` | JiubufaAnalyst | 要件审判九步法（请求权基础穷举 / 构成要件归入 / 举证责任矩阵 / 证据缺口 / 胜诉概率区间） | AGPL v3 |
+| `cn-judgment-analysis` | `.claude/skills/cn-judgment-analysis/` | JudgmentAnalyzer | 判决书 IRAC 反向还原 + 程序瑕疵审查 + 救济路径概率对比 | AGPL v3 |
+| `docx` / `pptx` / `xlsx` / `pdf` / `mineru-ocr` / `md2word` / `new-case` | `.claude/skills/<name>/` | 多 agent 调起 | 文件格式处理工具层 + 案件目录脚手架 | 项目根 LICENSE |
+
+### 外置 skill（用户全局 skill 库；克隆仓库后另行同步）
 
 | Skill | 被依赖方 | 用途 |
 |-------|---------|------|
-| `cn-litigation-drafting` | Writer | 诉讼文书起草（起诉状 / 答辩状 / 上诉状 / 再审 / 检察监督 / 代理词 / 质证意见书 / 财产保全 / 证据清单 / 仲裁 / 反诉 共 11 类模板） |
-| `cn-firm-documents` | Writer | 律所对外/对客户文书（律师函 / 委托代理协议 / 授权委托书 / 法律意见书 / 谈话笔录 / 调解协议 / 离婚协议审阅 / 刑事格式文书） |
-| `cn-contract-review` | ContractReviewer | **统一合同审查 skill（v1.8.0+）**：覆盖 14 类合同（通用商事 / 买卖 / 租赁 / 服务 / 知识产权与技术许可 / 担保 / 借贷赠与 / 互联网协议 / 婚姻家事 / 劳动雇佣 / 房地产 / 建设工程 / 公司投资 / 政企采购程序）；4-stage workflow + REDLINE/ORANGE/YELLOW + fallback 三档（目标/可签/底线）+ playbook + personal-preferences 机制（取代旧 4 个 cn-contract-review-* specialized） |
-| `cn-jiubufa-case-analysis` | JiubufaAnalyst | 要件审判九步法 9 步结构化分析 |
-| `cn-judgment-analysis` | JudgmentAnalyzer | 判决书 IRAC 反向还原 + 救济路径概率评估 |
+| `cn-firm-documents` | Writer | 律所对外/对客户文书（律师函 / 委托代理协议 / 授权委托书 / 法律意见书 / 谈话笔录 / 调解协议 / 离婚协议审阅 / 刑事格式文书）。**外置** —— 含具体律所名 / 对客户文书规则，律所专用，不入仓 |
+| `cn-litigation-case-folder-organizer` | 用户手动触发（非 agent 流程） | 把任意杂乱案件文件夹整理为本项目标准结构 |
 
 详见 [`AGENTS.md`](AGENTS.md) 的"外部 skill 桥接"段。
 
@@ -181,6 +190,7 @@
 完整变更见 [`CHANGELOG.md`](CHANGELOG.md)。本 fork 在原项目基础上的迭代轨迹：
 
 ```
+v1.9.0 phase6!  4 个 legal skill 内置到 .claude/skills/（仅 cn-firm-documents 外置）
 v1.8.0 phase5!  合同审查 skill 统一（4 个 cn-contract-review-* → 1 个 cn-contract-review，14 类合同全覆盖）
 v1.7.0 phase4   强化触发与路由（路由精度 + Reviewer 覆盖 + skill 入口标准化）
 v1.6.0 phase3!  命名规范清理（JudgmentReviewer → JudgmentAnalyzer BREAKING）

@@ -7,7 +7,7 @@ color: indigo
 
 # JiubufaAnalyst - 要件审判九步法分析师（orchestrator）
 
-九步法方法论本身**不在本 agent 内**——交给 `cn-jiubufa-case-analysis` skill 作为 single source of truth（**必需依赖**）。
+九步法方法论本身**不在本 agent 内**——交给 `cn-jiubufa-case-analysis` skill 作为 single source of truth（**必需依赖，项目内置 `.claude/skills/cn-jiubufa-case-analysis/`**）。
 
 JiubufaAnalyst 只负责 SuitAgent 工程包装层：判定何时该跑九步法、把上游 context 喂给 skill、把 skill 的结构化产物落盘到案件 slot、向下游 agent（Strategist / Writer）做结构化 handoff。
 

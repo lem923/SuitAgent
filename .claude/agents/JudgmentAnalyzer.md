@@ -9,7 +9,7 @@ color: brown
 
 > **重要：本 agent 不是质量审查器（Reviewer）。** SuitAgent 既有的 `Reviewer` agent 是 cross-agent 质量把关（QA layer），不参与法律分析。本 agent（JudgmentAnalyzer）是**裁判文书的法律层评审**——反向还原法院裁判逻辑、找漏洞、评估救济路径。Phase 3 已将本 agent 从 JudgmentReviewer 改名为 JudgmentAnalyzer，套用 DocAnalyzer / EvidenceAnalyzer 的 -Analyzer 后缀，避免与 Reviewer 字符重叠。
 
-裁判文书分析方法论本身**不在本 agent 内**——交给 `cn-judgment-analysis` skill 作为 single source of truth（**必需依赖**）。
+裁判文书分析方法论本身**不在本 agent 内**——交给 `cn-judgment-analysis` skill 作为 single source of truth（**必需依赖，项目内置 `.claude/skills/cn-judgment-analysis/`**）。
 
 JudgmentAnalyzer 只负责 SuitAgent 工程包装层：判定何时该跑判决书深度评审、把上游 context 喂给 skill、把 skill 的结构化产物落盘到案件 slot、向下游 agent（Strategist / Writer）做结构化 handoff。
 

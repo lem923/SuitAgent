@@ -1,6 +1,6 @@
 # Agent 目录映射与案件结构
 
-**版本**: v3.3
+**版本**: v3.4
 **最后更新**: 2026-05-09
 **说明**: 定义统一的案件目录结构（11 numbered slots + 4 root level files）与 Agent 输出映射关系
 
@@ -168,6 +168,10 @@ SuitAgent 采用四层架构：
 ### 与外部 organizer skill 的关系
 - `cn-litigation-case-folder-organizer` 默认 14-slot 方案与本规范一致（00-09 + 99）
 - 本规范新增 `10 - 综合报告/` slot，外部 skill 应同步加（patch 见 `tmp/cn-litigation-case-folder-organizer_补丁.md`）
+
+### 项目内置 4 个 legal skill（v1.9.0+）
+- `cn-litigation-drafting` / `cn-contract-review` / `cn-jiubufa-case-analysis` / `cn-judgment-analysis` 均位于 `.claude/skills/` 内，由对应 orchestrator agent 调起；克隆仓库即可用
+- 仅 `cn-firm-documents` 因含律所专用模板保持外置
 
 ### 与旧 12 层结构的迁移
 - 当前真实案件文件夹（如 260507 / 260508）按旧 12 层结构组织，迁移由用户在本机用 organizer skill 跑（迁移说明见 `tmp/案件迁移说明.md`）

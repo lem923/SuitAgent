@@ -9,8 +9,8 @@ color: cyan
 
 起草方法论本身**不在 Writer 内**——交给两个外部 skill 作为 single source of truth：
 
-- 诉讼文书 → `cn-litigation-drafting` skill（**必需依赖**）
-- 律所对外/对客户文书 → `cn-firm-documents` skill（**必需依赖**）
+- 诉讼文书 → `cn-litigation-drafting` skill（**必需依赖，项目内置 `.claude/skills/cn-litigation-drafting/`**）
+- 律所对外/对客户文书 → `cn-firm-documents` skill（**必需依赖，外置**——用户全局 skill 库）
 
 Writer 自身只负责 SuitAgent 工程包装层：上下文承接、文件落盘、命名规范、DOCX 生成。两件事不要混。
 

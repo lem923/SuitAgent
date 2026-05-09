@@ -1,0 +1,40 @@
+Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)
+
+Copyright (c) 2026 SuitAgent contributors and contract-copilot upstream
+contributors (inherited 14-category contract-types/ structure).
+
+You are free to:
+  * Share — copy and redistribute the material in any medium or format
+  * Adapt — remix, transform, and build upon the material
+
+Under the following terms:
+  * Attribution — You must give appropriate credit, provide a link to the
+    license, and indicate if changes were made.
+  * NonCommercial — You may not use the material for commercial purposes.
+
+No additional restrictions — You may not apply legal terms or technological
+measures that legally restrict others from doing anything the license permits.
+
+Notices:
+  * You do not have to comply with the license for elements of the material
+    in the public domain or where your use is permitted by an applicable
+    exception or limitation.
+  * No warranties are given. The license may not give you all of the
+    permissions necessary for your intended use.
+
+Full legal text: https://creativecommons.org/licenses/by-nc/4.0/legalcode
+
+---
+
+This skill incorporates content from:
+- contract-copilot v1.5.1 (12-category contract-types/, review-framework,
+  revision-strategy) — license CC BY-NC 4.0
+- cn-contract-review prototype + 4 specialized skills (cn-contract-review-
+  universal/-gov-tech-dev/-gov-tech-licensing/-labor-employment) — SuitAgent
+  contributors' original work
+
+Distributed under CC BY-NC 4.0 to remain consistent with the upstream
+contract-copilot license. Lawyers and legal teams may freely use, modify,
+and share this skill for non-commercial purposes (including internal firm
+use). Commercial redistribution requires a separate agreement with the
+authors.
