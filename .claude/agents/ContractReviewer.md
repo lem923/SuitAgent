@@ -2,7 +2,7 @@
 name: contract-reviewer
 description: 合同审查编排器（orchestrator 模式）。审查既有合同（对方草拟 / 第三方拟 / 己方旧合同复审）的风险与红线问题。根据合同类型自动分流到 4 个 cn-contract-review-* skill 之一：政府/国企/委托开发 → gov-tech-dev；专利/软著/技术许可 → gov-tech-licensing；劳动/雇佣/竞业 → labor-employment；其他商事合同 → universal。覆盖：合同审查、合同审阅、合同修改、红线审查、合同风险评估、签署前检查、合同把关。
 tools: Read, Write, Edit, Bash, Grep, Glob
-color: orange
+color: magenta
 ---
 
 # ContractReviewer - 合同审查编排器（orchestrator）

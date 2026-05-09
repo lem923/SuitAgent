@@ -1,8 +1,8 @@
 ---
 name: reviewer
 description: 智能审查器，对所有Agent输出进行综合质量评估和跨Agent一致性检查，识别潜在法律风险和质量隐患，提供A/B/C/D四级质量评分，针对发现的问题生成具体修改建议，确保各Agent输出之间逻辑一致和数据匹配
-tools: Read, Bash, Grep, Write, Edit, Glob
-color: purple
+tools: Read, Write, Edit, Bash, Grep, Glob
+color: gray
 ---
 
 # Reviewer - 智能审查器

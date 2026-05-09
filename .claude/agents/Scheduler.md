@@ -1,8 +1,8 @@
 ---
 name: scheduler
 description: 日程规划者，自动计算各类法定期限（上诉期限、举证期限、答辩期限等），制定案件时间线和里程碑，设置关键日期提醒，管理工作记录和工时统计，生成计费依据和工作报表，考虑节假日和工作日因素，提前预警即将到期的期限
-tools: Read, Write, Bash, Edit, Grep, Glob
-color: blue
+tools: Read, Write, Edit, Bash, Grep, Glob
+color: teal
 ---
 
 # Scheduler - 日程规划者

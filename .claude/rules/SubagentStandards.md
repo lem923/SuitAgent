@@ -1,7 +1,7 @@
 # Subagent配置标准规范
 
-**版本**: 2.0
-**最后更新**: 2026-01-01
+**版本**: 3.1
+**最后更新**: 2026-05-08
 **说明**: 基于Claude Code官方规范制定的SuitAgent Subagent统一配置标准
 
 ## 📋 规范依据
@@ -32,15 +32,21 @@ color: blue
 | :------------ | :--- | :----------------------------------------------------------- |
 | `name`        | ✅   | 唯一标识符，使用小写字母和连字符（如：`doc-analyzer`）       |
 | `description` | ✅   | 简洁的用途描述，用于主Agent自动路由决策                      |
-| `tools`       | ⚪   | 逗号分隔的工具列表                                           |
-| `color`       | ⚪   | Agent显示颜色（可选）                                        |
+| `tools`       | ⚪   | 逗号分隔的工具列表（顺序按下列约定）                         |
+| `color`       | ⚪   | Agent 显示颜色，13 个 agent 互不重复（见下表）              |
 
 **⚠️ 注意事项**：
 
-- name必须唯一且符合格式规范
-- description应具体且以行动为导向，便于自动路由
-- tools使用逗号分隔格式，不使用JSON数组
-- Skill由主Agent按需加载，不在Subagent配置中声明
+- name 必须唯一且符合格式规范
+- description 应具体且以行动为导向，便于自动路由
+- tools 使用逗号分隔格式，不使用 JSON 数组
+- **tools 字段顺序约定（v3.1+）**：`Read, Write, Edit, Bash, Grep, Glob`（文件操作组优先 → shell → 搜索 → 全局匹配）。如需 WebSearch / WebFetch 追加在末尾
+- **color 字段约定（v3.1+）**：13 个 agent 颜色互不重复，按层级分配：
+  - 输入层：blue (DocAnalyzer)、green (EvidenceAnalyzer)
+  - 分析层：yellow (IssueIdentifier)、purple (Researcher)、orange (Strategist)、indigo (JiubufaAnalyst)、brown (JudgmentAnalyzer)
+  - 输出层：cyan (Writer)、magenta (ContractReviewer)、pink (Summarizer)、red (Reporter)
+  - 支持层：teal (Scheduler)、gray (Reviewer)
+- Skill 由主 Agent 按需加载，不在 Subagent 配置中声明
 
 ### 1.2 Markdown内容（核心）
 
@@ -255,7 +261,7 @@ EvidenceAnalyzer输出文件必须遵循以下规范：
 
 - [ ] 使用准确的法律专业术语
 - [ ] 明确定义与其他Agent的协作关系
-- [ ] 案件输出目录符合12层结构规范
+- [ ] 案件输出目录符合 11-slot 目录结构规范
 - [ ] 文件命名遵循案件编号规则
 - [ ] 上下文继承机制完整（引用共享规则）
 - [ ] 无重复或冗余内容（引用共享规则而非重复定义）
@@ -284,7 +290,7 @@ EvidenceAnalyzer输出文件必须遵循以下规范：
 
 1. **法律专业性** - 使用准确的法律术语，确保专业性和严谨性
 2. **工作流连贯** - 明确定义与其他Agent的协作关系，确保自动触发机制
-3. **目录规范** - 严格遵循12层目录结构，文件命名遵循案件编号规则
+3. **目录规范** - 严格遵循 11-slot 目录结构，文件命名遵循案件编号规则
 4. **上下文继承** - 利用`.claude/rules/`中的共享规则，确保输出一致性
 5. **质量标准** - 每个Agent都应具备内嵌验证或专项审查机制
 

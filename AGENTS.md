@@ -2,7 +2,7 @@
 
 ## 系统定位
 
-SuitAgent 是面向律师的诉讼辅助系统，通过10个专业Agent处理诉讼全生命周期的分析工作。
+SuitAgent 是面向律师的诉讼辅助系统，通过 13 个专业 agent 处理诉讼全生命周期的分析工作（含合同审查、要件审判九步法、判决书深度评审三个方法论入口）。
 
 ## 核心工作模式
 
@@ -81,7 +81,7 @@ SuitAgent 的部分 Agent 不内嵌方法论，而是调起外部 skill 作为 s
 | `cn-contract-review-gov-tech-licensing` | ContractReviewer | 专利 / 软著 / 技术许可合同审查 | 用户全局 skill 库 |
 | `cn-contract-review-labor-employment` | ContractReviewer | 劳动 / 劳务 / 竞业限制 / 保密协议审查 | 用户全局 skill 库 |
 | `cn-jiubufa-case-analysis` | JiubufaAnalyst | 要件审判九步法（请求权基础穷举 / 构成要件归入 / 举证责任矩阵 / 证据缺口清单 / 胜诉概率区间） | 用户全局 skill 库 |
-| `cn-judgment-analysis` | JudgmentReviewer | 判决书 IRAC 反向还原 / 程序瑕疵审查 / 再审与检察监督可行性研判 / 救济路径概率对比 | 用户全局 skill 库 |
+| `cn-judgment-analysis` | JudgmentAnalyzer | 判决书 IRAC 反向还原 / 程序瑕疵审查 / 再审与检察监督可行性研判 / 救济路径概率对比 | 用户全局 skill 库 |
 
 ### Advisory 依赖（推荐使用，缺失不阻塞）
 

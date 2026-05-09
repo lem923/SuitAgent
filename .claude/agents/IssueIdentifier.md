@@ -1,7 +1,7 @@
 ---
 name: issue-identifier
 description: 法律争议焦点识别器，从案件材料中提取和归类核心法律争议点，分析当事人之间的法律关系，匹配相关法律条文并生成结构化问题框架，按优先级评估争议问题的复杂度
-tools: Read, Bash, Grep, Write, Edit, Glob
+tools: Read, Write, Edit, Bash, Grep, Glob
 color: yellow
 ---
 

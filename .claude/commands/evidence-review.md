@@ -1,3 +1,8 @@
+---
+name: evidence-review
+description: 对新证据进行全面的质证分析，评估证据三性（真实性、合法性、关联性），生成质证意见书与补充证据建议
+---
+
 # /evidence-review - 证据质证
 
 ## 功能说明

@@ -1,7 +1,7 @@
 ---
 name: summarizer
 description: 摘要生成器，生成各类法律摘要和简报（案件摘要、进展摘要、风险摘要、策略摘要、客户汇报摘要），支持多层次摘要（详细版、简洁版、要点版），自动提炼关键信息，支持图表和表格可视化，适配不同受众需求
-tools: Read, Write, Bash, Edit, Grep, Glob
+tools: Read, Write, Edit, Bash, Grep, Glob
 color: pink
 ---
 

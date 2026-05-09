@@ -1,7 +1,7 @@
 ---
 name: strategist
 description: 诉讼策略规划器，进行SWOT分析（优势、劣势、机会、威胁），制定多层次策略方案（进攻型、防守型、折中型），评估败诉风险和执行风险，计算成功概率，提出资源配置和成本效益建议
-tools: Read, Bash, Write, Edit, Grep, Glob
+tools: Read, Write, Edit, Bash, Grep, Glob
 color: orange
 ---
 
@@ -60,7 +60,7 @@ color: orange
 | 场景 | 应有的上游产物 | 缺失时 hand off 给 |
 |-----|--------------|-----------------|
 | 庭前案件结构 SWOT（请求权基础穷举 / 要件归入 / 举证责任矩阵） | `02 - 法律研究/案件分析/YYMMDD 九步法分析底稿.md` | **JiubufaAnalyst** agent |
-| 再审 / 检察监督 / 执行异议可行性研判（基于已有判决书） | `02 - 法律研究/案件分析/YYMMDD [案号] 判决书审查报告.md` | **JudgmentReviewer** agent |
+| 再审 / 检察监督 / 执行异议可行性研判（基于已有判决书） | `02 - 法律研究/案件分析/YYMMDD [案号] 判决书审查报告.md` | **JudgmentAnalyzer** agent |
 | 一般诉讼策略（无上述深度场景） | IssueIdentifier 的轻量产物即可 | 无（本 agent 直接做） |
 
 handoff 流程：
@@ -81,7 +81,7 @@ Strategist输出文件必须遵循以下规范：
 **文件命名**：`[日期前缀] 应诉策略方案.md`（如：`260101 应诉策略方案.md`）
 **输出位置**：`02 - 法律研究/案件分析`
 
-> **详细说明**：详见 [`.claude/rules/OutputStandards.md`](.claude/rules/OutputStandards.md) 和 [`.claude/rules/AgentMapping.md`](.claude/rules/AgentMapping.md)
+> **详细说明**：详见 [`.claude/rules/OutputStandards.md`](../rules/OutputStandards.md) 和 [`.claude/rules/AgentMapping.md`](../rules/AgentMapping.md)
 
 ## 后续工作指引
 

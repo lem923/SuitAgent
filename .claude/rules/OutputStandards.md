@@ -58,7 +58,7 @@
 | **Writer** | 一次性 | `YYMMDD [文书类型].md` | 各类法律文书 |
 | **ContractReviewer** | 一次性 | `YYMMDD [合同名] 审查报告.md` + `YYMMDD [合同名] 红线版.docx` | 合同审查报告与红线版 |
 | **JiubufaAnalyst** | 一次性 | `YYMMDD 九步法分析底稿.md`（+ 可选要件归入对照表 / 证据缺口清单） | 九步法结构化分析底稿 |
-| **JudgmentReviewer** | 一次性 | `YYMMDD [案号] 判决书审查报告.md`（+ 可选救济路径对比表 / 程序瑕疵清单） | 判决书 IRAC 反向还原 + 救济路径评估 |
+| **JudgmentAnalyzer** | 一次性 | `YYMMDD [案号] 判决书审查报告.md`（+ 可选救济路径对比表 / 程序瑕疵清单） | 判决书 IRAC 反向还原 + 救济路径评估 |
 | **Summarizer** | 一次性 | `YYMMDD [摘要类型]摘要.md` | 各类摘要报告 |
 | **Reporter** | 一次性 | `YYMMDD [报告类型]报告.md` | 综合分析报告 |
 | **Scheduler** | 持续维护 | `工时记录.md`（root level） | 工时记录文档（不加日期，案件根目录） |
@@ -372,7 +372,7 @@ AGENTS.md
 
 | 版本 | 日期 | 更新内容 |
 | :--- | :--- | :--- |
-| v1.5 | 2026-05-08 | Phase 2C：新增 JiubufaAnalyst + JudgmentReviewer 标准输出行 |
+| v1.5 | 2026-05-08 | Phase 2C：新增 JiubufaAnalyst + JudgmentAnalyzer 标准输出行 |
 | v1.4 | 2026-05-08 | Phase 2B：新增 ContractReviewer 标准输出行 |
 | v1.3 | 2026-05-08 | Phase 2A 同步：Scheduler 持续维护文件迁到案件根目录（matter.yaml + 工时记录.md），不再单独 `[案件编号].yaml` |
 | v1.2 | 2026-01-01 | 明确文档职责边界，专注于文件命名和格式标准，目录映射移至AgentMapping.md |

@@ -5,6 +5,43 @@
 
 ---
 
+## [v1.6.0] - 2026-05-08 — Phase 3: 命名规范与跨引用清理（含 BREAKING）
+
+### ⚠️ 破坏性变更 (Breaking)
+
+- **`JudgmentReviewer` agent 重命名为 `JudgmentAnalyzer`**：套用 DocAnalyzer / EvidenceAnalyzer 的 `-Analyzer` 后缀风格，彻底消除与 SuitAgent 既有 `Reviewer`（QA 质量审查器）的字符重叠
+  - 文件：`.claude/agents/JudgmentReviewer.md` → `.claude/agents/JudgmentAnalyzer.md`
+  - frontmatter：`name: judgment-reviewer` → `name: judgment-analyzer`
+  - 跨文件引用全部同步更新（AgentMapping / Workflow / OutputStandards / AGENTS / DocAnalyzer / Strategist 共 6 个文件）
+  - CHANGELOG 历史条目（v1.5.0）保留旧名作为变更记录，正文不动
+
+### 🔧 Bucket A · Hard violations 修正
+
+- `.claude/commands/evidence-review.md` 补 YAML frontmatter（违反 CommandMeta.md 已修）
+- `DocAnalyzer.md` / `EvidenceAnalyzer.md` / `Strategist.md` 共 6 处死链修正：`.claude/rules/...` → `../rules/...`（agents/ 内 .md 的相对路径）
+- `Writer.md`：'12 层映射' → '11-slot 目录映射'（Phase 2A 残留术语）
+- `deepresearch.md`：'12层目录集成' → '11-slot 目录集成'
+- `SubagentStandards.md` 第 258、287 行：'12 层结构规范' → '11-slot 目录结构规范'
+- `README.md`：'10 个 Subagent' 小节升级为 13 个 agent 表格 + 系统架构图升级（含 JiubufaAnalyst / JudgmentAnalyzer / ContractReviewer 三个 Phase 2 新增 agent）
+- `AGENTS.md` 第 5 行系统定位：'10 个专业 Agent' → '13 个专业 agent'
+
+### 🎨 Bucket B · 软整理（cosmetic 一致性）
+
+- **color 字段去重**：13 agent 颜色互不重复
+  - 调整：`Scheduler` blue → teal、`Reviewer` purple → gray、`ContractReviewer` orange → magenta、`JiubufaAnalyst` purple → indigo、`JudgmentAnalyzer`（原 JudgmentReviewer）red → brown
+- **tools 字段顺序统一**：所有 agent 改为 `Read, Write, Edit, Bash, Grep, Glob`（文件操作优先 → shell → 搜索 → 全局匹配；Researcher 末尾追加 WebSearch / WebFetch）
+- `SubagentStandards.md` v3.1：新增 tools 字段顺序约定与 color 字段去重约定（13 agent 配色表纳入规范）
+
+### 🚫 不在 Phase 3
+
+- description 风格升级（老 agent 短语连缀 vs 新 orchestrator 结构化）→ Phase 4 与触发关键词改造一起
+- new-case skill 内部 references 文件清理（属 skill 内部，不在本范围）
+- CHANGELOG 历史条目（v1.5.0 及更早，保留旧术语作为变更记录）
+- `JiubufaAnalyst` 拼音名（对中国诉讼律师反而直觉，不改）
+- `Reviewer` agent 命名（Survey 评估混淆风险低，已在 JudgmentAnalyzer 顶部明示边界，不动）
+
+---
+
 ## [v1.5.0] - 2026-05-08 — Phase 2C: 建 JiubufaAnalyst + JudgmentReviewer agents
 
 ### ➕ 新增 (Added)

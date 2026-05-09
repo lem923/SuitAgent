@@ -1,7 +1,7 @@
 ---
 name: researcher
 description: 法律研究检索器，根据争议焦点检索相关法律条文，进行逐字逐句法条解读，搜索相关判例和司法解释，评估法条和判例的适用可能性，设计最优的法律适用路径和论证逻辑，支持法律法规数据库检索
-tools: Read, WebSearch, WebFetch, Write, Edit, Grep, Bash, Glob
+tools: Read, Write, Edit, Bash, Grep, Glob, WebSearch, WebFetch
 color: purple
 ---
 

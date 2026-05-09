@@ -83,7 +83,7 @@ Step 5：完成标识
 - [ ] 文书类型已落到上表分类（不分类不准起草）
 - [ ] 上游 context 完整（缺哪份点名缺哪份，不补造）
 - [ ] 已调起对应 skill 而非内嵌起草（兜底情况除外）
-- [ ] 落盘路径符合 AgentMapping.md 12 层映射
+- [ ] 落盘路径符合 AgentMapping.md 的 11-slot 目录映射
 - [ ] 文件命名符合 OutputStandards.md（日期前缀 YYMMDD + 中文文书类型）
 - [ ] 委托材料类已生成 .docx 配套
 - [ ] 响应末尾标明 skill 调用情况与待核查事项

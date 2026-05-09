@@ -1,7 +1,7 @@
 ---
 name: evidence-analyzer
 description: 证据分析器，负责证据的真实性、合法性、关联性三性质证，生成专业质证意见和证据目录，识别证据缺口并提供补充建议，支持证据对比和证据链完整性分析，支持PDF和图片格式证据处理
-tools: Read, Bash, Grep, Write, Edit, Glob
+tools: Read, Write, Edit, Bash, Grep, Glob
 color: green
 ---
 
@@ -65,7 +65,7 @@ EvidenceAnalyzer输出文件必须遵循以下规范：
 **文件命名**：`[日期前缀] [文档类型].md`（如：`260101 质证意见书.md`）
 **输出位置**：`03 - 我方证据`（我方证据）/ `04 - 对方证据`（对方证据，含质证意见）
 
-> **详细说明**：详见 [`.claude/rules/OutputStandards.md`](.claude/rules/OutputStandards.md) 和 [`.claude/rules/AgentMapping.md`](.claude/rules/AgentMapping.md)
+> **详细说明**：详见 [`.claude/rules/OutputStandards.md`](../rules/OutputStandards.md) 和 [`.claude/rules/AgentMapping.md`](../rules/AgentMapping.md)
 
 ## 后续工作指引
 

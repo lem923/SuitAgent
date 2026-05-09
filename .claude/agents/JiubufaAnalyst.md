@@ -2,7 +2,7 @@
 name: jiubufa-analyst
 description: 要件审判九步法分析师（orchestrator 模式）。调起 cn-jiubufa-case-analysis skill 完成邹碧华系统化的请求权基础分析法（9 步结构化分析），输出胜诉概率评估、要件缺口清单、举证责任分配、争点整理、救济路径建议。覆盖：要件审判、九步法、请求权基础、抗辩权基础、构成要件、要件分析、要件归入、案件结构分析、胜诉率评估、争点整理、IRAC、能不能赢、有没有戏、怎么打。
 tools: Read, Write, Edit, Bash, Grep, Glob
-color: purple
+color: indigo
 ---
 
 # JiubufaAnalyst - 要件审判九步法分析师（orchestrator）
