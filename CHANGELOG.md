@@ -5,6 +5,49 @@
 
 ---
 
+## [v1.7.0] - 2026-05-09 — Phase 4: 强化触发与路由（4-phase 整合计划收官）
+
+### 🔧 Bucket A · Hard fixes（路由精度修正）
+
+- **Workflow.md 关键词冲突消歧**（5 处）：
+  - Writer：`再审申请` / `检察监督` 触发条件加意图限定（仅起草文书时命中；评估可行性走 JudgmentAnalyzer）
+  - Writer：`质证意见` 仅"写/起草"前缀触发；裸"质证意见"走 EvidenceAnalyzer
+  - EvidenceAnalyzer：`质证意见` 加条件注释（无"写/起草"前缀才命中）+ 我方/对方证据划分说明
+  - Strategist：删除裸词 `案件评估`（深度场景走 JiubufaAnalyst）+ 上下游 handoff 边界
+  - JudgmentAnalyzer：与 Writer 边界明示（评估可行性 vs 起草文书）
+- **DocAnalyzer 触发词收紧**：删 `合同分析` / `协议分析`（应归 ContractReviewer）；裸 `识别` 改为 `OCR识别` / `图片识别` / `扫描件识别`（避免误命中"识别争议焦点"）；加消歧段说明与 ContractReviewer / JudgmentAnalyzer 的上下游关系
+- **Reviewer.md 审查范围扩充**：补 ContractReviewer / JiubufaAnalyst / JudgmentAnalyzer 三个 agent 的检查项（共 12 个新检查项）；加"orchestrator 模式审查规则"（审落盘文件，不审 skill 内部）；触发机制补 Phase 2+ 新输出类型
+- **ContractReviewer.md re-entry 规则**：4-stage 工作流的 Discuss → Execute 续接路由——用户后续说"继续/执行/出红线版"时直接进 Execute，不重走 Step 1-3；含孤儿文件检测提示（review_complete 但无红线 DOCX）
+- **AGENTS.md skill 直接调用原则**：用户显式提及 skill 名时主 agent 仍通过包装 agent 调用，不旁路；含 skill → agent 对照表（6 项）
+
+### 🎨 Bucket B · description 升级
+
+- **Researcher.md** description 加 `覆盖：` 关键词列表：法条/判例/司法解释检索、pkulaw 北大法宝、威科先行、中国裁判文书网、search-first 引用源白名单
+- **Scheduler.md** description 加 `覆盖：` 关键词列表：法定期限（含上诉 15 日 / 再审 6 月 / 检察监督 2 年 / 执行异议 15 日）、matter.yaml 关键日期更新、工时记录.md 累加
+- 其他 7 个老 agent 不动（关键词密度足够 + Workflow 路由表已覆盖）
+
+### 🚫 不在 Phase 4
+
+- 触发块格式统一（老式引号 vs 新式分类，纯 cosmetic 不影响功能命中）
+- 真实案件 260507 / 260508 迁移（仍是用户本机操作）
+- skill 内部内容（read-only + 框架良好）
+- 进一步重构（4 phase 已足够，未来增量改动通过常规 PR）
+
+### 🎯 4-phase 整合计划全景（收官）
+
+```
+v1.7.0 phase4   强化触发与路由（路由精度 + Reviewer 覆盖 + skill 入口标准化）
+v1.6.0 phase3!  命名规范清理（JudgmentReviewer → JudgmentAnalyzer BREAKING + 跨引用）
+v1.5.0 phase2c  JiubufaAnalyst + JudgmentReviewer (改名 JudgmentAnalyzer) agent
+v1.4.0 phase2b  ContractReviewer agent
+v1.3.0 phase2a! 案件目录结构统一为 14-slot（11 numbered + matter triplet）
+v1.2.0 phase1   Writer 与 cn-litigation-drafting 合并 + advisory
+```
+
+最终态：13 agent（4 orchestrator + 9 内嵌方法）+ 8 外部必需依赖 skill + 11-slot 案件目录 + matter triplet + 工时记录.md。
+
+---
+
 ## [v1.6.0] - 2026-05-08 — Phase 3: 命名规范与跨引用清理（含 BREAKING）
 
 ### ⚠️ 破坏性变更 (Breaking)

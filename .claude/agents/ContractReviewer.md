@@ -69,6 +69,25 @@ Step 5：完成标识
   → 响应末尾输出：识别的合同类目、调用的 skill 名、落盘路径、未填字段、签署前必查清单
 ```
 
+## Discuss → Execute Re-entry 规则（多阶段续接）
+
+cn-contract-review-* skill 的 4-stage 工作流（Prepare → Review → Discuss → Execute → Learn）在 **Discuss 阶段会等待用户明确确认才执行 Execute（生成红线 DOCX）**。这意味着用户可能在两个 session 间隔后再来说"继续 / 执行 / 出红线版"。
+
+**主 agent 路由规则**：
+
+- 当前对话上下文含**已完成 Review 阶段的 cn-contract-review-* skill 产物**（即 `02 - 法律研究/案件分析/YYMMDD [合同名] 审查报告.md` 已落盘且案件状态为 review_complete），且用户消息含 `继续` / `执行` / `生成红线 DOCX` / `出红线版` / `出 redline` 等关键词时：
+  - **直接进入 Execute 步骤**，调起对应 skill 的 Execute 阶段
+  - **不重走** Step 1（DocAnalyzer 解析） / Step 2（路由识别） / Step 3 Review 阶段
+  - 上下文复用 Review 阶段的合同类目识别结果与 REDLINE 报告
+
+- 当前对话**无 Review 阶段已完成产物**或合同名/案件不同时：按完整 Step 1-5 流程走
+
+- 多合同并行场景（同一 matter 下有多份合同同时在审）：响应末尾保留"当前进行中合同审查"清单，便于用户用 `"继续审查 X 合同"` 显式指代
+
+**实现提示**：主 agent 在路由前先 grep `02 - 法律研究/案件分析/` 看有无 `*合同名* 审查报告.md` 但无对应 `*合同名* 红线版.docx` 的孤儿文件——这是 review_complete 但 execute 未跑的强信号。
+
+## 工作检查清单
+
 ## 工作模式
 
 ### 模式 A：Matter 内审查（推荐）

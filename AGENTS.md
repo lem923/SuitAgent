@@ -96,6 +96,24 @@ SuitAgent 的部分 Agent 不内嵌方法论，而是调起外部 skill 作为 s
 
 外部 skill 的引用路径在各 Agent 文件的"方法论参考"段中显式声明，不要硬编码本机绝对路径。
 
+### Skill 直接调用原则（用户显式提及 skill 名时）
+
+用户显式说"用 cn-jiubufa-case-analysis skill 分析"、"调起 cn-contract-review-gov-tech-dev"、"按 cn-litigation-drafting 起草" 等场景：
+
+- **不旁路 agent 直接触发 skill**——主 agent 仍调起对应包装 agent，由 agent 完成上下文承接、落盘、命名规范、handoff
+- **包装 agent 对照表**：
+
+| 用户提及的 skill | 调起的 agent |
+|------------------|------------|
+| `cn-litigation-drafting` / `cn-firm-documents` | Writer |
+| `cn-contract-review-*`（任一） | ContractReviewer |
+| `cn-jiubufa-case-analysis` | JiubufaAnalyst |
+| `cn-judgment-analysis` | JudgmentAnalyzer |
+| `cn-litigation-case-folder-organizer` | 不经 agent，由用户本机手动跑（保留人工确认） |
+| `new-case` | 不经 agent，由 Scheduler 在新案件场景中调起，或用户主动触发 |
+
+理由：旁路 agent 会丢失 SuitAgent 的工程层（matter context、case slot 落盘、命名规范、与下游 agent 的 handoff），违反"matter 隔离是合规底线"原则。
+
 ## 规范文件索引（按需查阅）
 
 | 目录 | 何时查阅 |

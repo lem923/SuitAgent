@@ -21,6 +21,10 @@
 
 **路由规则**: 检测到上述任一关键词 → 立即调用 Writer Agent
 
+**消歧（与其他 agent 的边界）**:
+- "再审申请" / "检察监督" / "上诉" 在 Writer 触发**仅当用户意图是"起草文书"**（含动词"写"/"起草"/"拟"）；意图是"评估能不能再审/上诉/监督的可行性" → 走 JudgmentAnalyzer
+- "质证意见" 在 Writer 触发**仅当用户说"写/起草质证意见书"**；意图是"对证据出质证意见" → 走 EvidenceAnalyzer
+
 **Writer 内部分流（orchestrator）**:
 - 诉讼文书 → Writer 调起 `cn-litigation-drafting` skill（必需依赖）
 - 律所对客户文书 → Writer 调起 `cn-firm-documents` skill（必需依赖）
@@ -73,6 +77,9 @@
 
 **路由规则**: 检测到上述任一关键词 + post-judgment 阶段（已有生效裁判文书）→ 立即调用 JudgmentAnalyzer Agent
 
+**消歧（与 Writer 的边界）**:
+- "再审申请" / "检察监督" / "上诉" 触发本 agent **仅当用户意图是"评估可行性 / 成功率 / 时机"**；意图是"起草文书" → 走 Writer
+
 **JudgmentAnalyzer 内部流程（orchestrator 模式）**:
 - 调起 `cn-judgment-analysis` skill 完成 5 步评审（文书画像 → 争议反向还原 → 证据认定拆解 → IRAC 重建 → 救济路径评估）
 - 上游接 DocAnalyzer 的事实抽取产物，不重复抽事实
@@ -98,15 +105,18 @@
 
 ### 📄 DocAnalyzer Agent - 文档分析
 **触发关键词**:
-- "OCR"、"识别"、"解析"
-- "分析文档"、"文档分析"
-- "提取信息"、"信息提取"
-- "处理PDF"、"PDF处理"
-- "扫描件"、"图片识别"
-- "合同分析"、"协议分析"
-- "文档智能分析"、"智能分析"
+- "OCR识别"、"图片识别"、"扫描件识别"
+- "分析文档"、"文档分析"、"文档智能分析"
+- "提取信息"、"信息提取"、"事实抽取"
+- "处理PDF"、"PDF处理"、"扫描件"
+- "解析判决书"、"解析庭审笔录"、"解析合同文本（仅结构层）"
 
-**路由规则**: 检测到上述任一关键词 → 立即调用DocAnalyzer Agent
+**路由规则**: 检测到上述任一关键词 → 立即调用 DocAnalyzer Agent
+
+**消歧（与其他 agent 的边界）**:
+- 裸"识别"不命中本 agent（避免误命中"识别争议焦点" → IssueIdentifier）
+- "合同分析" / "合同审查" → 走 ContractReviewer，不走本 agent；DocAnalyzer 仅负责合同文本的 OCR 与结构提取（作为 ContractReviewer 上游）
+- 判决书 post-judgment 评估 → 本 agent 抽事实后 hand off to JudgmentAnalyzer，不重复评判
 
 ---
 
@@ -114,12 +124,18 @@
 **触发关键词**:
 - "证据分析"、"证据质证"
 - "证据目录"、"证据清单"
-- "质证意见"、"质证书"
+- "质证意见"、"质证书"（**条件**：仅当无"写/起草/拟"前缀；起草质证意见书走 Writer）
 - "证据审查"、"证据评估"
 - "补充证据"、"证据不足"
 - "证据链"、"证据收集"
 
-**路由规则**: 检测到上述任一关键词 → 立即调用EvidenceAnalyzer Agent
+**路由规则**: 检测到上述任一关键词 → 立即调用 EvidenceAnalyzer Agent
+
+**消歧（与其他 agent 的边界）**:
+- 起草质证意见书 → 走 Writer（调起 cn-litigation-drafting skill 模板 G）
+- 制作证据清单文书 → 走 Writer（模板 I）
+- "证据三性分析"、"证据缺口梳理" → 本 agent
+- 我方/对方证据划分：本 agent 默认落 `03 - 我方证据/`，对方证据落 `04 - 对方证据/`
 
 ---
 
@@ -141,11 +157,17 @@
 - "诉讼策略"、"案件策略"
 - "风险评估"、"风险分析"
 - "策略制定"、"制定策略"
-- "可行性分析"、"胜诉可能性"
-- "案件评估"、"策略建议"
-- "制定方案"、"诉讼方案"
+- "可行性分析"、"胜诉可能性"（条件：浅层 SWOT 即可时；深度结构化分析走 JiubufaAnalyst）
+- "策略建议"、"制定方案"、"诉讼方案"
 
-**路由规则**: 检测到上述任一关键词 → 立即调用Strategist Agent
+**路由规则**: 检测到上述任一关键词 → 立即调用 Strategist Agent
+
+**消歧（与其他 agent 的边界）**:
+- 裸 "案件评估" 已移除——根据深度判断：
+  - 复杂案件（请求权 ≥3 / 起诉答辩前置 / 再审监督评估）→ 走 JiubufaAnalyst
+  - 浅层 SWOT / 风险预警 → 走本 agent
+- post-judgment 救济可行性研判 → JudgmentAnalyzer 提供救济路径表，本 agent 在表上选具体救济
+- 庭前 SWOT 期待 JiubufaAnalyst 底稿（如复杂案件）作为输入
 
 ---
 
