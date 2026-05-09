@@ -76,10 +76,7 @@ SuitAgent 的部分 Agent 不内嵌方法论，而是调起外部 skill 作为 s
 |-------|---------|------|------|
 | `cn-litigation-drafting` | Writer | 诉讼文书起草（起诉状/答辩状/上诉状/再审/检察监督/代理词/质证意见书/财产保全/证据清单/仲裁/反诉等 11 类） | 用户全局 skill 库 |
 | `cn-firm-documents` | Writer | 律所对外/对客户文书（律师函/委托代理协议/授权委托书/法律意见书/谈话笔录/调解协议/离婚协议审阅/刑事格式文书等） | 用户全局 skill 库 |
-| `cn-contract-review-universal` | ContractReviewer | 通用商事合同审查（买卖/租赁/服务/框架/M&A/股权等，兜底） | 用户全局 skill 库 |
-| `cn-contract-review-gov-tech-dev` | ContractReviewer | 政企技术采购 / 委托开发 / 系统集成合同审查 | 用户全局 skill 库 |
-| `cn-contract-review-gov-tech-licensing` | ContractReviewer | 专利 / 软著 / 技术许可合同审查 | 用户全局 skill 库 |
-| `cn-contract-review-labor-employment` | ContractReviewer | 劳动 / 劳务 / 竞业限制 / 保密协议审查 | 用户全局 skill 库 |
+| `cn-contract-review` | ContractReviewer | **统一合同审查 skill（v1.8.0+）**：覆盖 14 类合同（通用商事 / 买卖 / 租赁 / 服务 / 知识产权与技术许可 / 担保 / 借贷赠与 / 互联网协议 / 婚姻家事 / 劳动雇佣 / 房地产 / 建设工程 / 公司投资 / 政企采购程序）；4-stage workflow（Prepare→Review→Discuss→Execute→Learn）；REDLINE/ORANGE/YELLOW + fallback 三档（目标/可签/底线）；playbook + personal-preferences 机制 | 用户全局 skill 库（取代旧 4 个 cn-contract-review-* specialized） |
 | `cn-jiubufa-case-analysis` | JiubufaAnalyst | 要件审判九步法（请求权基础穷举 / 构成要件归入 / 举证责任矩阵 / 证据缺口清单 / 胜诉概率区间） | 用户全局 skill 库 |
 | `cn-judgment-analysis` | JudgmentAnalyzer | 判决书 IRAC 反向还原 / 程序瑕疵审查 / 再审与检察监督可行性研判 / 救济路径概率对比 | 用户全局 skill 库 |
 
@@ -98,7 +95,7 @@ SuitAgent 的部分 Agent 不内嵌方法论，而是调起外部 skill 作为 s
 
 ### Skill 直接调用原则（用户显式提及 skill 名时）
 
-用户显式说"用 cn-jiubufa-case-analysis skill 分析"、"调起 cn-contract-review-gov-tech-dev"、"按 cn-litigation-drafting 起草" 等场景：
+用户显式说"用 cn-jiubufa-case-analysis skill 分析"、"调起 cn-contract-review"、"按 cn-litigation-drafting 起草" 等场景：
 
 - **不旁路 agent 直接触发 skill**——主 agent 仍调起对应包装 agent，由 agent 完成上下文承接、落盘、命名规范、handoff
 - **包装 agent 对照表**：
@@ -106,7 +103,7 @@ SuitAgent 的部分 Agent 不内嵌方法论，而是调起外部 skill 作为 s
 | 用户提及的 skill | 调起的 agent |
 |------------------|------------|
 | `cn-litigation-drafting` / `cn-firm-documents` | Writer |
-| `cn-contract-review-*`（任一） | ContractReviewer |
+| `cn-contract-review` | ContractReviewer |
 | `cn-jiubufa-case-analysis` | JiubufaAnalyst |
 | `cn-judgment-analysis` | JudgmentAnalyzer |
 | `cn-litigation-case-folder-organizer` | 不经 agent，由用户本机手动跑（保留人工确认） |

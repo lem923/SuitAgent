@@ -43,12 +43,10 @@
 
 **路由规则**: 检测到上述任一关键词 → 立即调用 ContractReviewer Agent
 
-**ContractReviewer 内部分流（orchestrator 模式）**:
-- 政企技术采购 / 委托开发 → `cn-contract-review-gov-tech-dev` skill
-- 专利 / 软著 / 技术许可 → `cn-contract-review-gov-tech-licensing` skill
-- 劳动 / 雇佣 / 竞业 → `cn-contract-review-labor-employment` skill
-- 其他商事合同（兜底）→ `cn-contract-review-universal` skill
-- 详见 `.claude/agents/ContractReviewer.md` 的"自动路由判断逻辑"
+**ContractReviewer 内部分流（orchestrator 模式 v1.8.0+）**:
+- 调起统一的 `cn-contract-review` skill（取代旧 4 个 cn-contract-review-* specialized）
+- 14 类合同路由由 skill 自身完成（01 通用 / 02 买卖 / 03 租赁 / 04 服务 / 05 知识产权 / 06 担保 / 07 借贷赠与 / 08 互联网 / 09 婚姻家事 / 10 劳动 / 11 房地产 / 12 建设工程 / 13 公司投资 / 14 政企采购）
+- 详见 `.claude/agents/ContractReviewer.md` 的"调用 skill 的路由信息"
 
 ---
 
@@ -412,7 +410,7 @@
 
 **工作流步骤**：
 1. **DocAnalyzer** (合同解析：双方主体、标的、金额、期限、争议解决条款) → 落 `02 - 法律研究/案件分析/`
-2. **ContractReviewer** (合同类型识别 + 路由到对应 cn-contract-review-* skill) → skill 完成 4-stage（Prepare/Review/Discuss/Execute/Learn）
+2. **ContractReviewer** (调起 cn-contract-review skill；skill 内部按 14 类完成路由 + 4-stage workflow Prepare/Review/Discuss/Execute/Learn)
 3. **Reviewer** (跨 agent 质量把关) → 必要时返工
 4. **可选 - Writer** (仅当用户明确要求"重新拟定一份"时触发，起草修订版)
 
@@ -421,7 +419,7 @@
 - 红线 DOCX（execute 阶段产出）→ `02 - 法律研究/案件分析/YYMMDD [合同名] 红线版.docx`
 - 签署前必查清单（agent 响应内嵌）
 
-**特色**：自动识别合同类型并分流到 4 个专门 skill 之一；多类目命中时显式提示次类目补充审查路径
+**特色**：统一 skill v1.8.0+ 内置 14 类路由（含婚姻家事 / 房地产 / 建设工程 / 公司投资等原 4 specialized 未覆盖类目）；多类目命中时主类目优先 + 次类目叠加；fallback 三档（目标/可签/底线）支持谈判节奏
 
 ### 场景9：判决书深度评估（含再审/监督可行性）
 
@@ -486,7 +484,7 @@
 | Agent | 必需 skill | Advisory skill |
 |-------|----------|---------------|
 | Writer | cn-litigation-drafting / cn-firm-documents | — |
-| ContractReviewer | cn-contract-review-universal / -gov-tech-dev / -gov-tech-licensing / -labor-employment | — |
+| ContractReviewer | cn-contract-review（v1.8.0+ 统一版） | — |
 | **JiubufaAnalyst** | **cn-jiubufa-case-analysis** | — |
 | **JudgmentAnalyzer** | **cn-judgment-analysis** | — |
 | IssueIdentifier | — | hand off to JiubufaAnalyst（深度场景） |

@@ -167,10 +167,7 @@
 |-------|---------|------|
 | `cn-litigation-drafting` | Writer | 诉讼文书起草（起诉状 / 答辩状 / 上诉状 / 再审 / 检察监督 / 代理词 / 质证意见书 / 财产保全 / 证据清单 / 仲裁 / 反诉 共 11 类模板） |
 | `cn-firm-documents` | Writer | 律所对外/对客户文书（律师函 / 委托代理协议 / 授权委托书 / 法律意见书 / 谈话笔录 / 调解协议 / 离婚协议审阅 / 刑事格式文书） |
-| `cn-contract-review-universal` | ContractReviewer | 通用商事合同审查（兜底） |
-| `cn-contract-review-gov-tech-dev` | ContractReviewer | 政企技术采购 / 委托开发 / 系统集成合同 |
-| `cn-contract-review-gov-tech-licensing` | ContractReviewer | 专利 / 软著 / 技术许可合同 |
-| `cn-contract-review-labor-employment` | ContractReviewer | 劳动 / 劳务 / 竞业限制 / 保密协议 |
+| `cn-contract-review` | ContractReviewer | **统一合同审查 skill（v1.8.0+）**：覆盖 14 类合同（通用商事 / 买卖 / 租赁 / 服务 / 知识产权与技术许可 / 担保 / 借贷赠与 / 互联网协议 / 婚姻家事 / 劳动雇佣 / 房地产 / 建设工程 / 公司投资 / 政企采购程序）；4-stage workflow + REDLINE/ORANGE/YELLOW + fallback 三档（目标/可签/底线）+ playbook + personal-preferences 机制（取代旧 4 个 cn-contract-review-* specialized） |
 | `cn-jiubufa-case-analysis` | JiubufaAnalyst | 要件审判九步法 9 步结构化分析 |
 | `cn-judgment-analysis` | JudgmentAnalyzer | 判决书 IRAC 反向还原 + 救济路径概率评估 |
 
@@ -184,6 +181,7 @@
 完整变更见 [`CHANGELOG.md`](CHANGELOG.md)。本 fork 在原项目基础上的迭代轨迹：
 
 ```
+v1.8.0 phase5!  合同审查 skill 统一（4 个 cn-contract-review-* → 1 个 cn-contract-review，14 类合同全覆盖）
 v1.7.0 phase4   强化触发与路由（路由精度 + Reviewer 覆盖 + skill 入口标准化）
 v1.6.0 phase3!  命名规范清理（JudgmentReviewer → JudgmentAnalyzer BREAKING）
 v1.5.0 phase2c  JiubufaAnalyst + JudgmentReviewer agent

@@ -5,6 +5,66 @@
 
 ---
 
+## [v1.8.0] - 2026-05-09 — Phase 5: 合同审查 skill 统一（4 → 1，含 BREAKING）
+
+### ⚠️ 破坏性变更 (Breaking)
+
+- **`ContractReviewer` agent 的必需依赖从 4 个 cn-contract-review-* specialized skill 改为单一统一的 `cn-contract-review` skill（v1.8.0+）**：
+  - 原 4 个 specialized 已弃用：`cn-contract-review-universal` / `cn-contract-review-gov-tech-dev` / `cn-contract-review-gov-tech-licensing` / `cn-contract-review-labor-employment`
+  - 新统一 skill 覆盖 14 类合同（增加原 specialized 未覆盖的：买卖 / 租赁 / 服务 / 担保 / 借贷赠与 / 互联网协议 / 婚姻家事 / 房地产 / 建设工程 / 公司投资）
+  - 14 类路由由 skill 自身处理；ContractReviewer agent 不再复制路由逻辑
+
+### 🔄 调整 (Changed)
+
+- **`.claude/agents/ContractReviewer.md`**：
+  - frontmatter description 改为依赖单一 skill
+  - 删除"自动路由判断逻辑"段（路由迁到 skill 内部 `references/orientation-and-dispatch.md`）
+  - 改为"调用 skill 的路由信息"段（仅作 14 类摘要参考）
+  - 工作流程 Step 2-4 改为调起 `cn-contract-review` skill
+  - re-entry 规则 / 重要提醒 / 完成标识中所有 `cn-contract-review-*` 引用改为单一 `cn-contract-review`
+- **`.claude/rules/AgentMapping.md` v3.3**：ContractReviewer 段功能描述更新；变更历史加 Phase 5 条目
+- **`.claude/rules/Workflow.md`**：
+  - ContractReviewer 触发块的内部分流改为调起单一 skill
+  - skill 桥接表 4 行 → 1 行
+  - 场景 8（合同审查）说明同步更新
+- **`AGENTS.md`**：
+  - 必需依赖表 4 行 cn-contract-review-* → 1 行 cn-contract-review，附完整 14 类描述
+  - skill 直接调用对照表更新
+  - 第 5 行系统定位 → 13 个 agent（数量未变，描述微调）
+- **CHANGELOG.md** v1.8.0 BREAKING 条目
+
+### 📋 仓库外配套（Phase 5 不入仓）
+
+- **`tmp/cn-contract-review_unified_proposed/`**：完整的统一 skill 提案稿
+  - 92 个 .md 文件 / 约 7075 行
+  - 14 类 contract-types/ 子目录（80 个 content 文件）：12 类继承自 contract-copilot v1.5.1（已 P0/P1/P2 → REDLINE/ORANGE/YELLOW 转换 + v1.1 校对标记），2 类（01-universal / 14-gov-procurement）+ 各类目专属内容（5/9/16/5）来自 4 个原 specialized skill 注入
+  - 10 个框架 references/*.md：orientation-and-dispatch / review-framework / revision-strategy / deliverable-format / playbook（v1 仅骨架）/ negotiation-patterns / presign-checklist / qc-checklist / cross-border-review / personal-preferences
+  - 1 个 SKILL.md（202 行，4-stage workflow + 14 类路由 + REDLINE/ORANGE/YELLOW 等级 + fallback 三档）
+  - 1 个 memory.md（按 14 类合同分节的统一审查经验库）
+  - 1 个 LICENSE.txt（CC BY-NC 4.0，与 contract-copilot 上游一致）
+- **用户本机迁移路径**：
+  1. 复制 `tmp/cn-contract-review_unified_proposed/` 到 `~/Library/Application Support/Claude/.../skills/cn-contract-review/`
+  2. 测试 1-2 份合同跑通
+  3. 弃用旧 4 个 specialized skill（保留备份 30 天）
+  4. v1.1 阶段对 80 个 content 文件做本土化复核（v1 marker 已加在各文件顶部）
+
+### 📐 设计要点
+
+- **方法论吸收**：contract-copilot v1.5.1 的 12 类 contract-types/ + review-framework + revision-strategy；Claude `legal:review-contract` 的 playbook + fallback positions + Negotiation tier framework + Business Impact Summary
+- **Chris 偏好保留**：4-stage workflow（Prepare→Review→Discuss→Execute→Learn）100% 保留；REDLINE/ORANGE/YELLOW + GREEN 体系 100% 保留；7-section deliverable format 保留；docx skill 调用路径保留
+- **fallback positions 强约束**：REDLINE / ORANGE 必填三档（目标 / 可签 / 底线）；YELLOW 不强制
+- **playbook v1 骨架**：未填字段降级到 checklist 隐式立场，不退化；同事 fork 后填自己的标准立场
+- **personal-preferences.md**（重命名自 chris-contract-review-patterns.md）：通用化模板，便于同事拿走改成自己的偏好
+- **License CC BY-NC 4.0**：律所同事可任意使用 / fork / 转载，禁止商业再分发
+
+### 🚫 不在 Phase 5
+
+- 真实合同审查 v1 完整实战测试（用户本机执行）
+- v1.1 本土化校对（80 个 content 文件中 contract-copilot 继承的 60 个的本土化复核 + 与 4 specialized 注入的 20 个去重）
+- 4 个旧 specialized skill 的清理（用户本机操作，保留备份后再删）
+
+---
+
 ## [v1.7.0] - 2026-05-09 — Phase 4: 强化触发与路由（4-phase 整合计划收官）
 
 ### 🔧 Bucket A · Hard fixes（路由精度修正）
