@@ -1,48 +1,70 @@
 # SuitAgent - 诉讼法律服务智能分析系统
 
----
-
-## 📖 项目介绍文章
-
-想了解SuitAgent的完整设计思路和使用场景？查看详细文章：
-
-**👉 [SuitAgent：基于Claude Code的AI代理诉讼法律服务系统](https://mp.weixin.qq.com/s/Atm48_tpp7bcQhT12P7Btg)**
+> 本仓库 fork 自 [`cat-xierluo/SuitAgent`](https://github.com/cat-xierluo/SuitAgent)。在原项目基础上做了系统性的重构与扩展（增设和修改包括合同审查在内agents、修改案件目录、修改路由设置等）。当前形态相对原项目已有较大差异。
 
 ---
 
-## 👨‍💼 关于作者
+## 目录
 
-我是一名律师，擅长技术类（知识产权、数据与 AI）纠纷，如想进一步交流，欢迎添加我的微信：
+- [Fork 来源与鸣谢](#fork-来源)
+- [项目概述](#项目概述)
+- [核心特性](#核心特性)
+- [系统架构](#系统架构)
+- [13 个 Subagent](#13-个-subagent)
+- [案件目录结构](#案件目录结构)
+- [外部 skill 依赖](#外部-skill-依赖)
 
-<div align="center">
-  <img src="微信二维码.jpg" width="200" alt="微信二维码"/>
-</div>
+---
+
+## Fork 来源与鸣谢
+
+**原项目**：[`cat-xierluo/SuitAgent`](https://github.com/cat-xierluo/SuitAgent)（作者 maoking）
+
+原项目定位：基于 Claude Code 架构的诉讼法律服务智能分析系统，10 个专业 AI 代理（agent）协作处理诉讼工作流，落盘到 12 层带 emoji 的案件目录结构（如 `00 - 📅 日程管理`、`02 - 📄 案件分析`）。原项目把案件管理元数据收纳在单一 `[案件编号]案件信息.md` 中。原项目对外部法律 skill（合同审查、要件审判九步法、判决书评审等）的支持限于 advisory 引用，无对应 agent 入口。
+
+**本 fork 与原项目的关系**：保留原项目的整体定位、Subagent 架构思路、与 Claude Code 的集成方式；在此之上进行的实质性改造见下文"相对原项目的修改"。
 
 ---
 
 ## 项目概述
 
-SuitAgent 是一个基于 **Claude Code 架构** 的诉讼法律服务智能分析系统，采用 13 个专业 AI 代理（agent）协作的模式，将复杂的诉讼与合同审查工作分解为多个可独立执行的工作流，实现法律文书的工程化生成。
+本 fork 在原项目基础上进行以下改动：
 
-## ✨ 核心特性
+- 将 `Writer` agent 重写为 orchestrator 模式，删除其内嵌的 13 类文书模板与质量红线，改为分流到外部诉讼文书 skill（`cn-litigation-drafting`）与律所对客户文书 skill（`cn-firm-documents`）作为 single source of truth，避免方法论在 agent 与 skill 间双重维护。
+- 12 层带 emoji 的案件目录改为 11 numbered slots（无 emoji，编号 00-10 + 99）+ root level 4 件套（`matter.yaml` / `matter_dashboard.md` / `AGENTS.md` / `工时记录.md`）。原 `案件信息.md` 由 matter triplet 取代。
+- 新增 `ContractReviewer` agent（合同审查编排器），分流到 4 个 cn-contract-review-* skill（政企技术 / 技术许可 / 劳动 / 通用兜底）。
+- 新增 `JiubufaAnalyst` agent（要件审判九步法）+ `JudgmentAnalyzer` agent（裁判文书深度评审）。
+- `JudgmentReviewer` agent 重命名为 `JudgmentAnalyzer`（套用 `DocAnalyzer` / `EvidenceAnalyzer` 的 `-Analyzer` 后缀，避免与原有 `Reviewer`（QA agent）的字符重叠）；13 个 agent 的 `color` 字段去重；`tools` 字段顺序统一；跨文件死链与残留旧术语清理。
+- 对应新增或改动的路由关键词冲突消歧；`DocAnalyzer` 触发词收紧（删去会与 ContractReviewer 冲突的 `合同分析` 等词）；`Reviewer` 审查范围扩充到全部 13 agent 并加 orchestrator 模式审查规则；`ContractReviewer` 加 4-stage skill 的 Discuss → Execute re-entry 路由；`AGENTS.md` 加"用户显式提及 skill 名时仍走包装 agent，不旁路"原则。
 
-- 🎯 **多阶段覆盖**：从诉前分析到判决执行，全流程支持
-- 🚀 **一键启动**：上传文档即可自动分析，无需复杂配置
-- 🔄 **灵活组合**：13 个专业 AI 代理可自由组合使用，含合同审查、要件审判九步法、判决书深度评审三个方法论入口
-- 📊 **标准化输出**：统一的案件目录结构（11 numbered slots + matter triplet + 工时记录）与命名规范
-- 📱 **终端操作**：基于命令行界面，（并不）简单易用
+### 改动对比
 
-## 📋 目录
+| 维度 | 原项目（cat-xierluo） | 本 fork（lem923） |
+|------|---------------------|-----------------|
+| Subagent 数量 | 10 | **13**（+ ContractReviewer / JiubufaAnalyst / JudgmentAnalyzer） |
+| 案件目录结构 | 12 层带 emoji | **11 numbered + 99 + matter triplet（无 emoji）** |
+| 案件元数据 | 单文件 `案件信息.md` | **matter triplet：matter.yaml + matter_dashboard.md + AGENTS.md** |
+| per-case 保密边界 | 无 | **每案 root 级 AGENTS.md（client identifier 红线 + 文件操作禁区）** |
+| 外部 skill 集成 | advisory 引用 | **8 个必需依赖 skill，由 4 个 orchestrator agent 包装调起** |
+| 合同审查 | 无 | **ContractReviewer + 4 类 skill 路由** |
+| 要件审判九步法 | 无 | **JiubufaAnalyst + cn-jiubufa-case-analysis skill** |
+| 判决书深度评审 | 无 | **JudgmentAnalyzer + cn-judgment-analysis skill（含救济路径时效预警）** |
 
-- [项目概述](#项目概述)
-- [核心特性](#-核心特性)
-- [系统架构](#️-系统架构)
-- [13 个 Subagent](#-13-个-subagent)
-- [安装指南](#️-安装指南)
-- [常见使用场景](#-常见使用场景)
-- [常见问题](#-常见问题)
+---
 
-## 🏗️ 系统架构
+## 核心特性
+
+- **诉讼全周期覆盖**：从诉前案件结构分析（九步法）→ 起诉/答辩 → 庭审 → 判决评审（IRAC 反推 + 救济路径概率）→ 再审/检察监督文书起草，单一项目内贯通
+- **合同审查打通**：合同审查作为 SuitAgent 工作流的一等公民，自动按合同类型分流到 4 个专门 skill（政府/国企/委托开发 / 专利/软著/技术许可 / 劳动/竞业 / 通用兜底）
+- **方法论的 single source of truth**：起草、合同审查、九步法、判决评审等方法论均承载于外部 skill，agent 只做工程包装（context 承接、文件落盘、命名规范、handoff），方法论改动只需改一处
+- **per-case 保密硬约束**：每个案件根目录有自己的 `AGENTS.md`，明确 client identifier 红线（永不进入 web_search/web_fetch query）、文件操作禁区（`_FINAL` / `_SIGNED` / `_盖章` 等后缀的不动）、索引规约
+- **结构化期限管理**：`matter.yaml` 的 `关键日期` 字段集中管理上诉 15 日、再审 6 月、检察监督 2 年、执行异议 15 日等法定时效；`JudgmentAnalyzer` 主动核查并对 ≤30 天时效红色加粗预警
+- **路由精度**：13 个 agent 触发关键词无冲突；多类目命中场景按意图分流（如"再审申请"按动词前缀分到 Writer 起草 vs JudgmentAnalyzer 评估）
+
+
+---
+
+## 系统架构
 
 ```text
 ┌──────────────────────────────────────────────────────────────┐
@@ -85,116 +107,88 @@ SuitAgent 是一个基于 **Claude Code 架构** 的诉讼法律服务智能分�
 └──────────────────────────────────────────────────────────────┘
 ```
 
-## 🤖 13 个 Subagent
+---
+
+## 13 个 Subagent
 
 | Agent | 层级 | 职责 | 核心能力 |
-| :------ | :----- | :----- | :--------- |
-| **DocAnalyzer** | 输入层 | 文档分析 | PDF/Word/图片 OCR 解析、结构化信息提取；判决书 post-judgment 时 hand off 至 JudgmentAnalyzer |
-| **EvidenceAnalyzer** | 输入层 | 证据分析 | 三性质证、证明力评估、证据链分析 |
-| **IssueIdentifier** | 分析层 | 争议识别（轻量） | 争点提取、法条归类、法律关系梳理；复杂案件 hand off 至 JiubufaAnalyst |
-| **Researcher** | 分析层 | 法律研究 | 判例检索、法条解读、适用路径建议 |
-| **Strategist** | 分析层 | 诉讼策略 | SWOT 分析、风险评估、多套策略方案 |
-| **JiubufaAnalyst** | 分析层 | 要件审判九步法（深度） | 请求权基础穷举、构成要件归入、举证责任矩阵、证据缺口、胜诉概率区间（调起 cn-jiubufa-case-analysis skill） |
-| **JudgmentAnalyzer** | 分析层 | 裁判文书深度评审 | 判决书 IRAC 反向还原、程序瑕疵审查、上诉/再审/检察监督/执行异议的救济路径概率评估（调起 cn-judgment-analysis skill） |
-| **Writer** | 输出层 | 文书起草编排器 | orchestrator：诉讼文书 → cn-litigation-drafting skill；律所对客户文书 → cn-firm-documents skill |
-| **ContractReviewer** | 输出层 | 合同审查编排器 | orchestrator：分流 4 个 cn-contract-review-* skill（政企技术 / 技术许可 / 劳动 / 通用兜底）；输出 REDLINE/ORANGE/YELLOW 报告与红线 DOCX |
-| **Summarizer** | 输出层 | 摘要生成 | 多层次摘要（详细 / 简洁 / 要点） |
-| **Reporter** | 输出层 | 案件报告 | 整合多 agent 输出，生成综合分析报告 |
-| **Scheduler** | 支持层 | 日程规划 | 法定期限计算、工时统计、时间线管理；持续维护 root 级 matter.yaml 与 工时记录.md |
-| **Reviewer** | 支持层 | 跨 agent 质量审查（QA） | A/B/C/D 四级评分；**与 JudgmentAnalyzer 不同——本 agent 是 QA，JudgmentAnalyzer 是法律层评审** |
+| :---- | :--- | :--- | :------- |
+| **DocAnalyzer** | 输入层 | 文档分析 | PDF / Word / 图片 OCR 解析、结构化信息提取；判决书 post-judgment 时 hand off 至 JudgmentAnalyzer |
+| **EvidenceAnalyzer** | 输入层 | 证据分析 | 三性质证、证明力评估、证据链分析；按归属落 `03 - 我方证据/` 或 `04 - 对方证据/` |
+| **IssueIdentifier** | 分析层 | 争议识别（轻量） | 争点提取、法条归类、法律关系梳理；复杂案件（请求权 ≥3）hand off 至 JiubufaAnalyst |
+| **Researcher** | 分析层 | 法律研究 | 法条 / 判例 / 司法解释检索（pkulaw / 北大法宝 / 威科 / 裁判文书网），search-first 引用源白名单合规 |
+| **Strategist** | 分析层 | 诉讼策略 | SWOT、风险评估、策略方案；上游接 JiubufaAnalyst 底稿（深度场景）或 JudgmentAnalyzer 救济路径表（再审/监督场景） |
+| **JiubufaAnalyst** | 分析层 | 要件审判九步法（深度） | 请求权基础穷举、构成要件归入、举证责任矩阵、证据缺口、胜诉概率区间（调起 `cn-jiubufa-case-analysis` skill） |
+| **JudgmentAnalyzer** | 分析层 | 裁判文书深度评审 | 判决书 IRAC 反向还原、程序瑕疵审查、上诉/再审/检察监督/执行异议救济路径概率评估 + 时效预警（调起 `cn-judgment-analysis` skill） |
+| **Writer** | 输出层 | 文书起草编排器（orchestrator） | 诉讼文书 → `cn-litigation-drafting` skill；律所对客户文书 → `cn-firm-documents` skill |
+| **ContractReviewer** | 输出层 | 合同审查编排器（orchestrator） | 分流 4 个 `cn-contract-review-*` skill（政企技术 / 技术许可 / 劳动 / 通用兜底）；输出 REDLINE/ORANGE/YELLOW 报告 + 红线 DOCX；含 Discuss → Execute re-entry 路由 |
+| **Summarizer** | 输出层 | 摘要生成 | 多层次摘要（详细 / 简洁 / 要点），落 `10 - 综合报告/` |
+| **Reporter** | 输出层 | 案件报告 | 整合多 agent 输出生成综合报告，落 `10 - 综合报告/` |
+| **Scheduler** | 支持层 | 期限与工时管理 | 法定期限计算（上诉 15 日 / 再审 6 月 / 检察监督 2 年 / 执行异议 15 日）；维护 root 级 `matter.yaml` 关键日期与 `工时记录.md` |
+| **Reviewer** | 支持层 | 跨 agent 质量审查（QA） | A/B/C/D 四级评分；orchestrator 模式下审落盘文件不审 skill 内部产物。**与 JudgmentAnalyzer 不同——本 agent 是 QA 层，JudgmentAnalyzer 是法律评审层** |
 
-## 🛠️ 安装指南
+---
 
-### 第一步：安装 Claude Code
+## 案件目录结构
 
-```bash
-# macOS / Linux（推荐）
-curl -fsSL https://claude.ai/install.sh | bash
+每个案件文件夹的标准布局：
 
-# 或通过 NPM 安装（需 Node.js 18+）
-npm install -g @anthropic-ai/claude-code
+```
+[案件文件夹]/
+├── matter.yaml              ← 结构化操作数据（当事人 / 案号 / 阶段 / 关键日期 / 文件夹规约）
+├── matter_dashboard.md      ← 人读案件看板
+├── AGENTS.md                ← per-case agent 边界与保密硬约束
+├── 工时记录.md              ← 工时与费用核算
+├── 00 - 客户提供/           ← 客户递交的原始材料
+├── 01 - 委托材料/           ← 委托代理协议、授权委托书、谈话笔录
+├── 02 - 法律研究/           ← 法条、判例、研究报告
+│   └── 案件分析/            ← DocAnalyzer / IssueIdentifier / Strategist / JiubufaAnalyst / JudgmentAnalyzer / ContractReviewer 落盘
+├── 03 - 我方证据/           ← EvidenceAnalyzer 默认落盘
+├── 04 - 对方证据/           ← 对方提交的证据
+├── 05 - 我方法律文书/       ← Writer 主要落盘
+├── 06 - 对方法律文书/
+├── 07 - 法院法律文书/       ← 法院送达的传票、裁定、判决、调解书
+├── 08 - 庭审笔录/
+├── 09 - 参考文件/           ← 参考法条、参考判例、参考模板
+├── 10 - 综合报告/           ← Reporter / Summarizer 落盘
+└── 99 - 复盘沉淀/           ← 结案后复盘、归档心得、工作流改进
 ```
 
-> Windows 用户请参考 [Claude Code 官方文档](https://docs.anthropic.com/claude-code)
+**权威定义**：[`.claude/rules/AgentMapping.md`](.claude/rules/AgentMapping.md)
+**新案件搭建**：调起 `new-case` skill
 
-验证安装：`claude --version`
+---
 
-### 第二步：配置 AI 模型
+## 外部 skill 依赖
 
-推荐使用国内 CodePlan 订阅服务：
+本项目的 4 个 orchestrator agent 不内嵌方法论，而是调起外部 skill 作为 single source of truth。安装/同步这些 skill 到本机才能让对应 agent 完整工作。
 
-- **[智谱 GLM Coding 订阅](https://www.bigmodel.cn/glm-coding?ic=GQ7UADJJF1)** ⭐⭐⭐⭐⭐
-- **[MiniMax Coding Plan 订阅](https://platform.minimaxi.com/subscribe/coding-plan?code=3VCVnwZP1O&source=link)** ⭐⭐⭐⭐⭐
+| Skill | 被依赖方 | 用途 |
+|-------|---------|------|
+| `cn-litigation-drafting` | Writer | 诉讼文书起草（起诉状 / 答辩状 / 上诉状 / 再审 / 检察监督 / 代理词 / 质证意见书 / 财产保全 / 证据清单 / 仲裁 / 反诉 共 11 类模板） |
+| `cn-firm-documents` | Writer | 律所对外/对客户文书（律师函 / 委托代理协议 / 授权委托书 / 法律意见书 / 谈话笔录 / 调解协议 / 离婚协议审阅 / 刑事格式文书） |
+| `cn-contract-review-universal` | ContractReviewer | 通用商事合同审查（兜底） |
+| `cn-contract-review-gov-tech-dev` | ContractReviewer | 政企技术采购 / 委托开发 / 系统集成合同 |
+| `cn-contract-review-gov-tech-licensing` | ContractReviewer | 专利 / 软著 / 技术许可合同 |
+| `cn-contract-review-labor-employment` | ContractReviewer | 劳动 / 劳务 / 竞业限制 / 保密协议 |
+| `cn-jiubufa-case-analysis` | JiubufaAnalyst | 要件审判九步法 9 步结构化分析 |
+| `cn-judgment-analysis` | JudgmentAnalyzer | 判决书 IRAC 反向还原 + 救济路径概率评估 |
 
-推荐使用 [cc-switch](https://github.com/farion1231/cc-switch) 图形化工具管理模型配置（macOS: `brew install --cask cc-switch`）。
+详见 [`AGENTS.md`](AGENTS.md) 的"外部 skill 桥接"段。
 
-### 第三步：启动
 
-```bash
-cd SuitAgent
-claude
+---
+
+## 变更历史与开发轨迹
+
+完整变更见 [`CHANGELOG.md`](CHANGELOG.md)。本 fork 在原项目基础上的迭代轨迹：
+
 ```
-
-> 💡 推荐新手使用 [Zed 编辑器](https://zed.dev/)，内置终端 + 文件树，操作更直观。
-
-## 🎯 常见使用场景
-
-### 场景1：收到起诉状（被告应诉）
-
-> "我收到了一份起诉状，需要应诉"
-
-系统自动：分析起诉状 → 识别争议焦点 → 法律检索 → 制定应诉策略 → 起草答辩状 → 质量审查 → 生成案件报告
-
-**输出**：争议焦点分析、法律检索报告、应诉策略方案、答辩状草稿、证据清单、完整案件报告
-
-### 场景2：新证据质证
-
-> "收到对方新证据，需要质证"
-
-系统自动：分析证据 → 三性质证 → 针对性法条研究 → 质证意见书 → 证据摘要
-
-### 场景3：庭审后分析
-
-> "庭审结束了，分析一下"
-
-系统自动：庭审笔录分析 → 对比前后证据 → 调整策略 → 庭审摘要 → 阶段报告
-
-### 场景4：原告起诉
-
-> "准备起诉，需要起诉状"
-
-系统自动：案件材料分析 → 争议焦点 → 法律检索 → 证据分析 → 起诉状 + 证据目录 → 案件摘要 → 完整起诉包
-
-### 场景5：诉前咨询
-
-> "客户咨询，需要服务方案"
-
-系统自动：沟通记录分析 → 识别客户需求 → 制定服务方案 → 法律服务方案书 → 方案摘要
-
-## ❓ 常见问题
-
-### Q: 我是律师但不太懂技术，能用 SuitAgent 吗？
-
-当然可以。推荐使用 [Zed 编辑器](https://zed.dev/)：下载安装后打开 SuitAgent 项目，按 `Cmd + `` ` 打开内置终端，输入 `claude` 启动，然后直接用中文描述需求即可（如"我收到起诉状，需要应诉"）。
-
-### Q: 支持哪些文档格式？
-
-PDF（自动OCR识别扫描件）、Word（.docx）、图片（.jpg/.png OCR识别）、纯文本（.txt）。
-
-### Q: 生成的法律文书可以直接使用吗？
-
-SuitAgent 生成的文书是专业草稿，建议人工审核确保事实准确性，根据具体案情调整，符合当地法院格式要求，由律师最终把关。
-
-### Q: 想要自定义工作流可以吗？
-
-可以。修改 `.claude/agents/` 下的配置文件调整Agent行为，添加自定义的法律文书模板，调整输出格式和结构。
-
-### Q: 如何查看生成的文件？
-
-在文件管理器或编辑器中打开项目根目录下的案件文件夹（以案件编号命名），内含12个标准化子目录（日程管理、委托材料、案件分析、法律研究、证据材料、法律文书等）。
-
-## 🔗 相关链接
-
-- **[Claude Code 官方文档](https://docs.anthropic.com/claude-code)** - 了解 Claude Code
-- **[cc-switch](https://github.com/farion1231/cc-switch)** - AI 模型配置切换工具
-- **[Zed 编辑器](https://zed.dev/)** - 推荐的新手友好编辑器
+v1.7.0 phase4   强化触发与路由（路由精度 + Reviewer 覆盖 + skill 入口标准化）
+v1.6.0 phase3!  命名规范清理（JudgmentReviewer → JudgmentAnalyzer BREAKING）
+v1.5.0 phase2c  JiubufaAnalyst + JudgmentReviewer agent
+v1.4.0 phase2b  ContractReviewer agent
+v1.3.0 phase2a! 案件目录结构统一为 11 numbered slots + matter triplet（去 emoji）
+v1.2.0 phase1   Writer ↔ cn-litigation-drafting 合并 + advisory 接入
+v1.1.0          原项目最后一个继承版本
+```
