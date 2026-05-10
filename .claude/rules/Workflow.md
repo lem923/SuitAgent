@@ -16,7 +16,8 @@
 ### 📝 Writer Agent - 文书起草编排器（orchestrator 模式）
 **触发关键词**:
 - 诉讼文书：写/起草 起诉状、答辩状、上诉状、再审申请、检察监督申请、代理词、质证意见、财产保全申请、证据清单、仲裁申请书、反诉状
-- 律所对客户文书：写/起草 律师函、催款函、委托合同、委托代理协议、授权委托书、谈话笔录、法律意见书、调解协议、离婚协议、刑事格式文书
+- 律所对客户**正式**文书：写/起草 律师函、催款函、委托合同、委托代理协议、授权委托书、谈话笔录、法律意见书、调解协议、离婚协议、刑事格式文书
+- 律所对客户**日常**沟通文书（v1.10.0+）：周报、月报、进度通报、阶段总结、风险预警、决策建议、决策建议书、客户问询回复
 - 通用：写/起草 法律文书
 
 **路由规则**: 检测到上述任一关键词 → 立即调用 Writer Agent
@@ -47,6 +48,26 @@
 - 调起统一的 `cn-contract-review` skill（取代旧 4 个 cn-contract-review-* specialized）
 - 14 类合同路由由 skill 自身完成（01 通用 / 02 买卖 / 03 租赁 / 04 服务 / 05 知识产权 / 06 担保 / 07 借贷赠与 / 08 互联网 / 09 婚姻家事 / 10 劳动 / 11 房地产 / 12 建设工程 / 13 公司投资 / 14 政企采购）
 - 详见 `.claude/agents/ContractReviewer.md` 的"调用 skill 的路由信息"
+
+---
+
+### 🎯 TrialPrep Agent - 庭审准备编排器
+**触发关键词**:
+- 庭审准备、庭前准备、庭审提纲、出庭准备、庭前 mock
+- 证人询问问题、争点预演、对方反驳预测、举证质证演练
+- 口头辩论、最后陈述、当庭出示证据策略
+
+**路由规则**: 检测到上述任一关键词 + 开庭日期 ≤ 3 周 → 立即调用 TrialPrep Agent
+
+**TrialPrep 内部流程（orchestrator 模式 v1.10.0+）**:
+- 调起项目内置 `cn-trial-preparation` skill 完成 4-stage workflow
+- 整合上游 IssueIdentifier / Researcher / EvidenceAnalyzer / Strategist / JiubufaAnalyst / JudgmentAnalyzer 产物
+- 输出 4 份庭审实战工具落盘到 `02 - 法律研究/案件分析/庭前准备/`
+
+**消歧（与其他 agent 的边界）**:
+- "庭审记录 / 庭审笔录" → 不命中本 agent，走 DocAnalyzer（庭审后处理）
+- "庭审策略" 仅在策略层评估时走 Strategist；战术层落地走本 agent
+- 庭后复盘 → 走 Postmortem，不在本 agent 范围
 
 ---
 
@@ -83,6 +104,27 @@
 - 上游接 DocAnalyzer 的事实抽取产物，不重复抽事实
 - **本 agent 不是质量审查器（Reviewer）**，是判决书的法律层评审
 - 详见 `.claude/agents/JudgmentAnalyzer.md` 的"触发阈值"
+
+---
+
+### 🪦 Postmortem Agent - 案件结案复盘编排器
+**触发关键词**:
+- 结案、已结案、案件复盘、案件归档、复盘沉淀、案件总结
+- 工作流改进、胜败原因分析、postmortem
+- matter.yaml 阶段字段更新为"已结案"
+
+**路由规则**: 检测到上述任一关键词 + 案件已实际结案（判决送达 / 调解履行完毕 / 撤诉 / 终本）→ 立即调用 Postmortem Agent
+
+**Postmortem 内部流程（orchestrator 模式 v1.10.0+）**:
+- 调起项目内置 `cn-case-postmortem` skill 完成 5-stage workflow
+- Stage 4 Distill 触发**人 in the loop**：memory 沉淀草稿等用户明确确认后才写入
+- 输出落盘到 `99 - 复盘沉淀/`；memory 沉淀分布到对应 skill 的 memory.md
+
+**消歧（与其他 agent 的边界）**:
+- 客户向结案报告 → 走 Reporter（结案前 / 中产物，对客户输出）
+- 判决书评审 → 走 JudgmentAnalyzer（产物是本 agent 的输入）
+- 跨 agent 产物质量审查 → 走 Reviewer（产物层 QA；本 agent 是流程层复盘）
+- 跨 matter 知识检索 → 暂无 agent 支持（v1.11.0+ 计划）
 
 ---
 
@@ -442,6 +484,52 @@
 
 **特色**：JudgmentAnalyzer 主动核查各救济路径的法定时效（民事 15 日上诉、再审 6 月、检察监督 2 年），客户接近时效届满时在响应顶部红色预警
 
+### 场景10：庭审准备（v1.10.0+）
+
+**描述**：开庭前 1-3 周，整合既有上游产物输出庭审实战工具
+
+**触发关键词**：庭审准备、庭前准备、庭审提纲、证人询问问题、争点预演、出庭准备
+
+**工作流步骤**：
+1. **DocAnalyzer**（如有最新材料）→ 解析新文件
+2. **IssueIdentifier** 复盘争点（基于本案当前最新事实）
+3. **Researcher** 复盘最新法条 / 司法解释（开庭前 1 周内）
+4. **EvidenceAnalyzer** 复盘证据三性 + 证据缺口
+5. **Strategist** 庭审策略 SWOT
+6. **TrialPrep** 主持庭审准备（调起 cn-trial-preparation skill）
+7. **Reviewer**（4 份庭审实战工具的 cross-agent QA）
+
+**预期输出**：
+- 庭审提纲 → `02 - 法律研究/案件分析/庭前准备/YYMMDD 庭审提纲.md`
+- 争点对抗预演 → `02 - 法律研究/案件分析/庭前准备/YYMMDD 争点对抗预演.md`
+- 证人询问问题清单 → `02 - 法律研究/案件分析/庭前准备/YYMMDD 证人询问问题清单.md`
+- 证据出示策略 → `02 - 法律研究/案件分析/庭前准备/YYMMDD 证据出示策略.md`
+- 客户配合事项清单（agent 响应内嵌）
+
+**特色**：开庭前至少 3 个工作日完成，留客户审阅时间；4 份产物均按 PRC 民事庭审 4 阶段（法庭调查 / 法庭辩论 / 最后陈述 / 调解询问）展开。
+
+### 场景11：结案复盘与归档（v1.10.0+）
+
+**描述**：案件最终结案（判决 / 调解 / 撤诉 / 终本）后，整合全案产物输出复盘报告 + 工作流改进建议 + memory 沉淀
+
+**触发关键词**：结案、已结案、案件复盘、案件归档、复盘沉淀、案件总结
+
+**工作流步骤**：
+1. **DocAnalyzer**（如最终判决 / 调解书未解析）→ 提取最终裁判事实
+2. **可选 - JudgmentAnalyzer** 判决书深度评审（如有判决）
+3. **Postmortem** 主持复盘（调起 cn-case-postmortem skill）
+4. **Reviewer** 复盘质量审查 + memory 沉淀脱敏复核
+5. **人 in the loop**：memory 沉淀草稿等用户明确确认后才写入对应 skill 的 memory.md
+
+**预期输出**：
+- 案件复盘报告 → `99 - 复盘沉淀/YYMMDD 案件复盘报告.md`
+- 工作流改进建议 → `99 - 复盘沉淀/YYMMDD 工作流改进建议.md`
+- memory 沉淀清单 → `99 - 复盘沉淀/YYMMDD memory 沉淀清单.md`
+- memory 写入：分布到 cn-litigation-drafting / cn-contract-review / cn-jiubufa-case-analysis / cn-judgment-analysis / cn-trial-preparation / cn-client-communications 各对应 memory.md
+- matter.yaml 字段更新：`当前阶段` → "已结案归档"
+
+**特色**：5 维度胜败原因分析（法律层 / 事实层 / 程序层 / 策略层 / 资源层）；保密硬约束 zero tolerance（memory 沉淀严禁含 client identifier）；可复用经验自动分发到对应 skill。
+
 ## 路由执行流程
 
 ### 路由优先级规则
@@ -485,9 +573,12 @@
 |-------|----------|----|---------------|
 | Writer | cn-litigation-drafting | **项目内置** `.claude/skills/cn-litigation-drafting/` | — |
 | Writer | cn-firm-documents | **外置**（用户全局 skill 库） | — |
+| Writer | cn-client-communications（v1.10.0+） | **项目内置** `.claude/skills/cn-client-communications/` | — |
 | ContractReviewer | cn-contract-review（v1.8.0+ 统一版） | **项目内置** `.claude/skills/cn-contract-review/` | — |
 | **JiubufaAnalyst** | **cn-jiubufa-case-analysis** | **项目内置** `.claude/skills/cn-jiubufa-case-analysis/` | — |
 | **JudgmentAnalyzer** | **cn-judgment-analysis** | **项目内置** `.claude/skills/cn-judgment-analysis/` | — |
+| **TrialPrep** (v1.10.0+) | **cn-trial-preparation** | **项目内置** `.claude/skills/cn-trial-preparation/` | — |
+| **Postmortem** (v1.10.0+) | **cn-case-postmortem** | **项目内置** `.claude/skills/cn-case-postmortem/` | — |
 | IssueIdentifier | — | hand off to JiubufaAnalyst（深度场景） |
 | Strategist | — | hand off to JiubufaAnalyst（庭前 SWOT 深度场景）/ JudgmentAnalyzer（再审/监督场景） |
 | DocAnalyzer | — | hand off to JudgmentAnalyzer（判决书 post-judgment 场景） |

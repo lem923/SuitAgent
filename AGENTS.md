@@ -2,7 +2,7 @@
 
 ## 系统定位
 
-SuitAgent 是面向律师的诉讼辅助系统，通过 13 个专业 agent 处理诉讼全生命周期的分析工作（含合同审查、要件审判九步法、判决书深度评审三个方法论入口）。
+SuitAgent 是面向律师的诉讼辅助系统，通过 15 个专业 agent 处理诉讼全生命周期的分析工作（含合同审查、要件审判九步法、判决书深度评审、庭审准备、结案复盘等方法论入口）。
 
 ## 核心工作模式
 
@@ -90,6 +90,9 @@ SuitAgent 的 4 个 orchestrator agent 不内嵌方法论，而是调起 skill �
 | **`cn-contract-review`**（v1.9.0+ 内置） | ContractReviewer 调起；统一合同审查 skill 覆盖 14 类（通用 / 买卖 / 租赁 / 服务 / 知识产权 / 担保 / 借贷赠与 / 互联网 / 婚姻家事 / 劳动 / 房地产 / 建设工程 / 公司投资 / 政企采购）；4-stage workflow + REDLINE/ORANGE/YELLOW + fallback 三档 + playbook 机制。**双 license**：详见 `.claude/skills/cn-contract-review/NOTICE.md` |
 | **`cn-jiubufa-case-analysis`**（v1.9.0+ 内置） | JiubufaAnalyst 调起；要件审判九步法（请求权基础穷举 / 构成要件归入 / 举证责任矩阵 / 证据缺口 / 胜诉概率区间） |
 | **`cn-judgment-analysis`**（v1.9.0+ 内置） | JudgmentAnalyzer 调起；判决书 IRAC 反向还原 + 程序瑕疵审查 + 救济路径概率对比 |
+| **`cn-trial-preparation`**（v1.10.0+ 内置） | TrialPrep 调起；开庭前 1-3 周触发；输出 4 份庭审实战工具（庭审提纲 / 争点对抗预演 / 证人询问问题清单 / 证据出示策略），按 PRC 民事庭审 4 阶段（法庭调查 / 法庭辩论 / 最后陈述 / 调解询问）展开 |
+| **`cn-client-communications`**（v1.10.0+ 内置） | Writer 调起（律所对客户**日常**沟通文书）；周报 / 月报 / 进度通报 / 阶段总结 / 风险预警 / 决策建议书 / 客户问询回复；与 cn-firm-documents（**正式**文书）边界明确 |
+| **`cn-case-postmortem`**（v1.10.0+ 内置） | Postmortem 调起；案件结案复盘 + 5 维度胜败分析 + 工作流改进 + **人 in the loop memory 沉淀**（用户明确确认后才写入对应 skill 的 memory.md，保密硬约束 zero tolerance）|
 
 外部 skill 的引用路径在各 Agent 文件的"方法论参考"段中显式声明，不要硬编码本机绝对路径。
 
@@ -102,10 +105,12 @@ SuitAgent 的 4 个 orchestrator agent 不内嵌方法论，而是调起 skill �
 
 | 用户提及的 skill | 调起的 agent |
 |------------------|------------|
-| `cn-litigation-drafting`（项目内置）/ `cn-firm-documents`（外置） | Writer |
+| `cn-litigation-drafting`（项目内置）/ `cn-firm-documents`（外置）/ `cn-client-communications`（项目内置 v1.10.0+） | Writer |
 | `cn-contract-review`（项目内置） | ContractReviewer |
 | `cn-jiubufa-case-analysis`（项目内置） | JiubufaAnalyst |
 | `cn-judgment-analysis`（项目内置） | JudgmentAnalyzer |
+| `cn-trial-preparation`（项目内置 v1.10.0+） | TrialPrep |
+| `cn-case-postmortem`（项目内置 v1.10.0+） | Postmortem |
 | `cn-litigation-case-folder-organizer` | 不经 agent，由用户本机手动跑（保留人工确认） |
 | `new-case` | 不经 agent，由 Scheduler 在新案件场景中调起，或用户主动触发 |
 

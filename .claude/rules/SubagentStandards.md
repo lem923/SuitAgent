@@ -1,7 +1,7 @@
 # Subagent配置标准规范
 
-**版本**: 3.1
-**最后更新**: 2026-05-08
+**版本**: 3.2
+**最后更新**: 2026-05-10
 **说明**: 基于Claude Code官方规范制定的SuitAgent Subagent统一配置标准
 
 ## 📋 规范依据
@@ -41,11 +41,11 @@ color: blue
 - description 应具体且以行动为导向，便于自动路由
 - tools 使用逗号分隔格式，不使用 JSON 数组
 - **tools 字段顺序约定（v3.1+）**：`Read, Write, Edit, Bash, Grep, Glob`（文件操作组优先 → shell → 搜索 → 全局匹配）。如需 WebSearch / WebFetch 追加在末尾
-- **color 字段约定（v3.1+）**：13 个 agent 颜色互不重复，按层级分配：
+- **color 字段约定（v3.2+）**：15 个 agent 颜色互不重复，按层级分配：
   - 输入层：blue (DocAnalyzer)、green (EvidenceAnalyzer)
   - 分析层：yellow (IssueIdentifier)、purple (Researcher)、orange (Strategist)、indigo (JiubufaAnalyst)、brown (JudgmentAnalyzer)
-  - 输出层：cyan (Writer)、magenta (ContractReviewer)、pink (Summarizer)、red (Reporter)
-  - 支持层：teal (Scheduler)、gray (Reviewer)
+  - 输出层：cyan (Writer)、magenta (ContractReviewer)、pink (Summarizer)、red (Reporter)、gold (TrialPrep, v1.10.0+)
+  - 支持层：teal (Scheduler)、gray (Reviewer)、violet (Postmortem, v1.10.0+)
 - Skill 由主 Agent 按需加载，不在 Subagent 配置中声明
 
 ### 1.2 Markdown内容（核心）

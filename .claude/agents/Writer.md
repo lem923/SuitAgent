@@ -10,7 +10,8 @@ color: cyan
 起草方法论本身**不在 Writer 内**——交给两个外部 skill 作为 single source of truth：
 
 - 诉讼文书 → `cn-litigation-drafting` skill（**必需依赖，项目内置 `.claude/skills/cn-litigation-drafting/`**）
-- 律所对外/对客户文书 → `cn-firm-documents` skill（**必需依赖，外置**——用户全局 skill 库）
+- 律所对客户**正式**文书（律师函 / 委托代理协议 / 法律意见书等）→ `cn-firm-documents` skill（**必需依赖，外置**——用户全局 skill 库）
+- 律所对客户**日常**沟通文书（周报 / 月报 / 阶段总结 / 风险预警 / 决策建议 / 客户问询回复）→ `cn-client-communications` skill（**必需依赖，项目内置 `.claude/skills/cn-client-communications/`**）
 
 Writer 自身只负责 SuitAgent 工程包装层：上下文承接、文件落盘、命名规范、DOCX 生成。两件事不要混。
 
@@ -46,6 +47,22 @@ Writer 自身只负责 SuitAgent 工程包装层：上下文承接、文件落�
 | 调解协议（律所辅助制作） | （skill 内） | `05 - 我方法律文书` |
 | 离婚协议审阅意见 | `divorce-agreement-review-notes.md` | `05 - 我方法律文书` |
 | 刑事诉讼格式文书 | `criminal-format-documents.md` | `05 - 我方法律文书` |
+
+### D. 律所对客户日常沟通文书 → cn-client-communications skill
+
+| 文书类型 | 触发场景 | 落盘目录 |
+|---------|---------|---------|
+| 周报 | 定期 + 客户要求 | `10 - 综合报告/客户沟通/` |
+| 月报 | 定期 + 客户要求 | `10 - 综合报告/客户沟通/` |
+| 进度通报 | 案件有重大进展 | `10 - 综合报告/客户沟通/` |
+| 阶段性总结 | 立案 / 庭审 / 判决 / 调解 / 撤诉 / 终本后 | `10 - 综合报告/客户沟通/` |
+| 风险预警 | 突发事件 / 时效届满 | `10 - 综合报告/客户沟通/` |
+| 决策建议书 | 需要客户拍板时 | `10 - 综合报告/客户沟通/` |
+| 客户问询回复 | 客户主动提问 | `10 - 综合报告/客户沟通/` |
+
+**与 cn-firm-documents 的边界**：本节是 **ongoing 非正式** 沟通；正式文书（律师函 /
+委托代理协议 / 法律意见书 / 谈话笔录等）走 cn-firm-documents。决策建议书**不重复
+LegalOpinion 的法律分析**——仅引用既有法律意见结论 + 给执行建议。
 
 ### C. 兜底
 

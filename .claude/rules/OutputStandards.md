@@ -1,7 +1,7 @@
 # Agent输出标准规范
 
-**版本**: 1.5
-**最后更新**: 2026-05-08
+**版本**: 1.6
+**最后更新**: 2026-05-10
 **说明**: 定义所有Agent输出文件的命名规范、格式标准和质量要求（注：Agent目录映射关系详见 AgentMapping.md）
 
 ## 🎯 文档职责说明
@@ -55,10 +55,12 @@
 | **IssueIdentifier** | 一次性 | `YYMMDD 争议焦点分析.md` | 争议焦点识别结果 |
 | **Researcher** | 一次性 | `YYMMDD 法律研究报告.md` | 法律研究成果 |
 | **Strategist** | 一次性 | `YYMMDD 应诉策略方案.md` | 策略分析结果 |
-| **Writer** | 一次性 | `YYMMDD [文书类型].md` | 各类法律文书 |
+| **Writer** | 一次性 | `YYMMDD [文书类型].md`（含日常沟通文书：周报 / 月报 / 阶段总结 / 风险预警 / 决策建议书等） | 诉讼文书（cn-litigation-drafting）/ 律所对客户正式文书（cn-firm-documents，外置）/ 律所对客户日常沟通（cn-client-communications，v1.10.0+）|
 | **ContractReviewer** | 一次性 | `YYMMDD [合同名] 审查报告.md` + `YYMMDD [合同名] 红线版.docx` | 合同审查报告与红线版 |
 | **JiubufaAnalyst** | 一次性 | `YYMMDD 九步法分析底稿.md`（+ 可选要件归入对照表 / 证据缺口清单） | 九步法结构化分析底稿 |
 | **JudgmentAnalyzer** | 一次性 | `YYMMDD [案号] 判决书审查报告.md`（+ 可选救济路径对比表 / 程序瑕疵清单） | 判决书 IRAC 反向还原 + 救济路径评估 |
+| **TrialPrep** (v1.10.0+) | 一次性 | 4 份：`YYMMDD 庭审提纲.md` + `YYMMDD 争点对抗预演.md` + `YYMMDD 证人询问问题清单.md` + `YYMMDD 证据出示策略.md` | 庭审实战工具，落 `02 - 法律研究/案件分析/庭前准备/` |
+| **Postmortem** (v1.10.0+) | 一次性 | 3 份：`YYMMDD 案件复盘报告.md` + `YYMMDD 工作流改进建议.md` + `YYMMDD memory 沉淀清单.md` | 结案复盘 + 5 维度胜败分析 + 人 in the loop memory 沉淀，落 `99 - 复盘沉淀/` |
 | **Summarizer** | 一次性 | `YYMMDD [摘要类型]摘要.md` | 各类摘要报告 |
 | **Reporter** | 一次性 | `YYMMDD [报告类型]报告.md` | 综合分析报告 |
 | **Scheduler** | 持续维护 | `工时记录.md`（root level） | 工时记录文档（不加日期，案件根目录） |

@@ -1,7 +1,7 @@
 # Agent 目录映射与案件结构
 
-**版本**: v3.4
-**最后更新**: 2026-05-09
+**版本**: v3.5
+**最后更新**: 2026-05-10
 **说明**: 定义统一的案件目录结构（11 numbered slots + 4 root level files）与 Agent 输出映射关系
 
 ## 🎯 文档职责说明
@@ -105,13 +105,20 @@ SuitAgent 采用四层架构：
 - **主要输出**: `05 - 我方法律文书/`
 - **次要输出**: `01 - 委托材料/`（委托代理协议、授权委托书、谈话笔录）
 - **特殊场景**: 法律意见书 / 代理方案 / 风险评估 → `02 - 法律研究/案件分析/` 或 `10 - 综合报告/`
-- **功能**：调起 cn-litigation-drafting / cn-firm-documents skill 起草文书
+- **客户日常沟通文书** (v1.10.0+): 周报 / 月报 / 进度通报 / 阶段总结 / 风险预警 / 决策建议书 / 客户问询回复 → `10 - 综合报告/客户沟通/`
+- **功能**：调起 cn-litigation-drafting（诉讼文书）/ cn-firm-documents（律所对客户**正式**文书）/ cn-client-communications（律所对客户**日常**沟通文书）skill
 
 #### ContractReviewer
 - **主要输出**: `02 - 法律研究/案件分析/`（审查报告 + 红线 DOCX）
 - **输入接收位**: `00 - 客户提供/`（待审合同原件）
 - **特殊场景**: 客户要求"代理方案 / 法律意见书"形式 → 调起 cn-firm-documents skill，落 `02/案件分析/` 或 `10 - 综合报告/`
 - **功能**：调起统一的 `cn-contract-review` skill（v1.8.0+ 统一版本）；skill 内部按 14 类合同自动路由；本 agent 不复制路由逻辑，仅做输入接收 + skill 调起 + 落盘工程层
+
+#### TrialPrep（v1.10.0+）
+- **主要输出**: `02 - 法律研究/案件分析/庭前准备/`（4 份庭审实战工具：庭审提纲 + 争点对抗预演 + 证人询问问题清单 + 证据出示策略）
+- **触发阈值**: 已收到法院开庭传票 + 开庭日期 ≤ 3 周；或用户明示"庭审准备"
+- **输入接收**: 上游 IssueIdentifier / Researcher / EvidenceAnalyzer / Strategist / JiubufaAnalyst / JudgmentAnalyzer 已完成产物
+- **功能**：调起项目内置 `cn-trial-preparation` skill 完成 4-stage workflow；本 agent 不复制方法论
 
 #### Reporter
 - **主要输出**: `10 - 综合报告/`
@@ -133,6 +140,12 @@ SuitAgent 采用四层架构：
 - **主要输出**: 无（不写文件，作 cross-agent 质量审查）
 - **功能**：质量把关
 
+#### Postmortem（v1.10.0+）
+- **主要输出**: `99 - 复盘沉淀/`（案件复盘报告 + 工作流改进建议 + memory 沉淀清单）
+- **触发阈值**: 案件已实际结案（判决送达 / 调解履行完毕 / 撤诉 / 终本）；或用户明示"结案 / 复盘"
+- **特色能力**: 人 in the loop 触发 memory 沉淀（用户明确确认后才写入对应 skill 的 memory.md）；matter.yaml 字段更新为"已结案归档"
+- **功能**：调起项目内置 `cn-case-postmortem` skill 完成 5-stage workflow（事实回顾 / 5 维度胜败分析 / 工作流改进 / 人 in the loop 沉淀 / 归档）
+
 ## 🔄 反向映射（目录 → Agent）
 
 | 目录 | 主要输出 Agent |
@@ -145,6 +158,7 @@ SuitAgent 采用四层架构：
 | `01 - 委托材料/` | Writer（生成委托文件） |
 | `02 - 法律研究/` (root of slot) | Researcher |
 | `02 - 法律研究/案件分析/` | DocAnalyzer、IssueIdentifier、Strategist、ContractReviewer、JiubufaAnalyst、JudgmentAnalyzer |
+| `02 - 法律研究/案件分析/庭前准备/` (v1.10.0+) | TrialPrep |
 | `03 - 我方证据/` | EvidenceAnalyzer（我方部分） |
 | `04 - 对方证据/` | DocAnalyzer（解析对方证据）、EvidenceAnalyzer（对方部分） |
 | `05 - 我方法律文书/` | Writer |
@@ -153,7 +167,8 @@ SuitAgent 采用四层架构：
 | `08 - 庭审笔录/` | DocAnalyzer、Summarizer |
 | `09 - 参考文件/` | Researcher |
 | `10 - 综合报告/` | Reporter、Summarizer |
-| `99 - 复盘沉淀/` | 人工归档（结案后） |
+| `10 - 综合报告/客户沟通/` (v1.10.0+) | Writer（调 cn-client-communications skill）|
+| `99 - 复盘沉淀/` (v1.10.0+) | Postmortem（自动复盘 + 人 in the loop memory 沉淀）|
 
 ## 💡 使用说明
 

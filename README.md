@@ -10,7 +10,7 @@
 - [项目概述](#项目概述)
 - [核心特性](#核心特性)
 - [系统架构](#系统架构)
-- [13 个 Subagent](#13-个-subagent)
+- [15 个 Subagent](#15-个-subagent)
 - [案件目录结构](#案件目录结构)
 - [skill 依赖](#skill-依赖)
 - [变更历史与开发轨迹](#变更历史与开发轨迹)
@@ -44,7 +44,7 @@
 
 | 维度 | 原项目（cat-xierluo） | 本 fork（lem923） |
 |------|---------------------|-----------------|
-| Subagent 数量 | 10 | **13**（+ ContractReviewer / JiubufaAnalyst / JudgmentAnalyzer） |
+| Subagent 数量 | 10 | **15**（+ ContractReviewer / JiubufaAnalyst / JudgmentAnalyzer / TrialPrep / Postmortem） |
 | 案件目录结构 | 12 层带 emoji | **11 numbered + 99 + matter triplet（无 emoji）** |
 | 案件元数据 | 单文件 `案件信息.md` | **matter triplet：matter.yaml + matter_dashboard.md + AGENTS.md** |
 | per-case 保密边界 | 无 | **每案 root 级 AGENTS.md（client identifier 红线 + 文件操作禁区）** |
@@ -65,7 +65,7 @@
 - **per-case 保密硬约束**：每个案件根目录有自己的 `AGENTS.md`，明确 client identifier 红线（永不进入 web_search/web_fetch query）、文件操作禁区（`_FINAL` / `_SIGNED` / `_盖章` 等后缀的不动）、索引规约
 - **结构化期限管理**：`matter.yaml` 的 `关键日期` 字段集中管理上诉 15 日、再审 6 月、检察监督 2 年、执行异议 15 日等法定时效；`JudgmentAnalyzer` 主动核查并对 ≤30 天时效红色加粗预警
 - **fallback positions 谈判结构化**：合同审查的 REDLINE / ORANGE 风险条款必填"目标 / 可签底线 / 绝对底线"三档，配合 playbook（组织/审查人标准立场）支持谈判节奏
-- **路由精度**：13 个 agent 触发关键词无冲突；多类目命中场景按意图分流（如"再审申请"按动词前缀分到 Writer 起草 vs JudgmentAnalyzer 评估）
+- **路由精度**：15 个 agent 触发关键词无冲突；多类目命中场景按意图分流（如"再审申请"按动词前缀分到 Writer 起草 vs JudgmentAnalyzer 评估）
 
 
 ---
@@ -99,23 +99,25 @@
 │  │    Writer    │ │ ContractReviewer │ │     Reporter     │  │
 │  │  文书起草    │ │    合同审查      │ │    报告整合      │  │
 │  └──────────────┘ └──────────────────┘ └─────────────────┘  │
-│  ┌──────────────────────────────────────────────────────┐    │
-│  │              Summarizer    摘要生成                  │    │
-│  └──────────────────────────────────────────────────────┘    │
+│  ┌────────────────────────┐ ┌──────────────────────────┐    │
+│  │       Summarizer       │ │     TrialPrep             │    │
+│  │       摘要生成         │ │     庭审准备 (v1.10.0+)   │    │
+│  └────────────────────────┘ └──────────────────────────┘    │
 └────────────────┬─────────────────────────────────────────────┘
                  ▼
 ┌──────────────────────────────────────────────────────────────┐
-│            支持层 (Support Layer)                              │  期限与质量保证
-│  ┌──────────────┐ ┌──────────────────────────────────────┐  │
-│  │  Scheduler   │ │            Reviewer                   │  │
-│  │  日程规划    │ │      跨 agent 质量审查（QA）          │  │
-│  └──────────────┘ └──────────────────────────────────────┘  │
+│            支持层 (Support Layer)                              │  期限 / 质量保证 / 复盘
+│  ┌──────────────┐ ┌──────────────────┐ ┌─────────────────┐  │
+│  │  Scheduler   │ │     Reviewer      │ │    Postmortem    │  │
+│  │  日程规划    │ │     QA 审查       │ │  结案复盘 + 沉淀 │  │
+│  │              │ │                   │ │  (v1.10.0+)      │  │
+│  └──────────────┘ └──────────────────┘ └─────────────────┘  │
 └──────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 13 个 Subagent
+## 15 个 Subagent
 
 | Agent | 层级 | 职责 | 核心能力 |
 | :---- | :--- | :--- | :------- |
@@ -126,12 +128,14 @@
 | **Strategist** | 分析层 | 诉讼策略 | SWOT、风险评估、策略方案；上游接 JiubufaAnalyst 底稿（深度场景）或 JudgmentAnalyzer 救济路径表（再审/监督场景） |
 | **JiubufaAnalyst** | 分析层 | 要件审判九步法（深度） | 请求权基础穷举、构成要件归入、举证责任矩阵、证据缺口、胜诉概率区间（调起 `cn-jiubufa-case-analysis` skill） |
 | **JudgmentAnalyzer** | 分析层 | 裁判文书深度评审 | 判决书 IRAC 反向还原、程序瑕疵审查、上诉/再审/检察监督/执行异议救济路径概率评估 + 时效预警（调起 `cn-judgment-analysis` skill） |
-| **Writer** | 输出层 | 文书起草编排器（orchestrator） | 诉讼文书 → `cn-litigation-drafting` skill；律所对客户文书 → `cn-firm-documents` skill |
+| **Writer** | 输出层 | 文书起草编排器（orchestrator） | 诉讼文书 → `cn-litigation-drafting` skill；律所对客户**正式**文书 → `cn-firm-documents` skill；律所对客户**日常**沟通文书 → `cn-client-communications` skill（v1.10.0+ 周报 / 月报 / 阶段总结 / 风险预警 / 决策建议书）|
 | **ContractReviewer** | 输出层 | 合同审查编排器（orchestrator） | 调起统一 `cn-contract-review` skill（v1.8.0+），skill 内部按 14 类合同自动路由（通用 / 买卖 / 租赁 / 服务 / 知识产权 / 担保 / 借贷赠与 / 互联网 / 婚姻家事 / 劳动 / 房地产 / 建设工程 / 公司投资 / 政企采购）；输出 REDLINE/ORANGE/YELLOW 报告 + fallback 三档 + 红线 DOCX；含 Discuss → Execute re-entry 路由 |
+| **TrialPrep** (v1.10.0+) | 输出层 | 庭审准备编排器（orchestrator） | 开庭前 1-3 周触发；调起 `cn-trial-preparation` skill 输出 4 份庭审实战工具（庭审提纲 / 争点对抗预演 / 证人询问问题清单 / 证据出示策略），按 PRC 民事庭审 4 阶段展开 |
 | **Summarizer** | 输出层 | 摘要生成 | 多层次摘要（详细 / 简洁 / 要点），落 `10 - 综合报告/` |
 | **Reporter** | 输出层 | 案件报告 | 整合多 agent 输出生成综合报告，落 `10 - 综合报告/` |
 | **Scheduler** | 支持层 | 期限与工时管理 | 法定期限计算（上诉 15 日 / 再审 6 月 / 检察监督 2 年 / 执行异议 15 日）；维护 root 级 `matter.yaml` 关键日期与 `工时记录.md` |
 | **Reviewer** | 支持层 | 跨 agent 质量审查（QA） | A/B/C/D 四级评分；orchestrator 模式下审落盘文件不审 skill 内部产物。**与 JudgmentAnalyzer 不同——本 agent 是 QA 层，JudgmentAnalyzer 是法律评审层** |
+| **Postmortem** (v1.10.0+) | 支持层 | 案件结案复盘编排器（orchestrator） | 案件最终结案后触发；调起 `cn-case-postmortem` skill 输出复盘报告 + 5 维度胜败分析 + 工作流改进 + **人 in the loop memory 沉淀**（保密硬约束 zero tolerance）|
 
 ---
 
@@ -177,6 +181,9 @@
 | `cn-contract-review` | `.claude/skills/cn-contract-review/` | ContractReviewer | 统一合同审查 skill 覆盖 14 类（通用 / 买卖 / 租赁 / 服务 / 知识产权 / 担保 / 借贷赠与 / 互联网 / 婚姻家事 / 劳动 / 房地产 / 建设工程 / 公司投资 / 政企采购）；4-stage workflow + REDLINE/ORANGE/YELLOW + fallback 三档 + playbook 机制 | **双 license**：60 个继承自 contract-copilot v1.5.1 的文件受 CC BY-NC 4.0；其余 26 个原创文件受项目根 AGPL v3。详见 `.claude/skills/cn-contract-review/NOTICE.md` |
 | `cn-jiubufa-case-analysis` | `.claude/skills/cn-jiubufa-case-analysis/` | JiubufaAnalyst | 要件审判九步法（请求权基础穷举 / 构成要件归入 / 举证责任矩阵 / 证据缺口 / 胜诉概率区间） | AGPL v3 |
 | `cn-judgment-analysis` | `.claude/skills/cn-judgment-analysis/` | JudgmentAnalyzer | 判决书 IRAC 反向还原 + 程序瑕疵审查 + 救济路径概率对比 | AGPL v3 |
+| `cn-trial-preparation` (v1.10.0+) | `.claude/skills/cn-trial-preparation/` | TrialPrep | 庭审准备实战工具：庭审提纲 / 证人询问问题清单 / 争点对抗预演 / 证据出示策略；按 PRC 民事庭审 4 阶段展开 | AGPL v3 |
+| `cn-client-communications` (v1.10.0+) | `.claude/skills/cn-client-communications/` | Writer | 律所对客户日常沟通文书：周报 / 月报 / 进度通报 / 阶段总结 / 风险预警 / 决策建议书 / 客户问询回复；与 cn-firm-documents（正式文书）边界明确 | AGPL v3 |
+| `cn-case-postmortem` (v1.10.0+) | `.claude/skills/cn-case-postmortem/` | Postmortem | 案件结案复盘 + 5 维度胜败分析 + 工作流改进 + 人 in the loop memory 沉淀（保密硬约束）| AGPL v3 |
 | `docx` / `pptx` / `xlsx` / `pdf` / `mineru-ocr` / `md2word` / `new-case` | `.claude/skills/<name>/` | 多 agent 调起 | 文件格式处理工具层 + 案件目录脚手架 | 项目根 LICENSE |
 
 ### 外置 skill（用户全局 skill 库；克隆仓库后另行同步）
@@ -196,6 +203,7 @@
 完整变更见 [`CHANGELOG.md`](CHANGELOG.md)。本 fork 在原项目基础上的迭代轨迹：
 
 ```
+v1.10.0         G + F + L 实战工具实化（TrialPrep + Postmortem agent + 3 内置 skill）
 v1.9.0 phase6!  4 个 legal skill 内置到 .claude/skills/（仅 cn-firm-documents 外置）
 v1.8.0 phase5!  合同审查 skill 统一（4 个 cn-contract-review-* → 1 个 cn-contract-review，14 类合同全覆盖）
 v1.7.0 phase4   强化触发与路由（路由精度 + Reviewer 覆盖 + skill 入口标准化）

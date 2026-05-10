@@ -5,6 +5,87 @@
 
 ---
 
+## [v1.10.0] - 2026-05-10 — PRC 实战工具实化（G + F + L 合并 phase）
+
+### ➕ 新增 (Added)
+
+#### 2 个新 agent
+
+- **`.claude/agents/TrialPrep.md`** (gold)：庭审准备编排器（orchestrator 模式）
+  - 触发：开庭日期 ≤ 3 周；或用户明示"庭审准备 / 庭前准备 / 庭审提纲 / 出庭准备"
+  - 调起 `cn-trial-preparation` skill 输出 4 份庭审实战工具
+  - 落盘：`02 - 法律研究/案件分析/庭前准备/`
+  - 与 DocAnalyzer（庭审后处理）/ Strategist（策略层）边界明确
+- **`.claude/agents/Postmortem.md`** (violet)：案件结案复盘编排器（orchestrator 模式）
+  - 触发：matter.yaml 阶段为"已结案"；或用户明示"结案 / 复盘 / 归档"
+  - 调起 `cn-case-postmortem` skill 完成 5-stage workflow
+  - **关键能力**：Stage 4 Distill 触发**人 in the loop**——memory 沉淀草稿等用户明确确认后才写入对应 skill 的 memory.md（保密硬约束 zero tolerance）
+  - 落盘：`99 - 复盘沉淀/`；matter.yaml 字段更新为"已结案归档"
+
+agent 总数：13 → 15
+
+#### 3 个新内置 skill
+
+- **`.claude/skills/cn-trial-preparation/`**（5 文件 / 573 行）：庭审准备方法论
+  - 4-stage workflow（Prepare / Build / Discuss / Execute / Learn）
+  - references：`trial-procedure-cn.md`（PRC 民事庭审 4 阶段）、`witness-questioning-techniques.md`（主询问 / 反询问 / 重新询问 / 弹劾路径）、`oral-argument-template.md`（争点对抗预演 + 法庭辩论 + 最后陈述）、`evidence-presentation-strategy.md`（证据出示顺序与策略）
+- **`.claude/skills/cn-client-communications/`**（5 文件 / 727 行）：律所对客户日常沟通文书
+  - 5 类文书：周报 / 月报 / 阶段性总结 / 风险预警（红 / 橙 / 黄三级）/ 决策建议书 / 客户问询回复
+  - 与 cn-firm-documents（**正式**文书）边界明确——本 skill 仅做**ongoing 非正式**沟通
+  - 决策建议书**不重复 LegalOpinion 法律分析**——仅引用既有结论 + 给执行建议
+  - references：`progress-report-template.md` / `stage-summary-template.md` / `risk-alert-template.md` / `decision-recommendation-template.md`
+  - 落盘：`10 - 综合报告/客户沟通/`
+- **`.claude/skills/cn-case-postmortem/`**（4 文件 / 625 行）：案件结案复盘方法论
+  - 5-stage workflow（Prepare / Recap / Analyze / Improve / Distill / Archive）
+  - references：`postmortem-template.md`（完整复盘报告模板）、`win-loss-analysis-framework.md`（5 维度胜败原因分析：法律层 / 事实层 / 程序层 / 策略层 / 资源层 + 反事实推演）、`memory-distillation.md`（人 in the loop 沉淀指引 + 脱敏检查清单）
+
+3 个 skill 全部受项目根 LICENSE（GNU AGPL v3）约束。
+
+### 🔄 调整 (Changed)
+
+- **Writer.md** 加第三类文书路由：律所对客户**日常**沟通文书 → `cn-client-communications` skill
+- **Workflow.md**：
+  - 新增 TrialPrep + Postmortem 触发块（含消歧规则）
+  - 新增场景 10（庭审准备）+ 场景 11（结案复盘与归档）
+  - skill 桥接表加 3 行（cn-trial-preparation / cn-client-communications / cn-case-postmortem）
+  - Writer 触发关键词加客户日常沟通词（周报 / 月报 / 风险预警 / 决策建议书等）
+- **AgentMapping.md** v3.5：
+  - 输出层加 TrialPrep；支持层加 Postmortem
+  - Writer 段加 cn-client-communications 路由说明
+  - 反向映射加 `02 - 法律研究/案件分析/庭前准备/`、`10 - 综合报告/客户沟通/`、`99 - 复盘沉淀/`
+- **AGENTS.md**：
+  - 系统定位 13 → 15 个 agent
+  - 项目内置 skill 表加 3 行
+  - skill → agent 对照表加 TrialPrep / Postmortem / cn-client-communications 映射
+- **SubagentStandards.md** v3.2：color 表扩到 15（+ gold for TrialPrep / + violet for Postmortem）
+- **OutputStandards.md** v1.6：标准输出表加 TrialPrep（4 份）+ Postmortem（3 份）行；Writer 行扩展含客户日常沟通
+- **README.md**：13 → 15 Subagent；架构图加 TrialPrep + Postmortem；skill 表加 3 行；变更轨迹加 v1.10.0
+- **CHANGELOG.md** v1.10.0
+
+### 📐 设计要点
+
+- **TrialPrep 在无开庭实战时仍可用作方法论沉淀**：开庭前不一定每次都触发；当前真实案件（260507 / 260508）尚未开庭，本 skill 暂为方法论占位，等下次开庭实战时校准
+- **F 与 cn-firm-documents 的边界**（确认决策）：律师函 / 委托代理协议 / 法律意见书等正式文书归 cn-firm-documents（外置）；周报 / 月报 / 风险预警 / 决策建议书等日常沟通归 cn-client-communications（内置）。决策建议书**仅引用** LegalOpinion 结论，不重复法律分析
+- **TrialPrep 落盘路径**（确认决策）：`02 - 法律研究/案件分析/庭前准备/`（作为案件分析子产物，而非 `08 - 庭审笔录/` 同级 sibling）
+- **memory 自动沉淀的人 in the loop**（确认决策）：Postmortem agent Stage 4 显式输出"沉淀草稿"等用户明确确认后才写入；用户回复必须明确含"同意 / 全部同意 / 部分同意（指定哪些）/ 重做"，模糊回复（如"看起来还行"）不得据此判定为同意
+- **保密硬约束 zero tolerance**：cn-case-postmortem/references/memory-distillation.md 含完整脱敏检查清单（9 项）+ 抽象 4 步法 + 合规 / 不合规示例
+
+### 🚫 不在 v1.10.0
+
+- E（Researcher 工具实化）/ J（跨 matter 知识库）→ v1.11.0+（系统级基础设施，需要前期 case 数据积累后做才有用）
+- K（Workflow DAG 重构）→ 仅触发时做（YAGNI）
+- H（IP 诉讼）/ I（数据合规）→ 用户当前不办相关案件，非紧急需求
+- A/B/C/D（跨境扩展）→ PRC 完善阶段稳定后再做
+
+### 🎯 v1.10.0 后系统状态
+
+- **15 agent**（4 个 v1.10.0+ 新增 / 11 个原有）
+- **8 项目内置 skill**（含 v1.10.0+ 新增 3 个：cn-trial-preparation / cn-client-communications / cn-case-postmortem）
+- **1 外置必需依赖 skill**（cn-firm-documents）
+- **1 外置可选 skill**（cn-litigation-case-folder-organizer）
+
+---
+
 ## [v1.9.0] - 2026-05-09 — Phase 6: 4 个 legal skill 内置到项目（含 BREAKING）
 
 ### ⚠️ 破坏性变更 (Breaking)
