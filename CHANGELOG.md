@@ -5,6 +5,65 @@
 
 ---
 
+## [v1.10.1] - 2026-05-11 — 案件文件夹重命名工序 + .gitignore 兜底
+
+### ➕ 新增 (Added)
+
+#### new-case skill 扩展为 dual-mode（重大更新）
+
+- **Mode 1 创建模式**（已有）：从空白生成新案件框架
+- **Mode 2 重整理模式**（新增）：对已有案件文件夹做合规检查 + 必要时 mv 重命名 + 内部结构整理
+  - 现状扫描 → 5 项合规检查（YYMMNN / 空格 / 与 / 简称 / 案由）→ 缺字段人 in the loop 询问 → 生成 mv 命令 → 用户确认后执行 → 内部结构整理 → matter.yaml 字段更新
+  - **不自动 mv**（保密硬约束 + 客户案件不可逆操作）
+
+#### 严格命名规范
+
+新增 `.claude/rules/OutputStandards.md` v1.7 "案件文件夹命名规范"大段：
+
+- 格式：`{YYMMNN} {原告简称} 与 {被告简称} {案由}`
+- **YYMMNN 严格 6 位**（年 2 + 月 2 + NN 2）
+- **NN 自然顺序号规则**：本所当月内案件按收案时间递增；每月独立起算；不跳号；一旦使用不回收
+- 特殊场景变体：行政诉讼用"诉"、婚姻家事保留双名、多原告/多被告用"等"、仲裁、涉外
+- 6 个标准例 + 6 个反例修正示例
+- 一键合规检查 bash 脚本
+
+#### 新增 /organize-case 命令
+
+`.claude/commands/organize-case.md`：调起 new-case skill Mode 2 重整理模式
+
+- 触发：用户自然语言"整理这个案件 / 重命名案件 / 案件归一化"，或显式 `/organize-case [folder-path]`
+- 自动 dispatch 到 new-case Mode 2
+- 完整使用示例（含 260507 重命名实战 demo）
+
+### 🔄 调整 (Changed)
+
+- **`.gitignore` 案件文件夹兜底**（在 v1.10.0 commit 中已含；本 v1.10.1 仅补 patch 说明）：
+  - 原 `[0-9][0-9][0-9][0-9]*/` 仅匹配 YYMMNN 数字前缀
+  - 新增 14 个兜底模式：`*纠纷/` / `*离婚/` / `*案件/` / `*合同案/` / `*诉*/` / `* 与 */` / `* 对 */` / `* V. */` 等
+  - 验证 4 案件文件夹（260507 / 260508 / 260509 / 王荣 劳动纠纷）全部 ignored，vscode-extension/ 无误伤
+- `OutputStandards.md` v1.7：新增"案件文件夹命名规范"大段（约 100 行）+ v1.7 变更历史
+- `CHANGELOG.md` v1.10.1
+
+### 📋 仓库外配套（tmp/ 不入仓）
+
+- `tmp/cn-litigation-case-folder-organizer_patch_v2.md`：外置 organizer skill 的 Rename 阶段 patch（8-stage workflow，新增 Stage 3.5 Rename）
+- `tmp/rename-existing-cases.md`：4 个现有案件的一对一重命名建议（含 mv 命令模板 + 字段空位）
+
+### 📐 设计要点
+
+- **dual-mode skill 设计**：new-case 一个 skill 处理两种相关但不同的场景（创建 + 重整理），避免新建独立 skill 造成的功能重复（与外置 organizer skill 既配套又区隔）
+- **NN 自然编号实施**：扫描项目根目录 YYMMNN 文件夹，取当月最大 + 1；即使中间跳号也按最大值递增（不回填）
+- **保密硬约束**：4 案件的重命名建议在 tmp/（不入仓）；mv 命令模板含字段空位（`[对方简称]`）由用户本机手工填入
+- **/organize-case 命令与 new-case Mode 2 的关系**：命令是触发入口，skill 是方法论实现；用户既可以直接说"整理这个案件"触发，也可以显式 `/organize-case <path>` 触发
+
+### 🚫 不在 v1.10.1
+
+- 外置 organizer skill 的自动同步（在 read-only mount，用户本机手动 patch）
+- 4 个现有案件的自动 mv（必须人 in the loop + 字段空位需用户填）
+- NN 编号的全局唯一性强制（仍允许跳号；多月间编号独立）
+
+---
+
 ## [v1.10.0] - 2026-05-10 — PRC 实战工具实化（G + F + L 合并 phase）
 
 ### ➕ 新增 (Added)
