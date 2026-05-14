@@ -95,6 +95,43 @@ Step 5：完成标识
   → 响应末尾输出：调用 skill 名、落盘路径、未填字段、时限提醒
 ```
 
+## 3E 自检流程（v1.11.0b 强制嵌入，max_iter=1）
+
+> **核心理念**：调起 skill 后、落盘前必须插入一次自检（Examine 步）。Self-Refine 范式（NeurIPS 2023, arXiv 2303.17651）+ CoVe 校验问题清单（arXiv 2309.11495），拦截低级错误，作为 Reviewer 升级版（v1.11.0c）前置的第一道防御。**不可跳过**。
+
+### Explore（已有）
+
+按上文"工作流程"调起 skill 完成草稿/分析。skill 内部自身的 QC（cn-litigation-drafting §0 强制合规规则 / cn-firm-documents 内嵌规则 / cn-client-communications 内嵌规则）必须先完成。
+
+### Examine（强制，max_iter=1）
+
+落盘前对照本 agent 的"校验问题清单"逐项核查。每项答 Y/N，**任一项 N 进入 Enhance 修订一次**。
+
+**校验问题清单（agent 专属，7 项）**：
+
+- [ ] W1 文书类型已落到路由表分类（A 诉讼文书 / B 律所正式文书 / C 兜底 / D 客户日常沟通），不分类不准起草 (Y/N)
+- [ ] W2 上游 context 完整且未补造（DocAnalyzer / Researcher / Strategist / EvidenceAnalyzer 各产物存在或显式标注缺失，不编造） (Y/N)
+- [ ] W3 已调起对应 skill（不内嵌起草），兜底情况已在响应中显式声明 "未走 skill，纯手工起草" (Y/N)
+- [ ] W4 若调用 cn-litigation-drafting：skill 输出末尾的 "## QC 自检结果" 段已读取并核对（不缺失、专属 + 通用 QC 项无 N 未处理） (Y/N)
+- [ ] W5 文件命名符合 OutputStandards.md（YYMMDD 前缀 + 中文文书类型） (Y/N)
+- [ ] W6 落盘路径符合 AgentMapping.md 的 11-slot 目录映射（诉讼文书 → 05；委托材料 → 01；客户日常沟通 → 10/客户沟通；证据清单 → 03 等） (Y/N)
+- [ ] W7 客户标识符未在落盘正文外的响应中泄露（CLAUDE.md 保密硬约束 zero tolerance） (Y/N)
+
+### Enhance（条件触发）
+
+- Examine 全 Y → 直接落盘（不进入修订）
+- Examine 任一项 N → 针对 N 项修订草稿一次（不整体重写）→ 重新执行 Examine
+- 修订后仍 N → **不擅自落盘**，输出末尾显式列"未通过 Examine 项" + 修订摘要 + 升级建议（升级用户裁定 / Reviewer 接管）
+
+### Examine 自检结果段（落盘前响应必含）
+
+```
+## Examine 自检结果
+专属 7 项：[Y/Y/Y/Y/Y/Y/Y]
+修订次数：[0 / 1]
+未通过项（如有）：[列具体编号 + fail 理由 + 修订摘要 + 是否升级]
+```
+
 ## 工作检查清单
 
 - [ ] 文书类型已落到上表分类（不分类不准起草）

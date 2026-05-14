@@ -5,6 +5,73 @@
 
 ---
 
+## [v1.11.0b] - 2026-05-14 — 6 个 orchestrator agent 嵌入 3E 自检（输出质量纵深防御 Stage 2）
+
+### ➕ 新增 (Added)
+
+#### 6 个 orchestrator agent 一次性嵌入 3E 自检流程
+
+- **架构思路**：Explore（调起 skill）→ Examine（CoVe-style 校验问题独立审查）→ Enhance（条件触发修订或落盘）
+- **吸收文献**：
+  - Self-Refine（Madaan et al., NeurIPS 2023, arXiv 2303.17651）：generator + refiner + feedback 同一 LLM 范式
+  - CoVe Chain-of-Verification（Dhuliawala et al., arXiv 2309.11495）：draft → plan verification questions → independent answer
+- **位置**：插入到每个 agent 的 "工作流程" 后、"工作检查清单" 前
+- **固定 max_iter=1**（不设置 fast/normal/deep 三档开关，统一 normal 模式）
+- **作为 Reviewer 升级版（v1.11.0c）前置的第一道防御**：拦截低级错误，让 Reviewer 专注高级错误
+
+#### 各 agent 的 Examine 校验问题清单（合计 45 项）
+
+| Agent | 校验项数 | 重点核查 |
+|------|--------|---------|
+| **Writer** | 7 (W1-W7) | 路由分类 / 上游 context 完整 / 调起 skill 非内嵌起草 / cn-litigation-drafting QC 段已读 / 命名 / 路径映射 / 保密 |
+| **ContractReviewer** | 7 (CR1-CR7) | 主类目识别 / 调起 skill / REDLINE/ORANGE/YELLOW 齐全 / fallback 三档 / 签前必查清单 / 红线 DOCX 落盘到案件 slot / 多类目次类目提示 |
+| **JiubufaAnalyst** | 8 (JB1-JB8) | 9 步顺序完整 / 独立二级标题 / 请求权穷举 / 要件逐项归入 / 举证责任覆盖 / 证据缺口对应 / 概率区间表述 / 备考表对照 |
+| **JudgmentAnalyzer** | 8 (JA1-JA8) | IRAC 覆盖所有判项 / 救济时效 web_search 核对 / ≤30 天预警 / 程序瑕疵清单 / 概率区间 / 证据认定拆解 / RED/ORANGE/YELLOW 齐全 / 救济路径对比表 |
+| **TrialPrep** | 7 (TP1-TP7) | 4 份产物齐全 / 4 阶段框架 / 上游 6 产物整合 / 落盘路径 / 客户配合清单 / ≤3 周阈值 / 反驳预测 ≥3 点 |
+| **Postmortem** | 8 (PM1-PM8) | 5 阶段完整 / 5 维度胜败分析 / 3 份产物 / 落盘路径 / memory 脱敏 zero tolerance / 人 in the loop 已等用户确认 / matter.yaml 已更新 / 改进建议分发 |
+
+合计：**45 项 Examine 校验问题**
+
+#### 输出格式：落盘前响应必含 "## Examine 自检结果"段
+
+```
+## Examine 自检结果
+专属 N 项：[Y/Y/.../Y]
+修订次数：[0 / 1]
+未通过项（如有）：[列具体编号 + fail 理由 + 修订摘要 + 是否升级]
+```
+
+#### Enhance 条件触发逻辑
+
+- Examine 全 Y → 直接落盘（不进入修订）
+- Examine 任一项 N → 针对 N 项修订草稿一次（不整体重写） → 重新执行 Examine
+- 修订后仍 N → **不擅自落盘**，输出末尾显式列未通过项 + 修订摘要 + 升级建议（升级用户裁定 / Reviewer 接管）
+
+### 🔄 调整 (Changed)
+
+- **`.claude/agents/Writer.md`**：+44 行 3E 段（含 7 项 W 系列 Examine Q）
+- **`.claude/agents/ContractReviewer.md`**：+44 行 3E 段（含 7 项 CR 系列 Examine Q）
+- **`.claude/agents/JiubufaAnalyst.md`**：+45 行 3E 段（含 8 项 JB 系列 Examine Q）
+- **`.claude/agents/JudgmentAnalyzer.md`**：+45 行 3E 段（含 8 项 JA 系列 Examine Q）
+- **`.claude/agents/TrialPrep.md`**：+44 行 3E 段（含 7 项 TP 系列 Examine Q）
+- **`.claude/agents/Postmortem.md`**：+45 行 3E 段（含 8 项 PM 系列 Examine Q）
+
+### 🚫 不在 v1.11.0b 范围（按计划保留至 v1.11.0c）
+
+- v1.11.0c：Reviewer 升级为对抗式 Verifier（结构化 rubric Y/N + diagnostic notes + orchestrator auto-retry max-retry=2）
+
+### 🚫 用户明确否决项（不实施）
+
+- 试点观察期（用户明示 "不做试点，全部一次性修改"）
+- fast / normal / deep 三档模式开关（用户明示 "都以 normal 输出"）
+
+### 📊 文献引用
+
+- Self-Refine（NeurIPS 2023, arXiv 2303.17651）
+- Chain-of-Verification CoVe（arXiv 2309.11495）
+
+---
+
 ## [v1.11.0a] - 2026-05-14 — cn-litigation-drafting skill-level QC（输出质量纵深防御 Stage 1）
 
 ### ➕ 新增 (Added)
