@@ -1,7 +1,85 @@
 # 变更记录
 
-> Last updated: 2026-05-08
+> Last updated: 2026-05-14
 > 所有对用户或其他协作者有影响的变更都会在此记录。使用 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/) 格式。
+
+---
+
+## [v1.11.0a] - 2026-05-14 — cn-litigation-drafting skill-level QC（输出质量纵深防御 Stage 1）
+
+### ➕ 新增 (Added)
+
+#### cn-litigation-drafting 内嵌 mandatory skill-level QC（重大更新，结构性 gap 修补）
+
+- **背景**：项目内 4 个 legal skill 中，cn-contract-review / cn-jiubufa-case-analysis / cn-judgment-analysis 均已内嵌 skill-level QC 自检；唯独 cn-litigation-drafting 没有，质量全靠 Reviewer 事后审查，是已暴露的结构性 gap
+- **吸收文献**：Self-Refine（NeurIPS 2023, arXiv 2303.17651）generator+refiner+feedback 范式 / CoVe Chain-of-Verification（arXiv 2309.11495）校验问题独立审查
+- **修补**：参考 cn-jiubufa "0. 强制合规规则"硬约束模式
+
+#### SKILL.md §0 强制合规规则（最高优先级，不得违反）
+
+- 顶层加 "completion gated by self-check, cannot skip" 硬约束（5 条强制规则）
+- 输出末尾必含 "## QC 自检结果"段（Y/N 矩阵 + 修订记录 + 未通过项处理）
+- max_skill_iter = 1（修订次数上限 1 次）
+
+#### 11 模板各加专属 QC 块（共 68 项专属 QC 项）
+
+| 模板 | QC 项数 | 重点核查 |
+|------|--------|---------|
+| A 起诉状 | 6 | 诉求可执行 / 诉求 = 损失列式 / 管辖核对 / 请求权唯一 / 配套清单 / 送达地址 |
+| B 答辩状 | 5 | 逐段回应 / 证据立场 / 反驳法条 / 抗辩权基础 / 自认陷阱 |
+| C 上诉状 | 6 | 上诉期 / 不扩张诉求 / 新主张限制 / 事实vs法律错误区分 / 上诉费 / 不混"再审" |
+| D 再审申请书 | 7 | 6 月期限 / 211 条事由 / 具体论证 / 新证据合理理由 / 不混"上诉" / 再审前置 / 监督备选 |
+| E 检察监督申请书 | 6 | 2 年期限 / 再审前置 / 监督事由对照 / 检察机关层级 / 不混"上诉/再审" / 抗诉vs建议 |
+| F 代理词 | 6 | 焦点排序 / 已查明vs争议事实 / 请求权对要件 / 法条异议具体 / 不辩论赛风格 / 诉求明确 |
+| G 质证意见书 | 6 | 三性逐项独立 / 具体不认可理由 / 证明力评估 / 取证程序合规 / 形式适用规则 / 鉴定质证 |
+| H 财产保全申请 | 7 | 现实危险具体 / 标的明确 / 不超债权 / 担保方式 / 103vs104 / 不可逆损害 / 反赔风险 |
+| I 证据清单 | 6 | 编号一致 / 证明目的具体 / 形式分类 / 电子数据固化 / 提交方式 / 举证期限 |
+| J 仲裁申请书 | 7 | 仲裁条款援引 / 现行规则版本 / seat vs适用法 / 仲裁员选任 / 范围对应 / 仲裁费 / 配套清单 |
+| K 反诉状 | 6 | 牵连性论证 / 233 条引用 / 提起时点 / 反诉管辖 / 金额列式 / 配套清单 |
+
+合计：**68 项模板专属 QC**
+
+#### 通用 8 项共享 QC（所有模板 A-K 均必须通过）
+
+- 当事人主体完整且统一
+- 法律依据现行有效（search-first 强制）
+- 法条引用准确到条款项
+- 事实陈述有证据对应
+- 损失金额列式计算
+- 程序时限准确
+- 客户标识符未泄露（zero tolerance）
+- 法院/仲裁机构全称准确
+
+#### 新增 `.claude/skills/cn-litigation-drafting/references/drafting-qc-checklist.md`
+
+- 275 行 / ~14.5KB
+- 第 1 节：通用 8 项共享 QC 详解
+- 第 2 节：11 模板专属 QC 项详解（含易错点 + search-first 锚点表）
+- 第 3 节：失败处理流程（max_skill_iter=1 + 修订后仍 fail 处理）
+- 第 4 节：输出末尾必含段示例
+- 第 5 节：与外层 orchestrator（Writer agent）的衔接说明
+- 第 6 节：变更历史
+
+### 🔄 调整 (Changed)
+
+- **`.claude/skills/cn-litigation-drafting/SKILL.md`**：
+  - 612 行（原 480 行；新增 132 行 QC 内容）
+  - Step 5 自查清单 → 升级为 "Step 5: QC 自检（强制，不可跳过）"，引用 references/drafting-qc-checklist.md
+  - 新增 Step 6: 交付配套（拆出原 Step 5 的交付项）
+  - 质量红线 footer 增加 3 条新红线（不得跳过 QC / 不得凭训练数据引用 / 不得泄露客户标识符）
+  - 输出格式段加第 6 项 "QC 自检结果"必含段
+  - 新增"参考资料"段（指向 references/drafting-qc-checklist.md）
+
+### 🚫 不在 v1.11.0a 范围（按计划保留至 v1.11.0b/c）
+
+- v1.11.0b：6 个 orchestrator agent 内嵌 3E（Explore/Examine/Enhance）自检步
+- v1.11.0c：Reviewer 升级为对抗式 Verifier + orchestrator auto-retry（max-retry=2）
+
+### 📊 文献引用
+
+- Self-Refine（Madaan et al., NeurIPS 2023, arXiv 2303.17651）：iterative refinement with self-feedback
+- Chain-of-Verification CoVe（Dhuliawala et al., arXiv 2309.11495）：draft → plan verification questions → independent answer
+- LeMAJ（LLM-as-a-Judge for legal）：结构化 rubric + Y/N（避免浮动评分 hallucination）
 
 ---
 
