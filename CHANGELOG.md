@@ -5,6 +5,114 @@
 
 ---
 
+## [v1.11.0c] - 2026-05-14 — Reviewer 升级为对抗式 Verifier with auto-retry（输出质量纵深防御 Stage 3 完成）
+
+### ➕ 新增 (Added)
+
+#### Reviewer agent 从"事后 QA 评分员"升级为"对抗式 Verifier with auto-retry handshake"
+
+- **架构改造**：
+  - 旧版：A/B/C/D 浮动评分，C/D 后无定义动作；orchestrator 不读 Reviewer 输出
+  - 新版：8 维度结构化 Y/N rubric（无浮动评分）+ 可硬核对项 web_search 白名单源核对 + 具体 fail 项 diagnostic notes + auto-retry handshake（max-retry=2，第 3 次升级用户）
+- **吸收文献**：
+  - LeMAJ（LLM-as-a-Judge for Legal）：结构化 Y/N rubric，避免浮动评分在 legal 场景 58-88% hallucination 风险
+  - CoVe Chain-of-Verification（arXiv 2309.11495）：校验问题独立审查
+  - Reflexion（NeurIPS 2023, arXiv 2303.11366）：verbal feedback as semantic gradient（retry handshake 反喂机制的理论基础）
+- **完成 v1.11.0 纵深防御三层**：
+  - Stage 1（v1.11.0a）：cn-litigation-drafting skill-level QC
+  - Stage 2（v1.11.0b）：6 orchestrator agent 嵌入 3E 自检（45 Examine Q）
+  - Stage 3（v1.11.0c）：Reviewer 对抗式 Verifier + auto-retry（8 维度 × 53 子项）
+
+#### 8 维度 Rubric（结构化 Y/N，无浮动评分）
+
+| 维度 | 类型 | 子项数 | 核查重点 |
+|------|------|-------|---------|
+| **D1 法条引用** | 硬核对（web_search 白名单） | 7 | 现行有效版本 / 文号 / 施行日期 / 精确条款项 |
+| **D2 案号 / 判例引用** | 硬核对（court.gov.cn） | 5 | 案号格式 / 实际存在 / 裁判要旨准确 |
+| **D3 事实陈述一致性** | 软评估 | 6 | 与上游 agent 产物一致 / 时间线 / 数字 |
+| **D4 时效计算** | 硬核对（现行民诉法） | 9 | 诉讼时效 / 上诉期 / 再审期 / 检察监督期 / 举证期 / ≤30 天预警 |
+| **D5 程序节点** | 硬核对（现行民诉法） | 7 | 管辖 / 立案 / 程序前置 / 仲裁条款 / 反诉牵连 / 保全程序 |
+| **D6 主体清晰** | 软评估 | 5 | 全篇姓名/公司名一致 / 诉讼地位 / 代理关系链 |
+| **D7 内部逻辑** | 软评估 | 6 | 诉求 = 损失列示 / 法律依据对应事实 / 编号一致 / 段落无矛盾 |
+| **D8 保密硬约束** | **zero tolerance** | 8 | 未泄露完整客户标识符 / 已工程化占位符 / web_search query 脱敏 |
+
+合计：**53 项子项核查**
+
+#### 评级阈值映射
+
+| 评级 | Fail 维度数 | D8 状态 | 处理 |
+|------|------------|---------|------|
+| A 优秀 | 0 fail | Y | pass，本轮完成 |
+| B 良好 | 1 fail（非 D8）| Y | pass，diagnostic notes 提示但不 retry |
+| C 合格但需修改 | 2-3 fail（非 D8）| Y | trigger retry |
+| D 不合格 | ≥4 fail，**或任意 D8 fail** | — | trigger retry |
+
+**D8 special rule**：任意 D8 fail → 直接降级 D（不论其他 7 维度评级，zero tolerance）
+
+#### auto-retry handshake 协议
+
+1. orchestrator agent（Writer / ContractReviewer / JiubufaAnalyst / JudgmentAnalyzer / TrialPrep / Postmortem）落盘后**自动**触发 Reviewer
+2. Reviewer 评 A/B → pass，本轮完成
+3. Reviewer 评 C/D → 反喂 fail 维度 diagnostic notes 给 orchestrator → orchestrator 在 v1.11.0b 嵌入的 3E 自检流程中以 Reviewer notes 为新 Examine 输入 → 重跑 Enhance → 再次落盘 → Reviewer 再评
+4. **max-retry=2 硬上限**：第 3 次仍 C/D → escalate 用户裁定
+5. **D8 fail 在 retry 1 即可挽救**（脱敏后即可）；仍 D8 fail → 直接 escalate（zero tolerance 不接受 retry）
+
+#### Diagnostic Notes 输出格式
+
+- Y/N 矩阵（8 维度表格）
+- Fail 项详细 diagnostic notes（具体到子项编号 + fail 理由 + 建议修订方向）
+- Retry 决策（pass / retry 1 / retry 2 / escalate）
+- Escalate 时输出累计 Y/N 矩阵演变 + 累计 fail 维度 + 升级建议（用户裁定 / 资深律师人工复核 / 推迟落盘）
+
+#### 新增 `.claude/rules/ReviewerRubric.md`
+
+- 288 行 / ~8.2KB
+- 第 1 节：8 维度 Rubric 详细 53 子项规范 + web_search 白名单引用源
+- 第 2 节：评级阈值映射 + D8 special rule
+- 第 3 节：auto-retry handshake 协议详细规范 + retry 边界条件 + escalate 输出格式
+- 第 4 节：Diagnostic Notes 输出格式（Reviewer 响应必含段）
+- 第 5 节：与 v1.11.0b 3E 自检的衔接（不重叠原则）
+- 第 6 节：与既有 OutputStandards.md 的关系
+- 第 7 节：变更历史
+
+### 🔄 调整 (Changed)
+
+- **`.claude/agents/Reviewer.md`**：
+  - 116 行 → 205 行（重写为对抗式 Verifier）
+  - frontmatter description 升级（突出 auto-retry + zero tolerance + max-retry=2）
+  - tools 增加 WebSearch / WebFetch（硬核对项需要）
+  - 新增 8 维度 Rubric 概要表 + 评级阈值映射表 + 对抗式 Verifier 协议段（auto-retry handshake）
+  - 工作流程升级为 7 步（含 D8 优先检查 + 硬核对 web_search + 软评估）
+  - 审查范围按 agent 类型表升级（每 agent 重点维度对应表）
+  - 完成标识升级（含累计 retry 次数 + 最终决策）
+  - 新增文献引用段（LeMAJ / CoVe / Reflexion）
+
+### v1.11.0 三阶段完成总结
+
+| Stage | Version | 主交付 | 核查项 | 防御层 |
+|-------|---------|-------|--------|--------|
+| Stage 1 | v1.11.0a | cn-litigation-drafting skill-level QC | 11 模板 × 76 项（8 共享 + 68 专属）| skill 内 |
+| Stage 2 | v1.11.0b | 6 orchestrator agent 3E 自检 | 6 agent × 45 Examine Q | agent 内 |
+| Stage 3 | v1.11.0c | Reviewer 对抗式 Verifier + auto-retry | 8 维度 × 53 子项 + max-retry=2 | 跨 agent |
+
+**三层纵深防御逐级递进**：skill 内 → agent 内 → 跨 agent。每一层有自己的修订循环（skill QC max_skill_iter=1 / agent 3E max_iter=1 / Reviewer auto-retry max-retry=2），任何高级错误（法条版本错 / 案号编造 / 时效误算 / 保密泄露）须穿过全部三层才能产出。
+
+### 🚫 已明确不在 v1.11.0 范围（推迟）
+
+- Multi-Agent Debate（成本不匹配，已在 plan 中排除）
+- Hand-off 摘要协议（推 v1.12.0，等 context 真爆再做）
+- matter lesson buffer（推 v1.13.0，等 5+ 案件积累）
+- Leader 监督层（用户已否决）
+- 多模态输出（用户已否决）
+
+### 📊 文献引用
+
+- LLM-as-a-Judge for Legal（LeMAJ）：结构化 rubric + Y/N（避免浮动评分 hallucination）
+- Chain-of-Verification CoVe（arXiv 2309.11495）：校验问题独立审查
+- Reflexion（NeurIPS 2023, arXiv 2303.11366）：verbal feedback as semantic gradient
+
+---
+
 ## [v1.11.0b] - 2026-05-14 — 6 个 orchestrator agent 嵌入 3E 自检（输出质量纵深防御 Stage 2）
 
 ### ➕ 新增 (Added)
