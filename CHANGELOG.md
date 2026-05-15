@@ -1,7 +1,36 @@
 # 变更记录
 
-> Last updated: 2026-05-14
+> Last updated: 2026-05-15
 > 所有对用户或其他协作者有影响的变更都会在此记录。使用 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/) 格式。
+
+---
+
+## [v1.11.0d] - 2026-05-15 — Researcher 嵌入规范现行性强制核验（纵深防御上游前移）
+
+### 🔧 修复 (Fixed)
+
+#### 流程缺口：失效规范从上游 Researcher 无声流入下游
+
+- **暴露途径**：v1.11.0 P0 first pass 验证（260508 赵利平案答辩状 before/after）发现——旧版 Researcher 产出的《法律研究报告》引用了已失效的最高法《劳动争议解释（一）》第 32 条（被法释〔2025〕12 号废止，2025-09-01 施行）与京高法发〔2017〕142 号（被京高法发〔2024〕534 号取代）。失效规范无声流入下游答辩状（人工初稿与旧管线均未发现），开庭前 4 天才被 v1.11.0c Reviewer D1 web_search 白名单核对兜住。
+- **根因**：Researcher 已授予 `WebSearch`/`WebFetch` 工具，但 agent 正文无强制现行性核验工序——靠下游 Reviewer 晚兜底而非上游早拦截。
+
+### ➕ 新增 (Added)
+
+#### Researcher agent 嵌入"规范现行性强制核验"工序（`.claude/agents/Researcher.md`）
+
+- 工作流程新增第 4 步专章「🚨 规范现行性强制核验（search-first 硬约束）」：零信任训练数据 / 白名单源（复用 ReviewerRubric §1 单一来源，不复列防漂移）/ 逐条核验四要素 / 失效不得静默删除 / 以案件关键时点为现行性基准 / 无法核验即标注不得改判
+- 显式 WebSearch 调用约定 + query 模板 + 保密 query 脱敏（对齐 ReviewerRubric D8.7）
+- 报告强制产出「引用规范现行性核验表」（缺失即下游 Reviewer D1 关联项 fail）
+- 核心职责 / 工作检查清单 / 输出要求 / 完成标识 同步加现行性核验项
+
+#### 验证留痕
+
+- P0 验证报告：`status/v1.11.0-validation/260508-答辩状-before-after.md`（C→B→pass，auto-retry handshake 闭环走通，D8 安全断言成立）
+- HANDOFF Section 2.1 进度更新 + Section 7 追加 3 条 cowork→Claude Code 迁移 quirk
+
+### 🎯 设计原则
+
+上游预防（Researcher 现行性核验）与下游兜底（Reviewer D1）构成纵深——早拦截优于晚兜底，但不取消下游核对（双层冗余，对齐 v1.11.0 三层防御 defense-in-depth）。
 
 ---
 
