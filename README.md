@@ -45,7 +45,7 @@
   - **Stage 1（v1.11.0a）**：`cn-litigation-drafting` 内嵌 skill-level QC 自检（11 模板 × 76 项 = 8 共享 + 68 专属 Y/N 校验）
   - **Stage 2（v1.11.0b）**：6 个 orchestrator agent（Writer / ContractReviewer / JiubufaAnalyst / JudgmentAnalyzer / TrialPrep / Postmortem）一次性嵌入 3E 自检流程（Explore→Examine→Enhance），共 45 项 Examine 校验问题
   - **Stage 3（v1.11.0c）**：`Reviewer` 从事后 A/B/C/D 评分员升级为对抗式 Verifier with auto-retry（8 维度 × 53 子项 Y/N rubric + 可硬核对项 web_search 白名单源核对 + auto-retry handshake max-retry=2 + D8 保密硬约束 zero tolerance）
-  - **上游前移（v1.11.0d）**：P0 验证（260508）暴露上游 `Researcher` 引用失效规范无声流入下游（被下游 Reviewer D1 兜住但属晚拦截）；`Researcher` 嵌入「规范现行性强制核验」工序（零信任训练数据 / WebSearch 白名单逐条核验 / 报告强制产出现行性核验表 / 失效不得静默删除）。上游预防与下游 Reviewer D1 构成纵深——260511 second pass 经中性 prompt 确证生效，使下游首轮 A 级 0 retry
+  - **上游前移（v1.11.0d）**：P0 验证（260508）暴露上游 `Researcher` 引用失效规范无声流入下游（被下游 Reviewer D1 兜住但属晚拦截）；`Researcher` 嵌入「规范现行性强制核验」工序（零信任训练数据 / WebSearch 白名单逐条核验 / 报告强制产出现行性核验表 / 失效不得静默删除）。上游预防与下游 Reviewer D1 构成纵深。**P0 三 pass 实证收官**：260508（Writer/劳动法，C→B→pass，捕获 2 失效 SJ）+ 260511（Researcher+Writer/继承法，A 级 0 retry，v1.11.0d 上游前移确证）+ 260507（JudgmentAnalyzer/检察监督，B 级 0 retry，N* 接管闭环 + 民诉法 2023 修正条号补核），覆盖 起草/研究/判决评审 三链路 × 三法域 × 失效SJ/误引/变号 三现行性风险型态，结论**通过可推广**
 
 ### 改动对比
 
@@ -216,7 +216,7 @@
 完整变更见 [`CHANGELOG.md`](CHANGELOG.md)。本 fork 在原项目基础上的迭代轨迹：
 
 ```
-v1.11.0d phase9 Researcher 嵌入规范现行性强制核验（纵深防御上游前移；P0 260508/260511 验证驱动）
+v1.11.0d phase9 Researcher 嵌入规范现行性强制核验（纵深防御上游前移；P0 三 pass 260508/260511/260507 验证通过可推广）
 v1.11.0c phase9 Reviewer 对抗式 Verifier with auto-retry（8 维度 × 53 子项 Y/N rubric + max-retry=2 + D8 zero tolerance）
 v1.11.0b phase9 6 个 orchestrator agent 嵌入 3E 自检（45 Examine Q）
 v1.11.0a phase9 cn-litigation-drafting skill-level QC（11 模板 × 76 项 mandatory checklist）

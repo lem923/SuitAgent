@@ -25,8 +25,12 @@
 
 #### 验证留痕
 
-- P0 验证报告：`status/v1.11.0-validation/260508-答辩状-before-after.md`（C→B→pass，auto-retry handshake 闭环走通，D8 安全断言成立）
-- HANDOFF Section 2.1 进度更新 + Section 7 追加 3 条 cowork→Claude Code 迁移 quirk
+- P0 三 pass 验证报告（均在 `.gitignore` 的 `status/v1.11.0-validation/`，保留本机）：
+  - first pass `260508-答辩状-before-after.md`（Writer/劳动法：C→B→pass，auto-retry handshake 闭环，捕获 2 失效 SJ，D8 安全断言成立）
+  - second pass `260511-起诉状-second-pass.md`（Researcher+Writer/继承法：A 首轮 pass，v1.11.0d 声明层中性 prompt 确证生效 + 上游 3 误引拦截）
+  - third pass `260507-终审判决深度分析-third-pass.md`（JudgmentAnalyzer/检察监督：B 首轮 pass，N* 接管闭环最强验证，民诉法 2023 修正条号补核）
+- P0 阶段性结论：覆盖 起草/研究/判决评审 三链路 × 劳动/继承/建设用地 三法域 × 失效SJ/误引/变号 三风险型态，**通过可推广**
+- HANDOFF Section 2.1/7 同步更新（v1.3）
 
 ### 🎯 设计原则
 
