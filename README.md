@@ -47,26 +47,6 @@
   - **Stage 3（v1.11.0c）**：`Reviewer` 从事后 A/B/C/D 评分员升级为对抗式 Verifier with auto-retry（8 维度 × 53 子项 Y/N rubric + 可硬核对项 web_search 白名单源核对 + auto-retry handshake max-retry=2 + D8 保密硬约束 zero tolerance）
   - **上游前移（v1.11.0d）**：P0 验证（260508）暴露上游 `Researcher` 引用失效规范无声流入下游（被下游 Reviewer D1 兜住但属晚拦截）；`Researcher` 嵌入「规范现行性强制核验」工序（零信任训练数据 / WebSearch 白名单逐条核验 / 报告强制产出现行性核验表 / 失效不得静默删除）。上游预防与下游 Reviewer D1 构成纵深。**P0 四 pass 实证全面收官**：260508（Writer/劳动法，C→B→pass，捕获 2 失效 SJ）+ 260511（Researcher+Writer/继承法，A 级 0 retry，v1.11.0d 上游前移确证）+ 260507（JudgmentAnalyzer/检察监督，B 级 0 retry，N* 接管闭环 + 民诉法 2023 修正条号补核）+ 260510（ContractReviewer/合同审查，B 级 0 retry，cn-contract-review 10-employment 路由 + N* 补核 12 处法条），覆盖 起草/研究/判决评审/合同审查 **四大主链路**，N\* 工具边界诚实处置跨 4 类 orchestrator agent 一致复现，结论**通过可全面推广**
 
-### 改动对比
-
-| 维度 | 原项目（cat-xierluo） | 本 fork（lem923） |
-|------|---------------------|-----------------|
-| Subagent 数量 | 10 | **15**（+ ContractReviewer / JiubufaAnalyst / JudgmentAnalyzer / TrialPrep / Postmortem） |
-| 案件目录结构 | 12 层带 emoji | **11 numbered + 99 + matter triplet（无 emoji）** |
-| 案件元数据 | 单文件 `案件信息.md` | **matter triplet：matter.yaml + matter_dashboard.md + AGENTS.md** |
-| per-case 保密边界 | 无 | **每案 root 级 AGENTS.md（client identifier 红线 + 文件操作禁区）** |
-| 法律 skill 集成 | advisory 引用 | **5 个核心 legal skill（4 内置于 `.claude/skills/` + 1 外置 cn-firm-documents），由 4 个 orchestrator agent 包装调起** |
-| 合同审查 | 无 | **ContractReviewer + 统一 cn-contract-review skill（14 类内置路由）** |
-| 要件审判九步法 | 无 | **JiubufaAnalyst + 内置 cn-jiubufa-case-analysis skill** |
-| 判决书深度评审 | 无 | **JudgmentAnalyzer + 内置 cn-judgment-analysis skill（含救济路径时效预警）** |
-| skill 部署 | 用户全局 skill 库（外置） | **7 个 legal skill 内置（含 v1.10.0+ 三个新增）；仅 cn-firm-documents 外置** |
-| 庭审准备 | 无 | **TrialPrep + 内置 `cn-trial-preparation` skill（4 份庭审实战工具，PRC 民事庭审 4 阶段）** |
-| 结案复盘 | 无 | **Postmortem + 内置 `cn-case-postmortem` skill（5 维度胜败分析 + 人 in the loop memory 沉淀）** |
-| 案件命名 | 无强制规范 | **`{YYMMNN} {原告} 与 {被告} {案由}` 严格规范 + NN 自然顺序号 + .gitignore 兜底** |
-| 输出质量保证 | 无（仅 Reviewer A/B/C/D 评分） | **v1.11.0 纵深三层防御：skill QC（76 项）+ agent 3E（45 项）+ Reviewer 对抗式 Verifier with auto-retry（53 子项 + max-retry=2 + D8 zero tolerance）** |
-
----
-
 ## 核心特性
 
 - **诉讼全周期覆盖**：从诉前案件结构分析（九步法）→ 起诉/答辩 → 庭审 → 判决评审（IRAC 反推 + 救济路径概率）→ 再审/检察监督文书起草，单一项目内贯通
