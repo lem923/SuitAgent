@@ -182,20 +182,21 @@ SuitAgent 采用四层架构：
 
 ### 与外部 organizer skill 的关系
 - `cn-litigation-case-folder-organizer` 默认 14-slot 方案与本规范一致（00-09 + 99）
-- 本规范新增 `10 - 综合报告/` slot，外部 skill 应同步加（patch 见 `tmp/cn-litigation-case-folder-organizer_补丁.md`）
+- 本规范新增 `10 - 综合报告/` slot；外部 organizer skill 的同步补丁由用户在本机维护，不纳入本仓（避免悬空引用）
 
 ### 项目内置 4 个 legal skill（v1.9.0+）
 - `cn-litigation-drafting` / `cn-contract-review` / `cn-jiubufa-case-analysis` / `cn-judgment-analysis` 均位于 `.claude/skills/` 内，由对应 orchestrator agent 调起；克隆仓库即可用
 - 仅 `cn-firm-documents` 因含律所专用模板保持外置
 
 ### 与旧 12 层结构的迁移
-- 当前真实案件文件夹（如 260507 / 260508）按旧 12 层结构组织，迁移由用户在本机用 organizer skill 跑（迁移说明见 `tmp/案件迁移说明.md`）
+- 当前真实案件文件夹按既定结构组织，迁移由用户在本机用 organizer skill 跑（迁移说明由用户本机维护，不纳入本仓）
 - agent 在迁移前**不要在旧结构案件上执行写操作**——会产生混乱
 
 ## 🔄 变更历史
 
 | 版本 | 日期 | 更新内容 |
 | :--- | :--- | :--- |
+| v3.5 | 2026-05-16 | v1.11.1 工程债清偿：变更历史与头部版本号对齐（v3.3–v3.5 TrialPrep/Postmortem 落盘映射 + 庭前准备/复盘沉淀 slot 等修订散见正文与 commit 历史，未单列）；本行起强制头部版本=变更表顶行 |
 | v3.2 | 2026-05-08 | Phase 2C：新增 JiubufaAnalyst（九步法分析）+ JudgmentAnalyzer（判决书评审）两个方法论 agent，均输出到 `02 - 法律研究/案件分析/` |
 | v3.1 | 2026-05-08 | Phase 2B：新增 ContractReviewer agent（合同审查编排器），输入 `00 - 客户提供/`，输出 `02 - 法律研究/案件分析/` |
 | v3.0 | 2026-05-08 | Phase 2A 重构：12 层带 emoji → 11 numbered slots（无 emoji） + 4 root level 文件（matter triplet + 工时记录），新增 99 复盘沉淀，引入 per-case AGENTS.md |

@@ -456,6 +456,7 @@ done
 
 | 版本 | 日期 | 更新内容 |
 | :--- | :--- | :--- |
+| v1.7 | 2026-05-16 | v1.11.1 工程债清偿：变更历史与头部版本号对齐（v1.6 TrialPrep/Postmortem 输出行 + v1.7 案件文件夹命名规范等修订散见正文与 commit 历史，未单列）；本行起强制头部版本=变更表顶行 |
 | v1.5 | 2026-05-08 | Phase 2C：新增 JiubufaAnalyst + JudgmentAnalyzer 标准输出行 |
 | v1.4 | 2026-05-08 | Phase 2B：新增 ContractReviewer 标准输出行 |
 | v1.3 | 2026-05-08 | Phase 2A 同步：Scheduler 持续维护文件迁到案件根目录（matter.yaml + 工时记录.md），不再单独 `[案件编号].yaml` |

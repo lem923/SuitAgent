@@ -1,7 +1,7 @@
 # Reviewer Rubric 规范
 
-**版本**: 1.0
-**最后更新**: 2026-05-14
+**版本**: 1.1
+**最后更新**: 2026-05-16
 **说明**: Reviewer agent（v1.11.0c 升级版）的 8 维度结构化 rubric 详细子项规范 + web_search 核对锚点 + 评级阈值映射 + Diagnostic notes 格式 + auto-retry 协议详细规范
 
 ---
@@ -287,4 +287,5 @@ Reviewer 响应末尾必含"## Reviewer 评估结果"段：
 
 | 版本 | 日期 | 更新内容 |
 | :--- | :--- | :--- |
-| v1.0 | 2026-05-14 | v1.11.0c 初始版本：8 维度 Y/N rubric + 50 子项 + auto-retry 协议 + max-retry=2 |
+| v1.1 | 2026-05-16 | v1.11.1 工程债清偿：§5 新增 N\* 接管职责段 + 指针引用 NStarProtocol.md；订正子项计数 50→53（与正文/README/HANDOFF 一致）；头部版本对齐 |
+| v1.0 | 2026-05-14 | v1.11.0c 初始版本：8 维度 Y/N rubric + 53 子项 + auto-retry 协议 + max-retry=2 |
