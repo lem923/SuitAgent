@@ -37,6 +37,7 @@ Stage 0：Prepare（准备）
       - Strategist 策略 + SWOT
       - JudgmentAnalyzer 救济路径表（如二审/再审庭审）
   → 读取程序信息：庭前会议笔录（如有）/ 举证期限届满日 / 双方证据清单
+  → 启动读经验库（v1.12.0 闭环读侧）：读本 skill 目录 memory.md；若有非"（暂无条目）"真实条目，按案由 / 庭审阶段筛选 top-3 纳入准备参考；不存在或全空则跳过（no-op，不阻断、不污染 context）。只读不写，写入由 cn-case-postmortem 负责
 
 Stage 1：Build（庭审准备主体）
   → Step 1：争点对抗预演（references/oral-argument-template.md）
