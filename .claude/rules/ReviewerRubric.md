@@ -272,6 +272,8 @@ Reviewer 响应末尾必含"## Reviewer 评估结果"段：
 - 3E Examine 已核查过的项（如 cn-litigation-drafting QC 自检 + Writer 3E Examine W4 "QC 自检结果段已读"），Reviewer **不重复核查**该项是否被读取，但**仍核查其内容是否合规**（如 QC 自检结果段是否含 fail 项 / 是否如实呈现）
 - D 维度按文书类型不同重点不同（详见 Reviewer.md "审查范围（按 agent 类型）"表）
 
+**N\* 接管职责**：上游 orchestrator agent 因线程无 WebSearch 而对硬核对项标 **N\*** 并 escalate 时，Reviewer 是其接管层——必须对每个 N\* 项实际执行 D1/D2/D4/D5 白名单 web_search 双源核对，产出可定稿结论（精确现行条号/文号/期限），完成闭环。N\* 项经 Reviewer 补核后，若仅属工具边界（非实质缺陷）不计为质量 fail。完整协议（定义/适用条件/记法/反例/闭环判据）见 [`NStarProtocol.md`](./NStarProtocol.md)。
+
 ---
 
 ## 6. 与既有 OutputStandards.md 的关系
