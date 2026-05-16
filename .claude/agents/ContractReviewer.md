@@ -104,17 +104,9 @@ cn-contract-review skill 的 4-stage 工作流（Prepare → Review → Discuss 
 
 ## 3E 自检流程（v1.11.0b 强制嵌入，max_iter=1）
 
-> **核心理念**：调起 skill 后、落盘前必须插入一次自检（Examine 步）。Self-Refine 范式（NeurIPS 2023, arXiv 2303.17651）+ CoVe 校验问题清单（arXiv 2309.11495），拦截低级错误，作为 Reviewer 升级版（v1.11.0c）前置的第一道防御。**不可跳过**。
+> 3E（Explore→Examine→Enhance）通用规范——核心理念 / Explore / Examine 协议 / Enhance 条件触发 / 自检结果段格式——见 **[`.claude/rules/SelfCheck3E.md`](../rules/SelfCheck3E.md)**（落盘前必读必执行，max_iter=1，不可跳过）。下为本 agent 专属内容。
 
-### Explore（已有）
-
-按上文"工作流程"调起 skill 完成草稿/分析。skill 内部自身的 QC（cn-contract-review skill 内嵌 4-stage workflow + REDLINE/ORANGE/YELLOW 分级 + qc-checklist.md）必须先完成。
-
-### Examine（强制，max_iter=1）
-
-落盘前对照本 agent 的"校验问题清单"逐项核查。每项答 Y/N，**任一项 N 进入 Enhance 修订一次**。
-
-**校验问题清单（agent 专属，7 项）**：
+### Examine 校验问题清单（agent 专属，7 项）
 
 - [ ] CR1 合同主类目已由 skill 内部完成路由识别（agent 不复制路由逻辑） (Y/N)
 - [ ] CR2 已调起 cn-contract-review skill（非内嵌审查） (Y/N)
@@ -123,12 +115,6 @@ cn-contract-review skill 的 4-stage 工作流（Prepare → Review → Discuss 
 - [ ] CR5 签署前必查清单已生成（pre-signing checklist） (Y/N)
 - [ ] CR6 Execute 阶段产出的红线 DOCX 已从 /mnt/user-data/outputs/ 移到案件 slot（02 - 法律研究/案件分析/YYMMDD [合同名] 红线版.docx） (Y/N)
 - [ ] CR7 多类目命中时次类目提示已到位（响应内嵌建议补充审查项） (Y/N)
-
-### Enhance（条件触发）
-
-- Examine 全 Y → 直接落盘（不进入修订）
-- Examine 任一项 N → 针对 N 项修订草稿一次（不整体重写）→ 重新执行 Examine
-- 修订后仍 N → **不擅自落盘**，输出末尾显式列"未通过 Examine 项" + 修订摘要 + 升级建议（升级用户裁定 / Reviewer 接管）
 
 ### Examine 自检结果段（落盘前响应必含）
 

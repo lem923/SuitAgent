@@ -58,17 +58,9 @@ Step 5：完成标识
 
 ## 3E 自检流程（v1.11.0b 强制嵌入，max_iter=1）
 
-> **核心理念**：调起 skill 后、落盘前必须插入一次自检（Examine 步）。Self-Refine 范式（NeurIPS 2023, arXiv 2303.17651）+ CoVe 校验问题清单（arXiv 2309.11495），拦截低级错误，作为 Reviewer 升级版（v1.11.0c）前置的第一道防御。**不可跳过**。
+> 3E（Explore→Examine→Enhance）通用规范——核心理念 / Explore / Examine 协议 / Enhance 条件触发 / 自检结果段格式——见 **[`.claude/rules/SelfCheck3E.md`](../rules/SelfCheck3E.md)**（落盘前必读必执行，max_iter=1，不可跳过）。下为本 agent 专属内容。
 
-### Explore（已有）
-
-按上文"工作流程"调起 skill 完成草稿/分析。skill 内部自身的 QC（cn-case-postmortem skill 5-stage workflow + 人 in the loop memory 沉淀机制）必须先完成。
-
-### Examine（强制，max_iter=1）
-
-落盘前对照本 agent 的"校验问题清单"逐项核查。每项答 Y/N，**任一项 N 进入 Enhance 修订一次**。
-
-**校验问题清单（agent 专属，8 项）**：
+### Examine 校验问题清单（agent 专属，8 项）
 
 - [ ] PM1 5 阶段（Fact / Analysis / Improvement / Distill / Archive）完整执行 (Y/N)
 - [ ] PM2 5 维度胜败分析完成（法律层 / 事实层 / 程序层 / 策略层 / 资源层 每维度 win/lose/draw 评估） (Y/N)
@@ -78,12 +70,6 @@ Step 5：完成标识
 - [ ] PM6 Stage 4 Distill 触发的人 in the loop 已等待用户明确确认才写入对应 skill 的 memory.md（未先斩后奏） (Y/N)
 - [ ] PM7 matter.yaml 阶段字段已更新为 "已结案归档"；案件根目录 matter_dashboard.md 已添加结案总结段 (Y/N)
 - [ ] PM8 工作流改进建议已分发到对应 skill 的潜在改进点（响应内嵌建议清单） (Y/N)
-
-### Enhance（条件触发）
-
-- Examine 全 Y → 直接落盘（不进入修订）
-- Examine 任一项 N → 针对 N 项修订草稿一次（不整体重写）→ 重新执行 Examine
-- 修订后仍 N → **不擅自落盘**，输出末尾显式列"未通过 Examine 项" + 修订摘要 + 升级建议（升级用户裁定 / Reviewer 接管）
 
 ### Examine 自检结果段（落盘前响应必含）
 
