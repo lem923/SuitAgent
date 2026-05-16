@@ -93,8 +93,14 @@ Stage 5：Archive（归档）
 
 ## 三条铁律
 
-1. **保密硬约束 zero tolerance**：memory 沉淀严禁含 client identifier（当事人姓名 / 案号 /
-   合同金额原文 / 身份证号 / 银行账户）；脱敏检查由 Reviewer 二次复核
+1. **保密硬约束 zero tolerance（D8 写侧 gate，v1.12.0 命名化）**：memory 沉淀严禁含
+   client identifier（当事人姓名 / 案号 / 合同金额原文 / 身份证号 / 银行账户）。
+   这是项目级 **D8 zero-tolerance gate**（与 `.claude/rules/ReviewerRubric.md` D8 /
+   `.claude/rules/NStarProtocol.md` 同一保密硬约束口径）在 memory 写侧的实现，**三道闸
+   顺序门控、缺一不写**：① Stage 4 人 in the loop 明确确认沉淀草稿无 client identifier
+   → ② Postmortem 3E 自检 PM5 脱敏复核 → ③ 落盘后 Reviewer 对"memory 沉淀清单"
+   （99 - 复盘沉淀/）D8 二次复核（Reviewer 不审 memory.md 本体，审沉淀清单）。任一闸
+   未过 → 不得写入对应 skill 的 memory.md，返回重做。
 2. **诚实分析**：胜败原因不为客户辩护，不为律师团队辩护；指向系统性原因 / 个人决策原因
 3. **可复用导向**：所有改进建议和 memory 条目必须能被**下一个同类案件**直接受益
 

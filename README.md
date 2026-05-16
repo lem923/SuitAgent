@@ -196,6 +196,7 @@
 完整变更见 [`CHANGELOG.md`](CHANGELOG.md)。本 fork 在原项目基础上的迭代轨迹：
 
 ```
+v1.12.0  phase9 memory 闭环真正闭合（7 legal skill 统一 schema 脚手架 + 读侧 gated 前馈 + Postmortem 写侧 Distill 落地 + D8 写侧三道闸 gate；结构层闭环已通，live 验证待下次真实结案）
 v1.11.1  phase9 文档/工程债清偿（3E DRY 化 SelfCheck3E + N* 协议升一等规范 NStarProtocol + rules 版本对齐 + Reviewer 去二义；零行为变更）
 v1.11.0d phase9 Researcher 嵌入规范现行性强制核验（纵深防御上游前移；P0 四 pass 260508/260511/260507/260510 验证通过可全面推广）
 v1.11.0c phase9 Reviewer 对抗式 Verifier with auto-retry（8 维度 × 53 子项 Y/N rubric + max-retry=2 + D8 zero tolerance）

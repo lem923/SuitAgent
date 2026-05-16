@@ -5,6 +5,36 @@
 
 ---
 
+## [v1.12.0] - 2026-05-16 — memory 闭环真正闭合（修复"防御成熟但学习为零"）
+
+> 下一步迭代分析（`status/NEXT-ITERATION-分析.md`）识别的最大隐性债 L1：三层防御已 P0 四 pass 实证成熟，但学习闭环从未闭合——7 个 legal skill 仅 cn-contract-review 有 memory.md（且 0 条经验），其余 6 个文件根本不存在，Postmortem 写入逻辑"如未存在则新建"从未行使、读侧产出型 skill 不读 memory。本版闭合读写两端。
+
+### ➕ 新增 / 🔧 修复
+
+#### WP1 — 统一 memory schema + 6 skill 脚手架预建（commit 319042c，零行为）
+
+- 泛化 cn-contract-review schema（说明头 + D8 保密硬约束 zero tolerance + 条目格式[触发条件/问题模式/可复用结论/适用场景/脱敏校验] + 倒序追加约定）
+- 为 cn-litigation-drafting / cn-jiubufa-case-analysis / cn-judgment-analysis / cn-trial-preparation / cn-client-communications / cn-case-postmortem 预建空 schema memory.md（section 按各 skill 方法论切分）；7 legal skill 全部 schema 合规
+
+#### WP2 — 接通读侧（commit 2353b24，行为变更，gated 安全）
+
+- 6 产出型 skill SKILL.md 加启动 gated 读经验库步：按本任务维度筛 top-3 纳入参考；memory.md 不存在或全"（暂无条目）"→ no-op 不阻断不污染 context；只读不写
+
+#### WP3 — 接通写侧（commit dbef5fc，行为变更，仅 Postmortem）
+
+- cn-case-postmortem Stage 4 Distill 重写映射：7 legal skill 全部直指 `<skill>/memory.md` 根（去 stale "如有/references" 对冲）；补 client-communications + case-postmortem 自沉淀；写入约束为按既有 schema 倒序追加、替换占位、不新建/不覆盖/不破坏 schema 头
+
+#### WP4 — D8 写侧 gate 命名化 + 结构验收（commit 本条）
+
+- cn-case-postmortem 三条铁律 #1 命名化为项目级 **D8 zero-tolerance 写侧 gate**（与 ReviewerRubric D8 / NStarProtocol 同口径），三道闸顺序门控、缺一不写：① Stage 4 人 in the loop 确认 → ② Postmortem 3E PM5 脱敏复核 → ③ Reviewer 对"memory 沉淀清单"D8 二次复核
+- 闭环结构验收通过：7/7 schema 合规 · 6/6 读侧接通 · 7 写侧目标指向根 · 0 stale 对冲 · D8 三道闸命名
+
+### ✅ 验证与边界
+
+结构层闭环已通（读侧+写侧+gate 全接）。**全 live 闭环验证**（真实结案案件跑 Postmortem，确认 memory.md 从空 schema → 非空脱敏条目 → 下个同类案件前馈）**留待下一次真实结案案件**（同 v1.11.1 token 取舍，显式声明，不为验证而合成 Postmortem）。跨 matter 检索/类案匹配 = v1.14.0（依赖本闭环先通）。
+
+---
+
 ## [v1.11.1] - 2026-05-16 — 文档/工程债清偿（零行为变更，纯收敛）
 
 > P0 四 pass 实证三层防御"通过可全面推广"后，按下一步迭代分析（`status/NEXT-ITERATION-分析.md`）先做零风险工程债清偿，为 v1.12.0+ 铺路。
