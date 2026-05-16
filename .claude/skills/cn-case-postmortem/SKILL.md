@@ -62,15 +62,19 @@ Stage 3：Improve（工作流改进）
 Stage 4：Distill（人 in the loop 沉淀）
   ⚠️ **严格保密硬约束**：以下步骤必须人 in the loop，不得自动执行
   
-  → 按 references/memory-distillation.md 提取可复用条目：
-      - cn-litigation-drafting/memory.md：起草中的高频问题 + 采纳方案
-      - cn-contract-review/memory.md：合同审查中的高频问题（按 14 类合同分节）
-      - cn-jiubufa-case-analysis/references/（如有 memory）：要件归入经验
-      - cn-judgment-analysis/references/（如有 memory）：判决书评审经验
-      - cn-trial-preparation（如有 memory）：庭审准备实战经验
-  → 显式输出"沉淀草稿"到对话内
+  → 按 references/memory-distillation.md 提取可复用条目，分发到以下目标
+    （v1.12.0 WP1 起 7 个 legal skill 的 memory.md 均已 schema 预建于
+    skill 根目录，**不再是"如有/references 下"——直接定位 `<skill>/memory.md`**）：
+      - `cn-litigation-drafting/memory.md`：起草高频问题 + 可复用结论（按 A-K 文书类型 section）
+      - `cn-contract-review/memory.md`：合同审查高频问题（按 14 类合同 section）
+      - `cn-jiubufa-case-analysis/memory.md`：要件归入 / 请求权基础经验（按请求权类型 section）
+      - `cn-judgment-analysis/memory.md`：判决书评审 / 救济路径经验（按救济路径 section）
+      - `cn-trial-preparation/memory.md`：庭审准备实战经验（按庭审阶段 section）
+      - `cn-client-communications/memory.md`：客户沟通措辞口径经验（按文书类型 section）
+      - `cn-case-postmortem/memory.md`：**复盘方法论自身经验**（5 维度归因 / 分发踩坑，自沉淀）
+  → 显式输出"沉淀草稿"到对话内（标注每条 → 目标 skill memory.md 的哪个 section）
   → **等待用户明确确认** 沉淀草稿无 client identifier / 无具体合同金额 / 无客户名
-  → 用户确认后才执行写入对应 skill 的 memory.md
+  → 用户确认后才执行写入：**按目标文件既有 schema 格式（触发条件/问题模式/可复用结论/适用场景/脱敏校验），倒序追加到对应 section 顶部（替换该 section 的"（暂无条目）"占位或追加到已有条目之上）；不新建文件、不覆盖既有条目、不破坏 schema 头**。重复模式更新已有条目而非重复追加。
 
 Stage 5：Archive（归档）
   → 主交付物：YYMMDD 案件复盘报告.md（落 99 - 复盘沉淀/）
