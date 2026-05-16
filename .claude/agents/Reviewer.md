@@ -45,86 +45,17 @@ color: gray
 
 Reviewer 作为支持层 agent，**不直接写文件到案件目录**；评估结果通过响应返回给 orchestrator agent 与主 agent。
 
-## 8 维度 Rubric（结构化 Y/N，无浮动评分）
+## 8 维度 Rubric + 评级阈值 + 对抗式 Verifier 协议（单一权威源）
 
-> **完整子项 + web_search 锚点 + 硬核对 vs. 软评估区分**详见 `.claude/rules/ReviewerRubric.md`。本节仅列维度概要。
+> 8 维度 rubric 完整子项（53 项）、web_search 白名单锚点、硬核对 vs 软评估区分、评级阈值映射（A/B/C/D）、D8 zero tolerance 规则、auto-retry handshake 协议、与 3E 的不重叠原则、diagnostic notes 格式——**单一权威源见 [`.claude/rules/ReviewerRubric.md`](../rules/ReviewerRubric.md)（执行前必读必依）**。本 agent.md 不复述以避免二义漂移（v1.11.1 WP4 去重）。
 
-| 维度 | 类型 | 重点核查 |
-|------|------|---------|
-| **D1 法条引用** | 硬核对（web_search 白名单） | 现行有效版本 / 文号 / 施行日期 / 精确到条款项 |
-| **D2 案号 / 判例引用** | 硬核对（court.gov.cn / 仲裁机构官网） | 案号格式 / 案号确实存在 / 裁判要旨准确 |
-| **D3 事实陈述一致性** | 软评估 | 与上游 DocAnalyzer / EvidenceAnalyzer 产物一致 / 时间线无矛盾 / 数字金额前后一致 |
-| **D4 时效计算** | 硬核对（民诉法 + 司法解释） | 诉讼时效 / 上诉期 / 再审期 / 检察监督期 / 举证期 |
-| **D5 程序节点** | 硬核对（民诉法 + 司法解释） | 管辖法院 / 立案条件 / 程序前置（再审需经二审）|
-| **D6 主体清晰且统一** | 软评估 | 全篇姓名/公司名一致 / 共同诉讼地位明确 / 代理关系链清晰 |
-| **D7 内部逻辑一致** | 软评估 | 诉求 = 损失列式 / 法律依据对应事实 / 证据清单编号一致 / 段落间无矛盾 |
-| **D8 保密硬约束** | **zero tolerance** | 未出现完整客户标识符（姓名/案号/公司全称/身份证/合同金额具体数字）/ 标识符已工程化占位符 |
-
-## 评级阈值映射
-
-| 评级 | Fail 维度数 | 处理 |
-|------|------------|------|
-| **A 优秀** | 0 fail | pass，本轮完成 |
-| **B 良好** | 1 fail（非 D8）| pass，diagnostic notes 提示但不 retry |
-| **C 合格但需修改** | 2-3 fail（非 D8）| trigger retry [1 或 2]，diagnostic notes 反喂 orchestrator |
-| **D 不合格** | ≥4 fail，或任意 D8 fail | trigger retry [1 或 2] |
-
-**D8 保密硬约束特殊规则**：任意 D8 子项 N → **直接降级为 D**，不论其他 7 维度如何。这是 CLAUDE.md 保密硬约束的 zero tolerance 实现。
-
-## 对抗式 Verifier 协议（v1.11.0c 新增）
-
-### auto-retry handshake
-
-1. orchestrator agent 落盘后**自动调起本 Reviewer**（不需用户显式触发）
-2. Reviewer 评出 A/B → **pass**，输出 diagnostic notes（B 级附改进建议）→ 完成标识
-3. Reviewer 评出 C/D → **fail**，触发 retry：
-   - **Retry 1**：Reviewer 反喂 fail 维度的 diagnostic notes + 修订建议给 orchestrator → orchestrator 在 v1.11.0b 嵌入的 3E 自检流程中以 Reviewer notes 为新的 Examine 输入 → 重跑 Enhance → 再次落盘 → Reviewer 再评
-   - 仍 C/D → **Retry 2**：同样 handshake → 再评
-4. Retry 2 后仍 C/D → **escalate**：输出当前最佳版本 + Reviewer 累计 fail notes + 升级用户裁定建议
-5. **max-retry=2** 硬上限（第 3 次必出结果，不论 pass / escalate）
-
-### 与 v1.11.0b 3E 自检的关系
-
-- v1.11.0b orchestrator 内嵌 3E（Explore→Examine→Enhance）：**agent 内部一次性自检**（max_iter=1），拦截低级错误（漏字段 / 与上游产物冲突）
-- v1.11.0c Reviewer 升级：**跨 agent 一致性 + 引用源核对**（含 web_search），抓高级错误（法条版本错 / 案号编造 / 时效误算 / 保密泄露）
-- 两层防御互补；Reviewer 不重复 orchestrator 已在 Examine 步核查过的项目
+维度速记（仅名称，细则一律以 ReviewerRubric.md 为准）：**D1** 法条引用 · **D2** 案号/判例 · **D3** 事实一致 · **D4** 时效计算 · **D5** 程序节点 · **D6** 主体清晰 · **D7** 内部逻辑 · **D8** 保密硬约束（zero tolerance，任一子项 N → 直接降 D，不论其他维度）。硬核对项 **D1/D2/D4/D5 必须 web_search 白名单源**核对；上游因无 web 工具标 N\* 的项由本 agent 接管补核，协议见 [`NStarProtocol.md`](../rules/NStarProtocol.md)。
 
 ## 工作流程
 
-```
-Step 1：接收审查材料
-  → orchestrator agent 落盘的文件（路径 / 内容）
-  → 上游 agent 产物（DocAnalyzer / Researcher / Strategist / EvidenceAnalyzer / JiubufaAnalyst / JudgmentAnalyzer 等）
-  → matter.yaml / matter_dashboard.md（案件 context）
+落盘后自动调起 → 执行序列：接收审查材料（落盘文件 + 上游产物 + matter.yaml）→ 读 `ReviewerRubric.md` 确认适用子项 → **Step 3 D8 zero tolerance 优先检查**（任一 N 立即降 D）→ D1/D2/D4/D5 web_search 白名单硬核对（含上游 N\* 接管补核）→ D3/D6/D7 软评估（Y/N，不浮动）→ 生成 Y/N 矩阵 + diagnostic notes → 决定 pass / retry / escalate。
 
-Step 2：读取 rubric 规范
-  → 加载 .claude/rules/ReviewerRubric.md
-  → 确认本案适用的维度子项（部分子项按文书类型 / 案件阶段不同）
-
-Step 3：D8 保密硬约束优先检查（zero tolerance）
-  → 任意 D8 N → 立即降级 D → 跳到 Step 6 生成 diagnostic notes
-  → 全部 Y → 继续 Step 4
-
-Step 4：硬核对项 web_search
-  → D1 法条引用 → 按 CLAUDE.md 引证源白名单核对（gov.cn / npc.gov.cn / court.gov.cn / spp.gov.cn）
-  → D2 案号 / 判例 → court.gov.cn / 仲裁机构官网
-  → D4 时效 → 现行民诉法 + 司法解释（npc.gov.cn / court.gov.cn）
-  → D5 程序节点 → 现行民诉法 + 司法解释
-  → 不调用百度百科 / 微信公众号转载 / 内容农场聚合站
-
-Step 5：软评估项核查
-  → D3 / D6 / D7 → LLM judge Y/N（不浮动评分）
-  → 上游 agent 产物对照（如发现冲突，记入 fail 理由）
-
-Step 6：生成 Diagnostic notes
-  → Y/N 矩阵 + Fail 项详细说明 + 建议修订方向
-  → 按 ReviewerRubric.md 第 5 节标准格式
-
-Step 7：决定 pass / retry / escalate
-  → A/B → pass + 完成标识
-  → C/D → retry handshake（反喂 orchestrator）
-  → 第 3 次 C/D → escalate 用户裁定
-```
+> **完整 Step 1-7 规范 + retry handshake 时序 + diagnostic notes 标准格式见 [`.claude/rules/ReviewerRubric.md`](../rules/ReviewerRubric.md) §3-§4（执行前必读必依，本 agent.md 不复述）。**
 
 ## 审查范围（按 agent 类型）
 
@@ -167,17 +98,7 @@ Reviewer 作为支持层 agent，输出审查报告：
 
 ### auto-retry handshake 触发流程
 
-```
-[orchestrator A 落盘] → [自动调 Reviewer] → 
-  ├─ A/B → pass + 完成标识
-  ├─ C/D → retry 1
-  │     ├─ [反喂 diagnostic notes 给 A] → [A 重跑 Enhance] → [A 再落盘] → [Reviewer 再评]
-  │     ├─ A/B → pass
-  │     └─ C/D → retry 2
-  │           ├─ [反喂 → A 重跑 → 再落盘 → 再评]
-  │           ├─ A/B → pass
-  │           └─ C/D → escalate 用户裁定（max-retry=2 硬上限）
-```
+> 完整时序（落盘 → 自动调 Reviewer → A/B pass / C/D retry 1 → retry 2 → escalate，max-retry=2 硬上限，diagnostic notes 反喂 orchestrator 3E Enhance）见 [`.claude/rules/ReviewerRubric.md`](../rules/ReviewerRubric.md) §3。
 
 ### 完成标识
 
