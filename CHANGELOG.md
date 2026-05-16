@@ -1,7 +1,39 @@
 # 变更记录
 
-> Last updated: 2026-05-15
+> Last updated: 2026-05-16
 > 所有对用户或其他协作者有影响的变更都会在此记录。使用 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/) 格式。
+
+---
+
+## [v1.11.1] - 2026-05-16 — 文档/工程债清偿（零行为变更，纯收敛）
+
+> P0 四 pass 实证三层防御"通过可全面推广"后，按下一步迭代分析（`status/NEXT-ITERATION-分析.md`）先做零风险工程债清偿，为 v1.12.0+ 铺路。
+
+### 🔧 修复 / 重构 (Fixed / Refactored)
+
+#### WP1 — 3E 自检流程 DRY 化（commit 3009e98）
+
+- 6 个 orchestrator agent.md（Writer/ContractReviewer/JiubufaAnalyst/JudgmentAnalyzer/TrialPrep/Postmortem）原各自逐字复制同一段 3E 核心理念/Explore/Examine协议/Enhance（改一处需改六处）
+- 抽取 `.claude/rules/SelfCheck3E.md` 为单一权威源；6 agent 改指针引用，仅保留各自专属 Examine 校验清单（W/CR/JB/JA/TP/PM）与自检结果段
+
+#### WP2 — N\* 协议升为一等规范（commit 058e797）
+
+- N\* 工具边界诚实处置 + 接管闭环此前仅隐性散见，新建 `.claude/rules/NStarProtocol.md`（三态定义/适用条件/处置闭环流程/记法/反例/与 v1.11.0d 及 3E 及 Reviewer 关系/P0 四 pass 实证）
+- ReviewerRubric.md §5 加 N\* 接管职责段；与 SelfCheck3E.md 三文件双向交叉引用闭合
+
+#### WP3+WP5 — 版本对齐 + 二义/计数/死链收敛（commit bf6af49）
+
+- 真实版本漂移对齐：OutputStandards / AgentMapping / SubagentStandards 三文件加"与头部对齐"收敛行（CommandMeta/RulesMeta 经核为元规范示例块误报，未动）
+- RulesMeta 确立全局约定：头部版本=变更表顶行强一致（撰写要点第 6 条）
+- SubagentStandards color 说明 13→15 agent；AgentMapping 清除 2 处 `tmp/` 悬空死链；ReviewerRubric 子项计数 50→53；ReviewerRubric 头部 1.0→1.1
+
+#### WP4 — Reviewer.md 去二义（commit f5a8d30）
+
+- Reviewer.md 删除与 ReviewerRubric.md 全面重复的 8 维度表/评级阈值/对抗式 Verifier 协议/Step1-7/handshake 时序图（−79 行：205→126），改指向单一权威源；保留 agent 专属部分 + D1-D8 维度名速记
+
+### ✅ 验证
+
+每 WP 落盘后结构验收（残留块归零/指针就位/专属内容保留/版本对齐/三方一致）。指针机制与 4-pass 实证可靠的 ReviewerRubric.md 完全同模式，live 回归留待下次真实 agent 调用（零额外 token）。
 
 ---
 
