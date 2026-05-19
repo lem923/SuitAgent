@@ -31,8 +31,12 @@ md2word 使用 YAML 格式的配置文件来控制 Word 文档的格式化输出
 
 ```yaml
 page:
-  width: 21.0              # 纸张宽度 (cm)
-  height: 29.7             # 纸张高度 (cm)
+  paper: a4                # 纸张法域简写：a4(21.0×29.7) / letter(21.59×27.94, US Letter)
+                           # paper 存在即权威；无 paper 时回退 width/height（旧预设兼容）
+                           # 法域→paper 自动选择 + 误判安全门见 cn-firm-documents
+                           # /references/unified-format-spec.md §4（md2word 不读 matter.yaml）
+  width: 21.0              # 纸张宽度 (cm)（仅当无 paper 键时生效）
+  height: 29.7             # 纸张高度 (cm)（仅当无 paper 键时生效）
   margin_top: 2.54         # 上边距 (cm)
   margin_bottom: 2.54      # 下边距 (cm)
   margin_left: 3.18        # 左边距 (cm)

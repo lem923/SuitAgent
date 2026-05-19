@@ -446,10 +446,21 @@ def create_word_document(md_file_path, output_path, template_file=None, config: 
         pass
 
     # 设置页面大小和页边距
+    # paper 简写（法域纸张）：a4=21.0×29.7cm / letter=21.59×27.94cm（US Letter 8.5×11in）。
+    # 显式 width/height 仍可微调覆盖。法域→paper 的自动选择规则与误判安全门见
+    # cn-firm-documents/references/unified-format-spec.md §纸张法域规则（md2word 本体不读 matter.yaml）。
+    _PAPER = {'a4': (21.0, 29.7), 'letter': (21.59, 27.94)}
     for section in doc.sections:
         page_config = config.get('page', {})
-        section.page_width = Cm(page_config.get('width', 21.0))
-        section.page_height = Cm(page_config.get('height', 29.7))
+        if 'paper' in page_config:
+            # paper 显式存在 → 权威（法域纸张一键切换）；未识别值回退 a4
+            _pw, _ph = _PAPER.get(str(page_config['paper']).strip().lower(), _PAPER['a4'])
+        else:
+            # 无 paper（academic/report/minimal 等旧预设）→ 回退 width/height
+            _pw = page_config.get('width', 21.0)
+            _ph = page_config.get('height', 29.7)
+        section.page_width = Cm(_pw)
+        section.page_height = Cm(_ph)
         section.top_margin = Cm(page_config.get('margin_top', 2.54))
         section.bottom_margin = Cm(page_config.get('margin_bottom', 2.54))
         section.left_margin = Cm(page_config.get('margin_left', 3.18))

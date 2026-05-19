@@ -2,9 +2,11 @@ name: "法律文书统一格式"
 description: "律所统一版式：标题宋体加粗 / 正文仿宋14pt / 固定行距24磅 / 首行2字符 / 西文数字 Times New Roman。与 cn-firm-documents 统一规格一致（单一权威源见 cn-firm-documents/references/unified-format-spec.md）"
 
 # 页面设置（统一规格：上3.7 下3.5 左2.8 右2.6 cm）
+# paper：a4（PRC/HK 默认）/ letter（US·CA）。法域自动选择规则 + 误判安全门见
+# unified-format-spec.md §纸张法域规则——调用层据 matter.yaml 法域覆盖本键，
+# md2word 本体不读 matter.yaml。显式 width/height 不再设（由 paper 驱动）。
 page:
-  width: 21.0      # cm (A4)
-  height: 29.7     # cm (A4)
+  paper: a4
   margin_top: 3.7
   margin_bottom: 3.5
   margin_left: 2.8
