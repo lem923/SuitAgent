@@ -196,6 +196,7 @@
 完整变更见 [`CHANGELOG.md`](CHANGELOG.md)。本 fork 在原项目基础上的迭代轨迹：
 
 ```
+侧向     new-case 合同审查 profile（按项目类型分流：诉讼 11-slot 零回归 / 合同审查 7-slot 对齐 cn-contract-review 4-stage；命名变体 + 落位 profile-aware + Mode2 重整理 profile 感知）
 v1.13.0  phase9 结构化 handoff 简报协议（HandoffProtocol + handoff_ledger 第5root + 写侧SubagentStandards/读侧SelfCheck3E ledger-first DRY + Reviewer 豁免硬边界；非LLM摘要、gated向后兼容，结构层已通 live 待真实长context案件）
 v1.12.0  phase9 memory 闭环真正闭合（7 legal skill 统一 schema 脚手架 + 读侧 gated 前馈 + Postmortem 写侧 Distill 落地 + D8 写侧三道闸 gate；结构层闭环已通，live 验证待下次真实结案）
 v1.11.1  phase9 文档/工程债清偿（3E DRY 化 SelfCheck3E + N* 协议升一等规范 NStarProtocol + rules 版本对齐 + Reviewer 去二义；零行为变更）

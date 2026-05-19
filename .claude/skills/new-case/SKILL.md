@@ -1,6 +1,6 @@
 ---
 name: new-case
-description: 创建新案件 + 重整理已有案件文件夹（dual-mode）。**创建模式**：从空白生成案件框架，**按项目类型分两 profile**——诉讼（11 numbered slots）/ 合同审查（7 numbered slots，对齐 cn-contract-review 4-stage）+ matter triplet + 工时记录.md + handoff_ledger.md。**重整理模式**（v1.10.1+）：对已有案件文件夹做严格合规检查 → 必要时重命名 `YYMMNN 原告 与 被告 案由` 标准格式 → 内部结构整理。覆盖：创建新案件、新建案件、新案件、整理案件、整理案件文件夹、重整理、重命名案件、案件归一化、case folder organize、案件文件夹规范化。
+description: 创建新案件 + 重整理已有案件文件夹（dual-mode）。**创建模式**：从空白生成案件框架，**按项目类型分两 profile**——诉讼（11 numbered slots）/ 合同审查（7 numbered slots，对齐 cn-contract-review 4-stage）+ matter triplet + 工时记录.md + handoff_ledger.md。**重整理模式**（v1.10.1+）：先判项目类型 profile（诉讼/合同审查）→ 对已有案件文件夹做严格合规检查 → 必要时按 profile 重命名（诉讼 `YYMMNN 原告 与 被告 案由` / 合同审查 `YYMMNN 客户简称 合同类型审查`）→ 按 profile 内部结构整理。覆盖：创建新案件、新建案件、新案件、整理案件、整理案件文件夹、重整理、重命名案件、案件归一化、case folder organize、案件文件夹规范化。
 license: GNU AGPL v3（详见项目根 LICENSE）
 ---
 
@@ -205,10 +205,20 @@ Step 5：材料分类入位
 ### 重整理工作流（7 步）
 
 ```
+Step 0：项目类型 profile 判定（决定目标命名规范 + 目标 slot 结构）
+  → 优先读现有 matter.yaml `项目类型` 字段；无则按内容推断：
+      - 合同审查 profile 信号：含待审合同/审查报告/红线版、无证据·法院·庭审目录、
+        文件夹名以"审查"结尾、matter.yaml 案件类型=合同审查
+      - 否则 → 诉讼 profile（默认）
+  → 歧义无法判定 → 主动问用户（诉讼案件 / 合同审查项目）
+  → 判定结果决定：Step 2 目标命名规范、Step 5 目标 slot 结构（见 Mode 1 两 profile 定义）
+
 Step 1：现状扫描
   → 读取当前文件夹完整路径与名称
-  → 解析当前文件夹名（拆解 YYMMNN / 原告 / 与 / 被告 / 案由）
-  → 扫描内部文件结构：是否含 11 numbered slots / matter triplet / 工时记录 / 旧 12 层 emoji 目录 / 客户提供的散落材料
+  → 解析当前文件夹名（诉讼 profile 拆 YYMMNN/原告/与/被告/案由；
+    合同审查 profile 拆 YYMMNN/客户简称/合同类型审查）
+  → 扫描内部文件结构：是否含本 profile 应有 slots / matter triplet / 工时记录 /
+    handoff_ledger / 旧 12 层 emoji 目录 / 客户提供的散落材料
 
 Step 2：命名合规检查
   → 检查项：
@@ -234,9 +244,11 @@ Step 4：生成 mv 命令 + 用户确认
   → 显式输出到对话内，等待用户明确执行
   → ⚠️ 不自动 mv（保密硬约束 + 客户案件不可逆操作必须人 in the loop）
 
-Step 5：内部结构整理
-  → 缺 matter triplet → 生成（同 Mode 1 Step 4）
-  → 缺 11 numbered slots → 创建空目录
+Step 5：内部结构整理（目标结构 = Step 0 判定的 profile）
+  → 缺 matter triplet（含 handoff_ledger.md）→ 生成（同 Mode 1 Step 4，写入 `项目类型`）
+  → 缺本 profile 应有 numbered slots → 创建空目录（诉讼 11-slot / 合同审查 7-slot，见 Mode 1）
+  → 误建的他 profile 专属空 slot（如合同审查项目里的 03-我方证据/07-法院文书）→
+    若为空可经用户确认后清理；非空则保留并提示人工归位
   → 含旧 12 层 emoji 目录（00 - 📅 日程管理 等）→ 迁移内容到新 slot（按 AgentMapping v3.0+ 映射表）
   → 散落在根目录的客户材料 → 移到对应 slot
   → 调起 cn-litigation-case-folder-organizer skill（外置）的 Move 阶段（如可用）
@@ -304,7 +316,7 @@ get_next_nn(year, month):
 
 ### Mode 1 创建模式
 
-- [ ] 案件根目录已创建，**名称严格符合 YYMMNN 原告 与 被告 案由 格式**
+- [ ] 案件根目录已创建，**名称严格符合本 profile 命名规范**（诉讼 `YYMMNN 原告 与 被告 案由` / 合同审查 `YYMMNN 客户简称 合同类型审查`）
 - [ ] NN 项已按自然编号规则递增
 - [ ] matter.yaml / matter_dashboard.md / AGENTS.md / 工时记录.md 全部生成（root level）
 - [ ] 11 个 numbered slot 目录全部创建（含 `02 - 法律研究/案件分析/` 子目录）

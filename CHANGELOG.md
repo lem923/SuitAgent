@@ -5,6 +5,23 @@
 
 ---
 
+## [合同审查 profile] - 2026-05-16 — new-case 按项目类型分流（合同审查专用文件夹结构）
+
+> 用户反馈：合同审查新建案件强建诉讼 11-slot，03-08 全空、语义不匹配 cn-contract-review 工作特点。引入 profile 分流，诉讼 profile **零回归**。
+
+### ➕ 新增（feat，非路线 v-number；用户驱动侧向需求）
+
+- **WP1（0660fbe）判定+字段+命名**：new-case Step1 增项目类型 profile 判定（contract-review 信号 + 无诉讼语境，歧义问用户）；matter.yaml schema 增 `项目类型: 诉讼|合同审查`；OutputStandards(1.8→1.9) 命名变体 `{YYMMNN} {客户简称} {合同类型}审查` + 反例 + 验证脚本兼容两 profile（回归测试通过）
+- **WP2（cf9551b）脚手架分支**：new-case 生成目标结构拆 profile A 诉讼（11-slot 零改动）/ profile B 合同审查（7-slot：00客户提供/01委托材料/02审查报告/03谈判轮次/04红线与交付/09参考与playbook/99复盘沉淀，对齐 cn-contract-review 4-stage）；Step3 建目录、Step5 材料分类入位 按 profile 分支
+- **WP3（29651df）落位映射**：AgentMapping(v3.6→v3.7) ContractReviewer 落位按 profile 分流（合同审查→02-审查报告/04-红线与交付/03-谈判轮次；诉讼→02-法律研究/案件分析）+ 合同审查 profile 反向映射表；ContractReviewer.md + cn-contract-review/SKILL.md 工程包装层 profile-aware
+- **WP4（本条）验收+收尾**：全结构验收通过（判定/命名/脚手架/落位/诉讼零回归/版本对齐）；**Mode 2 重整理 profile 感知补齐**（Step0 项目类型判定 → 按 profile 重命名/结构整理；organize-case 经 Mode2 一并覆盖；旧合同审查文件夹重整理不再被强套 11-slot/诉讼命名）
+
+### ✅ 边界
+
+诉讼 profile 全程零回归（11-slot/命名/落位逐字未动，grep 验证）；合同审查为新增分支。5 件 root 文件（含 handoff_ledger.md）两 profile 通用。cn-firm-documents 外置不涉及。
+
+---
+
 ## [v1.13.0] - 2026-05-16 — 结构化 handoff 简报协议（砍长 context 膨胀）
 
 > 下一步迭代分析 L3：agent 间此前读上游 .md 全文、无 schema 无预算，长 context 链路（华雄类多判决多证据）膨胀/丢失。外部研究（Google ADK/Anthropic claude-progress/LangChain）收敛于结构化简报（非 LLM 摘要——摘要 lossy+误差累积）。本版按结构化简报路线闭合。
