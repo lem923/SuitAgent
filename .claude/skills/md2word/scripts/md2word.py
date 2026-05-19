@@ -288,37 +288,37 @@ def add_page_number(doc):
         else:
             footer_para.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
         
+        def _add_field(instr):
+            r = footer_para.add_run()
+            r._r.append(parse_xml(r'<w:fldChar w:fldCharType="begin" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"/>'))
+            r._r.append(parse_xml(r'<w:instrText xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"> %s </w:instrText>' % instr))
+            r._r.append(parse_xml(r'<w:fldChar w:fldCharType="end" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"/>'))
+
         page_format = page_number_config.get('format', '1/x')
-        if '1' in page_format:
-            run = footer_para.add_run()
-            fld_char_begin = parse_xml(r'<w:fldChar w:fldCharType="begin" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"/>')
-            run._r.append(fld_char_begin)
-            instr_text = parse_xml(r'<w:instrText xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"> PAGE </w:instrText>')
-            run._r.append(instr_text)
-            fld_char_end = parse_xml(r'<w:fldChar w:fldCharType="end" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"/>')
-            run._r.append(fld_char_end)
-        
-        if '/' in page_format:
-            sep_run = footer_para.add_run("/")
-        
-        if 'x' in page_format:
-            total_run = footer_para.add_run()
-            fld_char_begin2 = parse_xml(r'<w:fldChar w:fldCharType="begin" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"/>')
-            total_run._r.append(fld_char_begin2)
-            instr_text2 = parse_xml(r'<w:instrText xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"> NUMPAGES </w:instrText>')
-            total_run._r.append(instr_text2)
-            fld_char_end2 = parse_xml(r'<w:fldChar w:fldCharType="end" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"/>')
-            total_run._r.append(fld_char_end2)
-        
+        # 向后兼容：旧 "1/x" 记法 → token 记法 {PAGE}/{TOTAL}
+        if page_format == '1/x':
+            page_format = '{PAGE}/{TOTAL}'
+        # token 化构建：{PAGE}→PAGE 域，{TOTAL}→NUMPAGES 域，其余为字面文本
+        # （支持 "第 {PAGE} 页 共 {TOTAL} 页" 等中文模板）
+        for part in re.split(r'(\{PAGE\}|\{TOTAL\})', page_format):
+            if part == '{PAGE}':
+                _add_field('PAGE')
+            elif part == '{TOTAL}':
+                _add_field('NUMPAGES')
+            elif part:
+                footer_para.add_run(part)
+
         font_name = page_number_config.get('font', 'Times New Roman')
+        ascii_name = page_number_config.get('ascii', font_name)  # 汉字用 font_name，西文/数字用 ascii_name
         font_size = page_number_config.get('size', 10.5)
-        
+
         for run in footer_para.runs:
             run.font.name = font_name
             run.font.size = Pt(font_size)
             run.font.color.rgb = RGBColor(0, 0, 0)
-            run._element.rPr.rFonts.set(qn('w:ascii'), font_name)
-            run._element.rPr.rFonts.set(qn('w:hAnsi'), font_name)
+            run._element.rPr.rFonts.set(qn('w:ascii'), ascii_name)
+            run._element.rPr.rFonts.set(qn('w:hAnsi'), ascii_name)
+            run._element.rPr.rFonts.set(qn('w:eastAsia'), font_name)
     
     except Exception as e:
         print(f"⚠️  页码添加失败，将跳过页码设置: {e}")

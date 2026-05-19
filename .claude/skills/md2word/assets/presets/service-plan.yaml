@@ -7,14 +7,15 @@ colors:
   accent: "#927F76"        # 律所棕 - 高亮（方案名、价格）
   alt: "#F5F0ED"           # 浅棕 - 交替行背景
 
-# 页面设置
+# 页面设置（仅页边距对齐统一规格：上3.7 下3.5 左2.8 右2.6 cm；
+# 配色/微软雅黑标题/交替行等设计风格作为客户展示稿刻意保留，不并入纯文本规格）
 page:
   width: 21.0
   height: 29.7
-  margin_top: 2.54
-  margin_bottom: 2.54
-  margin_left: 3.18
-  margin_right: 3.18
+  margin_top: 3.7
+  margin_bottom: 3.5
+  margin_left: 2.8
+  margin_right: 2.6
 
 # 字体设置
 fonts:

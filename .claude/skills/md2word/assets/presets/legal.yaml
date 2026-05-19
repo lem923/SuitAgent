@@ -1,64 +1,81 @@
-name: "法律文书格式"
-description: "标准法律文书格式，仿宋_GB2312，小四号，1.5倍行距"
+name: "法律文书统一格式"
+description: "律所统一版式：标题宋体加粗 / 正文仿宋14pt / 固定行距24磅 / 首行2字符 / 西文数字 Times New Roman。与 cn-firm-documents 统一规格一致（单一权威源见 cn-firm-documents/references/unified-format-spec.md）"
 
-# 页面设置
+# 页面设置（统一规格：上3.7 下3.5 左2.8 右2.6 cm）
 page:
   width: 21.0      # cm (A4)
   height: 29.7     # cm (A4)
-  margin_top: 2.54
-  margin_bottom: 2.54
-  margin_left: 3.18
-  margin_right: 3.18
+  margin_top: 3.7
+  margin_bottom: 3.5
+  margin_left: 2.8
+  margin_right: 2.6
 
-# 字体设置
+# 字体设置（正文：仿宋14pt；西文/阿拉伯数字统一 Times New Roman）
 fonts:
   default:
     name: "仿宋"
-    name_alt: "仿宋_GB2312"
+    name_alt: "仿宋"
     ascii: "Times New Roman"
-    size: 12      # pt (小四)
+    size: 14      # pt
     color: "#000000"
 
-# 标题设置
+# 标题设置（标题宋体加粗；西文 Times New Roman）
 titles:
+  # 文章标题：16pt 宋体加粗 居中 段前6/段后6
   level1:
-    size: 15      # pt (小三)
+    size: 16
     bold: true
     align: "center"
+    font: "宋体"
+    font_alt: "Times New Roman"
     space_before: 6
     space_after: 6
     indent: 0
+  # 正文内标题（level2/3/4 全级同规格）：14pt 宋体加粗 左对齐 段前6/段后0
   level2:
-    size: 12      # pt (小四)
+    size: 14
     bold: true
-    align: "justify"
-    indent: 24
-    space_before: 9   # 0.5行距 (12pt × 1.5 × 0.5)
-    space_after: 9    # 0.5行距
+    align: "left"
+    font: "宋体"
+    font_alt: "Times New Roman"
+    space_before: 6
+    space_after: 0
+    indent: 0
   level3:
-    size: 12      # pt (小四)
+    size: 14
     bold: true
-    align: "justify"
-    indent: 24
-    space_before: 9   # 0.5行距
-    space_after: 9    # 0.5行距
+    align: "left"
+    font: "宋体"
+    font_alt: "Times New Roman"
+    space_before: 6
+    space_after: 0
+    indent: 0
   level4:
-    size: 12      # pt (小四)
+    size: 14
     bold: true
-    align: "justify"
-    indent: 24
+    align: "left"
+    font: "宋体"
+    font_alt: "Times New Roman"
+    space_before: 6
+    space_after: 0
+    indent: 0
 
-# 段落设置
+# 段落设置（正文：两端对齐 / 段前0段后0 / 固定行距24磅 / 首行缩进2字符）
 paragraph:
-  line_spacing: 1.5
-  first_line_indent: 24  # 2个字符
+  line_spacing_rule: exact   # 固定值（非倍数）
+  line_spacing_pt: 24        # 固定行距 24 磅（标题段与正文段同享）
+  line_spacing: 1.5          # 回退值（仅当 line_spacing_rule≠exact 时生效）
+  first_line_indent_chars: 2 # 首行缩进 2 字符（× 正文字号，随字号走）
   align: "justify"
+  space_before: 0
+  space_after: 0
 
-# 页码设置
+# 页码设置（第 X 页 共 Y 页 / 居中 / 五号 / 汉字宋体 / 数字 Times New Roman）
 page_number:
   enabled: true
-  format: "1/x"
-  font: "Times New Roman"
+  format: "第 {PAGE} 页 共 {TOTAL} 页"
+  font: "宋体"
+  ascii: "Times New Roman"
   size: 10.5    # pt (五号)
   position: "center"
 
@@ -66,7 +83,7 @@ page_number:
 quotes:
   convert_to_chinese: true
 
-# 表格设置
+# 表格设置（非统一规格项，保留既有）
 table:
   border_enabled: true
   border_color: "#000000"
@@ -80,30 +97,23 @@ table:
     left: 60
     right: 60
   vertical_align: "center"
-
-  # 表格标题行（第一行）格式
   header:
     font: "Times New Roman"
     size: 10.5
     bold: true
     color: "#000000"
-
-  # 表格正文格式
   body:
     font: "仿宋"
-    font_alt: "仿宋_GB2312"
+    font_alt: "仿宋"
     size: 10.5
     color: "#000000"
 
-# 代码块设置
+# 代码块设置（非统一规格项，保留既有；律所文书一般无代码块）
 code_block:
-  # 语言标签格式（代码块开头的 [language] 标签）
   label:
     font: "Times New Roman"
     size: 10
     color: "#808080"
-
-  # 代码内容格式
   content:
     font: "Times New Roman"
     size: 10
@@ -152,11 +162,9 @@ lists:
   bullet:
     marker: "•"
     indent: 24
-
   numbered:
     indent: 24
     preserve_format: true
-
   task:
     unchecked: "☐"
     checked: "☑"

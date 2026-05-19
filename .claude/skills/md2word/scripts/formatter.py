@@ -326,14 +326,23 @@ def set_run_format_with_styles(run, formats, title_level=0, is_quote=False):
             font.strike = True
 
 
+def _apply_line_spacing(paragraph_format, paragraph_config):
+    """行距：line_spacing_rule=exact 时用固定磅值（python-docx 赋 Length 自动 EXACTLY），
+    否则用 line_spacing 倍数（向后兼容既有 academic/report/minimal 等预设）。"""
+    if paragraph_config.get('line_spacing_rule') == 'exact':
+        paragraph_format.line_spacing = Pt(paragraph_config.get('line_spacing_pt', 24))
+    else:
+        paragraph_format.line_spacing = paragraph_config.get('line_spacing', 1.5)
+
+
 def set_paragraph_format(paragraph, title_level=0, is_quote=False):
     """设置段落格式"""
     config = get_config()
     paragraph_config = config.get('paragraph', {})
 
-    # 设置段落格式
+    # 设置段落格式（标题段与正文段同享行距规则，支持固定磅值）
     paragraph_format = paragraph.paragraph_format
-    paragraph_format.line_spacing = paragraph_config.get('line_spacing', 1.5)
+    _apply_line_spacing(paragraph_format, paragraph_config)
 
     if title_level == 1:
         # 一级标题配置
@@ -348,24 +357,24 @@ def set_paragraph_format(paragraph, title_level=0, is_quote=False):
         title_config = config.get('titles.level2', {})
         align_str = title_config.get('align', 'justify')
         paragraph_format.alignment = parse_alignment(align_str)
-        paragraph_format.space_before = Pt(0)
-        paragraph_format.space_after = Pt(0)
+        paragraph_format.space_before = Pt(title_config.get('space_before', 0))
+        paragraph_format.space_after = Pt(title_config.get('space_after', 0))
         paragraph_format.first_line_indent = Pt(title_config.get('indent', 24))
     elif title_level == 3:
         # 三级标题配置
         title_config = config.get('titles.level3', {})
         align_str = title_config.get('align', 'justify')
         paragraph_format.alignment = parse_alignment(align_str)
-        paragraph_format.space_before = Pt(0)
-        paragraph_format.space_after = Pt(0)
+        paragraph_format.space_before = Pt(title_config.get('space_before', 0))
+        paragraph_format.space_after = Pt(title_config.get('space_after', 0))
         paragraph_format.first_line_indent = Pt(title_config.get('indent', 24))
     elif title_level == 4:
         # 四级标题配置
         title_config = config.get('titles.level4', {})
         align_str = title_config.get('align', 'justify')
         paragraph_format.alignment = parse_alignment(align_str)
-        paragraph_format.space_before = Pt(0)
-        paragraph_format.space_after = Pt(0)
+        paragraph_format.space_before = Pt(title_config.get('space_before', 0))
+        paragraph_format.space_after = Pt(title_config.get('space_after', 0))
         paragraph_format.first_line_indent = Pt(title_config.get('indent', 24))
     elif is_quote:
         # 引用：两端对齐，无首行缩进
@@ -377,9 +386,16 @@ def set_paragraph_format(paragraph, title_level=0, is_quote=False):
         # 正文段落配置
         align_str = paragraph_config.get('align', 'justify')
         paragraph_format.alignment = parse_alignment(align_str)
-        paragraph_format.space_before = Pt(0)
-        paragraph_format.space_after = Pt(0)
-        paragraph_format.first_line_indent = Pt(paragraph_config.get('first_line_indent', 24))
+        paragraph_format.space_before = Pt(paragraph_config.get('space_before', 0))
+        paragraph_format.space_after = Pt(paragraph_config.get('space_after', 0))
+        # 首行缩进：first_line_indent_chars 指定时按"字符数 × 正文字号"换算（随字号走，
+        # 语义对齐 OOXML firstLineChars）；否则回退既有 first_line_indent（磅，向后兼容）
+        fli_chars = paragraph_config.get('first_line_indent_chars')
+        if fli_chars is not None:
+            body_size = config.get('fonts.default', {}).get('size', 12)
+            paragraph_format.first_line_indent = Pt(fli_chars * body_size)
+        else:
+            paragraph_format.first_line_indent = Pt(paragraph_config.get('first_line_indent', 24))
 
     # 确保所有runs都有正确的格式
     for run in paragraph.runs:
