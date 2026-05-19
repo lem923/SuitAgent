@@ -57,7 +57,7 @@ Step 1：合同接收与解析
   → 输入合同（DOCX / PDF / 图片扫描件）落盘到 00 - 客户提供/
   → 调起 DocAnalyzer 解析合同关键信息：
       - 合同类型 / 双方主体 / 标的 / 金额 / 期限 / 争议解决条款
-      - 解析结果落 02 - 法律研究/案件分析/
+      - 解析结果落位按 profile：合同审查 profile → 02 - 审查报告/；诉讼 profile → 02 - 法律研究/案件分析/
 
 Step 2：调起 cn-contract-review skill
   → 把合同与 context 传给 skill；skill 内部完成 14 类路由识别
@@ -73,13 +73,18 @@ Step 3：skill 执行 4-stage workflow（自驱）
     → Learn（写 memory.md 对应类目分节）
   → ContractReviewer 不干预 skill 内部步骤；仅承接其输入输出
 
-Step 4：落盘 + 命名（agent 工程层职责）
-  → 审查报告 → 02 - 法律研究/案件分析/YYMMDD [合同名] 审查报告.md
-  → 红线 DOCX → 02 - 法律研究/案件分析/YYMMDD [合同名] 红线版.docx
+Step 4：落盘 + 命名（agent 工程层职责，**按 matter.yaml `项目类型` profile 分流**）
+  → **合同审查 profile（7-slot）**：
+      审查报告 → 02 - 审查报告/YYMMDD [合同名] 审查报告.md
+      红线 DOCX + 审查意见书终稿 → 04 - 红线与交付/YYMMDD [合同名] 红线版.docx
+      谈判轮次往来 → 03 - 谈判轮次/
+  → **诉讼 profile（11-slot；合同审查作为诉讼前合同梳理子任务）**：
+      审查报告 + 红线 DOCX → 02 - 法律研究/案件分析/YYMMDD [合同名] 审查报告.md / 红线版.docx
   → 重要：cn-contract-review skill 的 Execute 阶段默认输出到 /mnt/user-data/outputs/，
-    本 agent 必须在 skill 完成后将文件移动到案件 slot
+    本 agent 必须在 skill 完成后将文件移动到对应 profile 的案件 slot
   → 如客户要求"代理方案 / 法律意见书"格式呈现 → 调起 cn-firm-documents skill 走
-    references/client-doc-style-rules.md，落 02 - 法律研究/案件分析/ 或 10 - 综合报告/
+    references/client-doc-style-rules.md；合同审查 profile 落 04 - 红线与交付/，
+    诉讼 profile 落 02 - 法律研究/案件分析/ 或 10 - 综合报告/
 
 Step 5：完成标识
   → 响应末尾输出：识别的合同类目、调用的 skill 名、落盘路径、未填字段、签署前必查清单

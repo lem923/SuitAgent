@@ -1,6 +1,6 @@
 # Agent 目录映射与案件结构
 
-**版本**: v3.6
+**版本**: v3.7
 **最后更新**: 2026-05-10
 **说明**: 定义统一的案件目录结构（11 numbered slots + 5 root level files）与 Agent 输出映射关系
 
@@ -112,10 +112,12 @@ SuitAgent 采用四层架构：
 - **功能**：调起 cn-litigation-drafting（诉讼文书）/ cn-firm-documents（律所对客户**正式**文书）/ cn-client-communications（律所对客户**日常**沟通文书）skill
 
 #### ContractReviewer
-- **主要输出**: `02 - 法律研究/案件分析/`（审查报告 + 红线 DOCX）
-- **输入接收位**: `00 - 客户提供/`（待审合同原件）
-- **特殊场景**: 客户要求"代理方案 / 法律意见书"形式 → 调起 cn-firm-documents skill，落 `02/案件分析/` 或 `10 - 综合报告/`
-- **功能**：调起统一的 `cn-contract-review` skill（v1.8.0+ 统一版本）；skill 内部按 14 类合同自动路由；本 agent 不复制路由逻辑，仅做输入接收 + skill 调起 + 落盘工程层
+- **落位按 matter.yaml `项目类型` profile 分流**：
+  - **合同审查 profile**（7-slot）：审查报告 → `02 - 审查报告/`；红线 DOCX + 审查意见书终稿 → `04 - 红线与交付/`；谈判往来 → `03 - 谈判轮次/`
+  - **诉讼 profile**（11-slot；合同审查作为诉讼前合同梳理的子任务）：审查报告 + 红线 DOCX → `02 - 法律研究/案件分析/`（诉讼结构无审查报告专属 slot）
+- **输入接收位**: `00 - 客户提供/`（待审合同原件，两 profile 一致）
+- **特殊场景**: 客户要求"代理方案 / 法律意见书"形式 → 调起 cn-firm-documents skill；合同审查 profile 落 `04 - 红线与交付/`，诉讼 profile 落 `02/案件分析/` 或 `10 - 综合报告/`
+- **功能**：调起统一的 `cn-contract-review` skill（v1.8.0+ 统一版本）；skill 内部按 14 类合同自动路由；本 agent 不复制路由逻辑，仅做输入接收 + skill 调起 + 按 profile 落盘工程层
 
 #### TrialPrep（v1.10.0+）
 - **主要输出**: `02 - 法律研究/案件分析/庭前准备/`（4 份庭审实战工具：庭审提纲 + 争点对抗预演 + 证人询问问题清单 + 证据出示策略）
@@ -174,11 +176,24 @@ SuitAgent 采用四层架构：
 | `10 - 综合报告/客户沟通/` (v1.10.0+) | Writer（调 cn-client-communications skill）|
 | `99 - 复盘沉淀/` (v1.10.0+) | Postmortem（自动复盘 + 人 in the loop memory 沉淀）|
 
+> 上表为**诉讼 profile**（11-slot）。**合同审查 profile**（7-slot，matter.yaml `项目类型: 合同审查`）反向映射：
+
+| 目录（合同审查 profile）| 主要输出 Agent |
+|------|-------------|
+| 5 件 root 文件 | 同诉讼 profile（含 handoff_ledger.md）|
+| `00 - 客户提供/` | DocAnalyzer（合同 OCR/解析）、ContractReviewer（待审合同接收）|
+| `01 - 委托材料/` | Writer（委托书/服务协议，独立委托时）|
+| `02 - 审查报告/` | ContractReviewer（7-section 报告 + RED/ORANGE/YELLOW + fallback三档 + 签署前清单）|
+| `03 - 谈判轮次/` | ContractReviewer / 人工（对方回应 + 逐轮修改 + 版本对比）|
+| `04 - 红线与交付/` | ContractReviewer（红线版 DOCX + 审查意见书终稿 _FINAL/_SIGNED）|
+| `09 - 参考与playbook/` | Researcher（playbook + 同类范本 + 法规监管）|
+| `99 - 复盘沉淀/` | Postmortem（复盘；可复用经验另沉淀 cn-contract-review/memory.md）|
+
 ## 💡 使用说明
 
 ### 新案件创建
-- 由 `new-case` skill 生成完整结构（matter triplet + 工时记录.md + handoff_ledger.md + 11 numbered slots）
-- 案件根目录命名规范见 OutputStandards.md
+- 由 `new-case` skill 按 matter.yaml `项目类型` 生成对应 profile 结构（matter triplet + 工时记录.md + handoff_ledger.md + 诉讼 11 numbered slots **或** 合同审查 7 numbered slots）
+- 案件根目录命名规范见 OutputStandards.md（诉讼 `{原告} 与 {被告} {案由}` / 合同审查 `{客户简称} {合同类型}审查`）
 
 ### Agent 上下文加载
 - 优先读取 root 级的 `matter.yaml`（结构化 fast path）和 `matter_dashboard.md`（叙事 context）
@@ -200,6 +215,7 @@ SuitAgent 采用四层架构：
 
 | 版本 | 日期 | 更新内容 |
 | :--- | :--- | :--- |
+| v3.7 | 2026-05-16 | 合同审查 profile WP3：新增合同审查 profile（7-slot）反向映射 + ContractReviewer 落位按 matter.yaml 项目类型分流（合同审查→02-审查报告/04-红线与交付；诉讼→02-法律研究/案件分析）；使用说明同步双 profile |
 | v3.6 | 2026-05-16 | v1.13.0 WP2：新增第 5 个 root level 文件 `handoff_ledger.md`（agent 间结构化简报滚动账本）；布局/职责表/反向映射/new-case 完整结构/说明 同步 4→5 件套 |
 | v3.5 | 2026-05-16 | v1.11.1 工程债清偿：变更历史与头部版本号对齐（v3.3–v3.5 TrialPrep/Postmortem 落盘映射 + 庭前准备/复盘沉淀 slot 等修订散见正文与 commit 历史，未单列）；本行起强制头部版本=变更表顶行 |
 | v3.2 | 2026-05-08 | Phase 2C：新增 JiubufaAnalyst（九步法分析）+ JudgmentAnalyzer（判决书评审）两个方法论 agent，均输出到 `02 - 法律研究/案件分析/` |

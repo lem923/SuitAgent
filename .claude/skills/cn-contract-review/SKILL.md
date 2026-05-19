@@ -189,9 +189,11 @@ ELSE
 ## 与 SuitAgent 的集成
 
 本技能由 SuitAgent 的 `ContractReviewer` agent 调起。agent 负责工程包装层（输入合同到
-`00 - 客户提供/`，审查报告与红线 DOCX 落到 `02 - 法律研究/案件分析/`，工时计入
-`工时记录.md`）。在 SuitAgent 工作流外（如同事独立使用本 skill），agent 层 fallback 为：
-直接对话内输出 7-section 报告 + `/mnt/user-data/outputs/` 落 DOCX。
+`00 - 客户提供/`，工时计入 `工时记录.md`；审查报告与红线 DOCX 按 matter.yaml `项目类型`
+profile 落位——**合同审查 profile**：审查报告→`02 - 审查报告/`、红线 DOCX 与意见书终稿
+→`04 - 红线与交付/`、谈判往来→`03 - 谈判轮次/`；**诉讼 profile**（合同梳理子任务）：
+审查报告与红线 DOCX→`02 - 法律研究/案件分析/`）。在 SuitAgent 工作流外（如同事独立
+使用本 skill），agent 层 fallback 为：直接对话内输出 7-section 报告 + `/mnt/user-data/outputs/` 落 DOCX。
 
 详见 SuitAgent 仓库的 `.claude/agents/ContractReviewer.md`。
 
