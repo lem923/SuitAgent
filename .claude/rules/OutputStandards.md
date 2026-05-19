@@ -1,6 +1,6 @@
 # Agent输出标准规范
 
-**版本**: 1.7
+**版本**: 1.8
 **最后更新**: 2026-05-11
 **说明**: 定义所有Agent输出文件的命名规范、格式标准和质量要求（注：Agent目录映射关系详见 AgentMapping.md）
 
@@ -65,7 +65,8 @@
 | **Reporter** | 一次性 | `YYMMDD [报告类型]报告.md` | 综合分析报告 |
 | **Scheduler** | 持续维护 | `工时记录.md`（root level） | 工时记录文档（不加日期，案件根目录） |
 | **Scheduler** | 持续维护 | `matter.yaml`（root level） | 结构化期限管理（不加日期，案件根目录；不再单独写 `[案件编号].yaml`） |
-| **Reviewer** | N/A | 无固定输出 | 质量审查器（审查其他Agent输出） |
+| **所有 producing agent** (v1.13.0) | 持续维护 | `handoff_ledger.md`（root level） | agent 间结构化简报滚动账本（不加日期，案件根目录，倒序追加）；schema/软约束/硬边界见 `.claude/rules/HandoffProtocol.md` |
+| **Reviewer** | N/A | 无固定输出 | 质量审查器（审查其他Agent输出；**不写 ledger、不以 briefing 替代 full 产物核查**） |
 
 #### 📋 命名示例
 
@@ -89,6 +90,7 @@
 matter.yaml
 matter_dashboard.md
 AGENTS.md
+handoff_ledger.md
 ```
 
 ## 案件文件夹命名规范
@@ -456,6 +458,7 @@ done
 
 | 版本 | 日期 | 更新内容 |
 | :--- | :--- | :--- |
+| v1.8 | 2026-05-16 | v1.13.0 WP2：新增 `handoff_ledger.md` 持续维护文件（root level，无日期前缀，倒序追加）；Reviewer 行注明不写 ledger / 不以 briefing 替代 full 核查 |
 | v1.7 | 2026-05-16 | v1.11.1 工程债清偿：变更历史与头部版本号对齐（v1.6 TrialPrep/Postmortem 输出行 + v1.7 案件文件夹命名规范等修订散见正文与 commit 历史，未单列）；本行起强制头部版本=变更表顶行 |
 | v1.5 | 2026-05-08 | Phase 2C：新增 JiubufaAnalyst + JudgmentAnalyzer 标准输出行 |
 | v1.4 | 2026-05-08 | Phase 2B：新增 ContractReviewer 标准输出行 |

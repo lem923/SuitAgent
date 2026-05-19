@@ -1,13 +1,13 @@
 # Agent 目录映射与案件结构
 
-**版本**: v3.5
+**版本**: v3.6
 **最后更新**: 2026-05-10
-**说明**: 定义统一的案件目录结构（11 numbered slots + 4 root level files）与 Agent 输出映射关系
+**说明**: 定义统一的案件目录结构（11 numbered slots + 5 root level files）与 Agent 输出映射关系
 
 ## 🎯 文档职责说明
 
 本文档专注于**目录结构与映射关系**：
-- ✅ 案件根目录 4 件套文件
+- ✅ 案件根目录 5 件套文件
 - ✅ 11 个 numbered slots 的标准化结构
 - ✅ Agent → 目录映射
 - ✅ Agent 分层架构
@@ -26,6 +26,7 @@ SuitAgent 项目内外统一采用以下结构（继承自 `cn-litigation-case-f
 ├── matter_dashboard.md        ← 人读案件看板（替代旧 案件信息.md）
 ├── AGENTS.md                  ← per-case agent 边界与保密硬约束
 ├── 工时记录.md                ← 工时与费用核算（律师/财务读）
+├── handoff_ledger.md          ← agent 间结构化简报滚动账本（v1.13.0；下游 ledger-first lazy-load）
 ├── 00 - 客户提供/             ← 客户递交的原始材料
 ├── 01 - 委托材料/             ← 委托代理协议、授权委托书、谈话笔录、监督卡
 ├── 02 - 法律研究/             ← 法条、判例、研究报告
@@ -41,7 +42,7 @@ SuitAgent 项目内外统一采用以下结构（继承自 `cn-litigation-case-f
 └── 99 - 复盘沉淀/             ← 结案后复盘笔记、归档心得、工作流改进
 ```
 
-### 4 个 root level 文件职责
+### 5 个 root level 文件职责
 
 | 文件 | 主要使用者 | 更新频率 | 职责 |
 |------|---------|--------|------|
@@ -49,6 +50,7 @@ SuitAgent 项目内外统一采用以下结构（继承自 `cn-litigation-case-f
 | **matter_dashboard.md** | 承办律师、客户汇报 | 关键节点 | 人读看板：时间线、待办、风险提示、阶段总结。**替代旧 `[案件编号]案件信息.md`** |
 | **AGENTS.md** | 所有 agent | 极少改 | per-case 的保密硬约束 / 文件操作禁区 / 索引规约。继承根目录 CLAUDE.md，只写 case-specific 内容 |
 | **工时记录.md** | 承办律师、财务 | 每天/每周 | 工时记录、费用预算、月度统计 |
+| **handoff_ledger.md** (v1.13.0) | 所有 orchestrator agent（读侧 ledger-first / 写侧落盘后追加 briefing）；Reviewer 不简化（读 full 产物）| 每 agent 完成落盘后追加 | agent 间结构化简报滚动账本（倒序，最新在顶）：下游据 briefing 指针 lazy-load 仅需 full 产物，砍长 context 膨胀。schema/软约束/硬边界见 [`HandoffProtocol.md`](./HandoffProtocol.md)。缺失→回退全读 gated |
 
 ## 🔄 文件职责分工（取代旧 12 层时代的"三件套"）
 
@@ -58,6 +60,7 @@ SuitAgent 项目内外统一采用以下结构（继承自 `cn-litigation-case-f
 | `matter_dashboard.md` | 人读看板 | 旧 `[案件编号]案件信息.md` |
 | `AGENTS.md` (per-case) | agent 行为约束 | 无（新增层） |
 | `工时记录.md` | 律师/财务 | 旧 `00 - 📅 日程管理/[案件编号]工时记录.md` |
+| `handoff_ledger.md` (v1.13.0) | orchestrator agent context 经济（ledger-first lazy-load）| 无（新增层；取代"下游全量读上游 .md"）|
 
 ## 📊 Agent 分层架构与目录映射
 
@@ -154,6 +157,7 @@ SuitAgent 采用四层架构：
 | `matter_dashboard.md` (root) | 人读 / Scheduler（关键日期更新可同步） |
 | `AGENTS.md` (root) | 案件创建时定稿 / 所有 agent（读） |
 | `工时记录.md` (root) | Scheduler、承办律师 |
+| `handoff_ledger.md` (root, v1.13.0) | 写侧：所有 producing agent 落盘后追加 briefing；读侧：orchestrator Explore ledger-first lazy-load（Reviewer 不简化，读 full 产物）|
 | `00 - 客户提供/` | DocAnalyzer（解析）、ContractReviewer（合同输入接收）、人工归档 |
 | `01 - 委托材料/` | Writer（生成委托文件） |
 | `02 - 法律研究/` (root of slot) | Researcher |
@@ -173,7 +177,7 @@ SuitAgent 采用四层架构：
 ## 💡 使用说明
 
 ### 新案件创建
-- 由 `new-case` skill 生成完整结构（matter triplet + 工时记录.md + 11 numbered slots）
+- 由 `new-case` skill 生成完整结构（matter triplet + 工时记录.md + handoff_ledger.md + 11 numbered slots）
 - 案件根目录命名规范见 OutputStandards.md
 
 ### Agent 上下文加载
@@ -196,6 +200,7 @@ SuitAgent 采用四层架构：
 
 | 版本 | 日期 | 更新内容 |
 | :--- | :--- | :--- |
+| v3.6 | 2026-05-16 | v1.13.0 WP2：新增第 5 个 root level 文件 `handoff_ledger.md`（agent 间结构化简报滚动账本）；布局/职责表/反向映射/new-case 完整结构/说明 同步 4→5 件套 |
 | v3.5 | 2026-05-16 | v1.11.1 工程债清偿：变更历史与头部版本号对齐（v3.3–v3.5 TrialPrep/Postmortem 落盘映射 + 庭前准备/复盘沉淀 slot 等修订散见正文与 commit 历史，未单列）；本行起强制头部版本=变更表顶行 |
 | v3.2 | 2026-05-08 | Phase 2C：新增 JiubufaAnalyst（九步法分析）+ JudgmentAnalyzer（判决书评审）两个方法论 agent，均输出到 `02 - 法律研究/案件分析/` |
 | v3.1 | 2026-05-08 | Phase 2B：新增 ContractReviewer agent（合同审查编排器），输入 `00 - 客户提供/`，输出 `02 - 法律研究/案件分析/` |

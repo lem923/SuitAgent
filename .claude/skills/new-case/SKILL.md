@@ -1,6 +1,6 @@
 ---
 name: new-case
-description: 创建新案件 + 重整理已有案件文件夹（dual-mode）。**创建模式**：从空白生成案件框架（11 numbered slots + matter triplet + 工时记录.md）。**重整理模式**（v1.10.1+）：对已有案件文件夹做严格合规检查 → 必要时重命名 `YYMMNN 原告 与 被告 案由` 标准格式 → 内部结构整理。覆盖：创建新案件、新建案件、新案件、整理案件、整理案件文件夹、重整理、重命名案件、案件归一化、case folder organize、案件文件夹规范化。
+description: 创建新案件 + 重整理已有案件文件夹（dual-mode）。**创建模式**：从空白生成案件框架（11 numbered slots + matter triplet + 工时记录.md + handoff_ledger.md）。**重整理模式**（v1.10.1+）：对已有案件文件夹做严格合规检查 → 必要时重命名 `YYMMNN 原告 与 被告 案由` 标准格式 → 内部结构整理。覆盖：创建新案件、新建案件、新案件、整理案件、整理案件文件夹、重整理、重命名案件、案件归一化、case folder organize、案件文件夹规范化。
 license: GNU AGPL v3（详见项目根 LICENSE）
 ---
 
@@ -98,6 +98,7 @@ license: GNU AGPL v3（详见项目根 LICENSE）
 ├── matter_dashboard.md      ← 人读案件看板（必生成）
 ├── AGENTS.md                ← per-case agent 边界（必生成）
 ├── 工时记录.md              ← 工时与费用（必生成）
+├── handoff_ledger.md        ← agent 间结构化简报账本（必生成，v1.13.0；预建空 schema 头）
 ├── 00 - 客户提供/
 ├── 01 - 委托材料/
 ├── 02 - 法律研究/
@@ -130,11 +131,13 @@ Step 3：建立标准目录结构
   → 创建 11 个 numbered slots（00-10 + 99）+ 案件分析子目录
   → 不创建未使用的 slot（不删除项目根 .gitignore 的兜底）
 
-Step 4：生成 4 件 root 文件
+Step 4：生成 5 件 root 文件
   → matter.yaml（结构化操作数据；schema 见 references/yaml-schema.md）
   → matter_dashboard.md（人读看板；模板见 references/case-info-template.md）
   → AGENTS.md（per-case agent 边界；模板见 cn-litigation-case-folder-organizer 中 AGENTS.md 模板段）
   → 工时记录.md（工时模板见 references/timesheet-template.md）
+  → handoff_ledger.md（v1.13.0；预建空 schema 头：标题 + 说明引 .claude/rules/HandoffProtocol.md
+     + 一行"（暂无 briefing，由各 producing agent 落盘后倒序追加）"占位）
 
 Step 5：材料分类入位
   → 按下表把客户提供的材料移到对应 slot
