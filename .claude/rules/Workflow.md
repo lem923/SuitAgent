@@ -1,6 +1,6 @@
 # 工作流系统配置
 
-**版本**: 2.0
+**版本**: 2.1
 **最后更新**: 2026-04-02
 **说明**: 定义用户需求识别、Agent自动路由和复合工作流执行机制
 
@@ -550,6 +550,7 @@
 2. **上下文继承**：主Agent将前序Subagent的结果传递给后续Subagent，保持分析一致性
 3. **增量更新**：复用历史分析结果，提高效率
 4. **质量保证**：每个Agent都具备内嵌验证或专项审查机制
+5. **结构化 handoff（v1.13.0）**：producing agent 落盘后向案件根 `handoff_ledger.md` 追加结构化 briefing；下游 orchestrator 的 3E Explore **ledger-first**——先读小账本，再按 briefing 指针 **lazy-load 仅需的 full 产物**，不全量读上游 .md（砍长 context 膨胀）。ledger 缺失/不确定 → 回退全读（gated no-op）。**Reviewer 豁免**：D 维度核查仍读 full 产物，不以 briefing 替代。规范见 [`.claude/rules/HandoffProtocol.md`](.claude/rules/HandoffProtocol.md)
 
 ## 快速启动模板
 
@@ -600,6 +601,7 @@
 
 | 版本 | 日期 | 更新内容 |
 | :--- | :--- | :--- |
+| v2.1 | 2026-05-16 | v1.13.0 WP3：工作流执行原则新增第 5 条"结构化 handoff"（ledger-first lazy-load + Reviewer 豁免 + gated 回退），指向 HandoffProtocol.md |
 | v2.0 | 2026-04-02 | 合并 WorkflowSystem.md 与 WorkflowScenarios.md，消除重复内容 |
 | v1.0 | 2026-01-01 | 迁移到Claude Code Rules架构，从YAML配置文件转换为Markdown格式 |
 

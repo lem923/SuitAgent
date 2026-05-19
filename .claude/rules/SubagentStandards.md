@@ -1,6 +1,6 @@
 # Subagent配置标准规范
 
-**版本**: 3.2
+**版本**: 3.3
 **最后更新**: 2026-05-10
 **说明**: 基于Claude Code官方规范制定的SuitAgent Subagent统一配置标准
 
@@ -120,9 +120,14 @@ color: blue
 >
 > 主Agent根据触发场景中定义的调用链，编排后续Subagent调用。
 
+#### 写侧：handoff briefing（v1.13.0，producing agent 必需）
+
+凡**落盘 .md 产物**的 producing agent（DocAnalyzer / EvidenceAnalyzer / IssueIdentifier / Researcher / Strategist / JiubufaAnalyst / JudgmentAnalyzer / Writer / ContractReviewer / TrialPrep / Summarizer / Reporter / Postmortem），**落盘 full 产物后必须**按 [`.claude/rules/HandoffProtocol.md`](../rules/HandoffProtocol.md) schema 向案件根 `handoff_ledger.md` **倒序追加一条 briefing 块**（指针引用规范，**勿在本 agent 复述 schema**——DRY）。`handoff_ledger.md` 不存在时（旧案件未脚手架）先按规范建空 schema 头再追加。**Reviewer 与 Scheduler 豁免**（Reviewer 只读核查不写 ledger、不以 briefing 替代 full 产物；Scheduler 维护 matter.yaml/工时记录，非分析产物）。
+
 ### ⚠️ 重要提醒
 - **确保路径正确** - 文件保存在对应案件目录下
 - **检查文件格式** - 所有输出文件必须为.md格式
+- **handoff briefing** - producing agent 落盘后按 HandoffProtocol 追加 `handoff_ledger.md`（Reviewer/Scheduler 豁免）
 
 ### 完成标识
 
@@ -298,6 +303,7 @@ EvidenceAnalyzer输出文件必须遵循以下规范：
 
 | 版本 | 日期 | 更新内容 |
 | :--- | :--- | :--- |
+| v3.3 | 2026-05-16 | v1.13.0 WP3：§2.4 后续工作指引共享模板新增"写侧 handoff briefing"——producing agent 落盘后按 HandoffProtocol 追加 handoff_ledger.md（指针引用不复述，DRY；Reviewer/Scheduler 豁免），一处覆盖全部 producing agent |
 | v3.2 | 2026-05-16 | v1.11.1 工程债清偿：变更历史与头部版本号对齐（v2.2–v3.2 期间 tools 顺序约定 v3.1 / 15 agent color 约定 v3.2 等修订散见正文与 commit 历史，未单列）；同步订正 color 字段说明 13→15 agent；本行起强制头部版本=变更表顶行 |
 | v2.1.0 | 2026-01-01 | 新增tools和skills字段说明，使用逗号分隔格式 |
 | v2.0.0 | 2026-01-01 | 基于Claude Code官方规范重构，删除触发词章节 |
