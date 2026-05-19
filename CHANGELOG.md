@@ -5,6 +5,24 @@
 
 ---
 
+## [v1.13.0] - 2026-05-16 — 结构化 handoff 简报协议（砍长 context 膨胀）
+
+> 下一步迭代分析 L3：agent 间此前读上游 .md 全文、无 schema 无预算，长 context 链路（华雄类多判决多证据）膨胀/丢失。外部研究（Google ADK/Anthropic claude-progress/LangChain）收敛于结构化简报（非 LLM 摘要——摘要 lossy+误差累积）。本版按结构化简报路线闭合。
+
+### ➕ 新增 / 🔧 修复
+
+- **WP1（commit bf664eb）**：新建 `.claude/rules/HandoffProtocol.md` 单一权威源——typed HandoffBriefing schema（产出agent/日期/full产物指针/目标达成/关键约束/已决事项/待决&N*项/下游建议）；**软约束**（按用户指示去硬 token 门槛：简洁不啰嗦、随案件复杂度伸缩，大型案件可展开宁多带不漏）；**三硬边界 zero tolerance**（① Reviewer D1-D8 必读 full 产物绝不以 briefing 替代，防 v1.11.0c 退化 ② 待决/N* 强制非空 ③ gated 回退优先安全）；非 LLM 摘要路线
+- **WP2（9791f4d）**：`handoff_ledger.md` 升为案件根第 5 个 root level 文件——AgentMapping(v3.5→3.6) 布局/职责/反向映射/说明同步 4→5 件套 + OutputStandards(1.7→1.8) 持续维护文件归类 + new-case 脚手架预建空 schema 头
+- **WP3（e63dc39）写侧（DRY）**：SubagentStandards(3.2→3.3) §2.4 共享模板新增"写侧 handoff briefing"——producing agent 落盘后按 HandoffProtocol 追加 ledger（指针不复述）；Reviewer/Scheduler 豁免。Workflow(2.0→2.1) 执行原则第 5 条。一处覆盖全部 13 producing agent（同 SelfCheck3E/ReviewerRubric 模式）
+- **WP4（c20072f）读侧（DRY）**：SelfCheck3E(v1.0→v1.1) Explore 步 ledger-first——读小账本→按指针 lazy-load 仅需 full 产物，gated 回退全读；DRY 覆盖 6 orchestrator。Reviewer.md 显式 v1.13.0 硬边界豁免（必读 full 产物，不写 ledger）
+- **WP5（本条）**：6 项结构闭环验收通过（schema/5root/写侧/读侧/gated 向后兼容/版本全对齐）
+
+### ✅ 验证与边界
+
+结构层闭环已通（写侧+读侧+Reviewer 豁免+gated 全接，6 rules 文件版本=变更表顶强一致）。**长 context 链路 live token 对比**（华雄 post-judgment：DocAnalyzer→JudgmentAnalyzer→Strategist→Writer→Reviewer）**留待下次真实长 context 案件**（同 v1.11.1/v1.12.0 token 取舍，显式声明，不为验证合成案件）。gated 设计保证：ledger 缺失/不足 → 回退现状全读，向后兼容零破坏。
+
+---
+
 ## [v1.12.0] - 2026-05-16 — memory 闭环真正闭合（修复"防御成熟但学习为零"）
 
 > 下一步迭代分析（`status/NEXT-ITERATION-分析.md`）识别的最大隐性债 L1：三层防御已 P0 四 pass 实证成熟，但学习闭环从未闭合——7 个 legal skill 仅 cn-contract-review 有 memory.md（且 0 条经验），其余 6 个文件根本不存在，Postmortem 写入逻辑"如未存在则新建"从未行使、读侧产出型 skill 不读 memory。本版闭合读写两端。
