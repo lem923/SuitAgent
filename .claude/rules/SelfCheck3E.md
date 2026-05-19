@@ -1,6 +1,6 @@
 # 3E 自检流程规范（Stage 2 单一权威源）
 
-**版本**: v1.0
+**版本**: v1.1
 **最后更新**: 2026-05-16
 **说明**: v1.11.0 三层纵深防御 Stage 2 的通用规范单一权威源。6 个 orchestrator agent（Writer / ContractReviewer / JiubufaAnalyst / JudgmentAnalyzer / TrialPrep / Postmortem）的 3E 自检共享本规范；各 agent.md 只保留**专属 Examine 校验问题清单**与**专属自检结果段格式**，不再重复本文通用部分（DRY 单一权威源，v1.11.1 抽取）。
 
@@ -14,7 +14,9 @@
 
 ### Explore（已有）
 
-按本 agent "工作流程" 章节调起对应 skill 完成草稿 / 分析。**skill 内部自身的 QC（Stage 1）必须先完成**（各 agent 调起的具体 skill 及其内嵌 QC 见该 agent 的工作流程章节，此处不复述以避免漂移）。
+**上游 context 承接（v1.13.0 ledger-first）**：进入本步前，先读案件根 `handoff_ledger.md`（小账本）→ 按各 briefing 的"下游建议 / 指针"**只 lazy-load 本任务真正需要的 full 上游产物**，不全量读所有上游 .md（砍长 context 膨胀）。`handoff_ledger.md` 不存在 / 为空 / briefing 不足以支撑本任务 → **回退现状"读相关上游 .md 全文"（gated no-op，不阻断、安全侧默认）**。规范见 [`HandoffProtocol.md`](./HandoffProtocol.md)。
+
+然后按本 agent "工作流程" 章节调起对应 skill 完成草稿 / 分析。**skill 内部自身的 QC（Stage 1）必须先完成**（各 agent 调起的具体 skill 及其内嵌 QC 见该 agent 的工作流程章节，此处不复述以避免漂移）。
 
 ### Examine（强制，max_iter=1）
 
@@ -58,6 +60,7 @@ Examine 校验清单中涉及**硬核对项**（法条现行性 / 案号 / 时�
 
 | 版本 | 日期 | 更新内容 |
 | :--- | :--- | :--- |
+| v1.1 | 2026-05-16 | v1.13.0 WP4：Explore 步新增 ledger-first 上游 context 承接（读 handoff_ledger.md → 按指针 lazy-load 仅需 full 产物，gated 回退全读），DRY 覆盖 6 orchestrator 读侧 |
 | v1.0 | 2026-05-16 | v1.11.1 工程债清偿：从 6 个 orchestrator agent.md 抽取 3E 通用规范为单一权威源（DRY），各 agent 改为指针引用 + 仅保留专属清单 |
 
 ---

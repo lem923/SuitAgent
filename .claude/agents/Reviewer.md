@@ -51,6 +51,8 @@ Reviewer 作为支持层 agent，**不直接写文件到案件目录**；评估�
 
 维度速记（仅名称，细则一律以 ReviewerRubric.md 为准）：**D1** 法条引用 · **D2** 案号/判例 · **D3** 事实一致 · **D4** 时效计算 · **D5** 程序节点 · **D6** 主体清晰 · **D7** 内部逻辑 · **D8** 保密硬约束（zero tolerance，任一子项 N → 直接降 D，不论其他维度）。硬核对项 **D1/D2/D4/D5 必须 web_search 白名单源**核对；上游因无 web 工具标 N\* 的项由本 agent 接管补核，协议见 [`NStarProtocol.md`](../rules/NStarProtocol.md)。
 
+> **v1.13.0 handoff 硬边界（zero tolerance）**：本 agent **豁免** ledger-first 简化——D1-D8 核查**必须读 orchestrator 落盘的 full 产物**，**绝不**以 `handoff_ledger.md` 的 briefing 替代全文核查。briefing 仅供 orchestrator→orchestrator context 经济；Reviewer 是对抗式 Verifier，简报化会使 v1.11.0c 三层防御退化。本 agent 也**不写** ledger。详见 [`HandoffProtocol.md`](../rules/HandoffProtocol.md) §硬边界。
+
 ## 工作流程
 
 落盘后自动调起 → 执行序列：接收审查材料（落盘文件 + 上游产物 + matter.yaml）→ 读 `ReviewerRubric.md` 确认适用子项 → **Step 3 D8 zero tolerance 优先检查**（任一 N 立即降 D）→ D1/D2/D4/D5 web_search 白名单硬核对（含上游 N\* 接管补核）→ D3/D6/D7 软评估（Y/N，不浮动）→ 生成 Y/N 矩阵 + diagnostic notes → 决定 pass / retry / escalate。
