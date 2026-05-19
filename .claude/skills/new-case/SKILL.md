@@ -1,6 +1,6 @@
 ---
 name: new-case
-description: 创建新案件 + 重整理已有案件文件夹（dual-mode）。**创建模式**：从空白生成案件框架（11 numbered slots + matter triplet + 工时记录.md + handoff_ledger.md）。**重整理模式**（v1.10.1+）：对已有案件文件夹做严格合规检查 → 必要时重命名 `YYMMNN 原告 与 被告 案由` 标准格式 → 内部结构整理。覆盖：创建新案件、新建案件、新案件、整理案件、整理案件文件夹、重整理、重命名案件、案件归一化、case folder organize、案件文件夹规范化。
+description: 创建新案件 + 重整理已有案件文件夹（dual-mode）。**创建模式**：从空白生成案件框架，**按项目类型分两 profile**——诉讼（11 numbered slots）/ 合同审查（7 numbered slots，对齐 cn-contract-review 4-stage）+ matter triplet + 工时记录.md + handoff_ledger.md。**重整理模式**（v1.10.1+）：对已有案件文件夹做严格合规检查 → 必要时重命名 `YYMMNN 原告 与 被告 案由` 标准格式 → 内部结构整理。覆盖：创建新案件、新建案件、新案件、整理案件、整理案件文件夹、重整理、重命名案件、案件归一化、case folder organize、案件文件夹规范化。
 license: GNU AGPL v3（详见项目根 LICENSE）
 ---
 
@@ -91,15 +91,14 @@ license: GNU AGPL v3（详见项目根 LICENSE）
 | `--opposite-party` | 否 | 对方当事人 | `上海 XX 公司` |
 | `--input-dir` | 否 | 客户提供材料的源目录 | `/path/to/materials` |
 
-### 案件根目录结构（生成目标）
+### 案件根目录结构（生成目标，**按 matter.yaml `项目类型` 分两 profile**）
 
+**5 件 root 文件两 profile 通用**：matter.yaml / matter_dashboard.md / AGENTS.md / 工时记录.md / handoff_ledger.md（均必生成）。numbered slots 按 profile 分支：
+
+**profile A — 诉讼（litigation，默认；11 numbered slots，与既往完全一致，零改动）**
 ```
 {YYMMNN 原告 与 被告 案由}/
-├── matter.yaml              ← 结构化操作数据（必生成）
-├── matter_dashboard.md      ← 人读案件看板（必生成）
-├── AGENTS.md                ← per-case agent 边界（必生成）
-├── 工时记录.md              ← 工时与费用（必生成）
-├── handoff_ledger.md        ← agent 间结构化简报账本（必生成，v1.13.0；预建空 schema 头）
+├── （5 件 root 文件，见上）
 ├── 00 - 客户提供/
 ├── 01 - 委托材料/
 ├── 02 - 法律研究/
@@ -114,6 +113,20 @@ license: GNU AGPL v3（详见项目根 LICENSE）
 ├── 10 - 综合报告/
 └── 99 - 复盘沉淀/
 ```
+
+**profile B — 合同审查（contract-review；7 numbered slots，对齐 cn-contract-review 4-stage）**
+```
+{YYMMNN 客户简称 合同类型审查}/
+├── （5 件 root 文件，见上）
+├── 00 - 客户提供/          ← Prepare 输入：待审合同原件 + 附件 + OCR
+├── 01 - 委托材料/          ← 委托书 / 服务协议（独立委托时；可空）
+├── 02 - 审查报告/          ← Review：7-section 报告 + RED/ORANGE/YELLOW + fallback三档 + 签署前清单
+├── 03 - 谈判轮次/          ← Discuss：对方回应 + 逐轮修改 + 版本对比
+├── 04 - 红线与交付/        ← Execute：红线版 DOCX + 审查意见书终稿（_FINAL/_SIGNED）
+├── 09 - 参考与playbook/    ← playbook + 同类合同范本 + 相关法规监管
+└── 99 - 复盘沉淀/          ← Learn：案件侧复盘（可复用经验另沉淀进 cn-contract-review/memory.md）
+```
+> 合同审查 profile **不创建** 03-我方证据 / 04-对方证据(诉讼语义) / 05-08 文书法院庭审 / 10-综合报告 等诉讼专属空 slot；09/99 保留与诉讼同号习惯统一（语义按 profile 解释）。
 
 ### 创建工作流（5 步）
 
@@ -140,9 +153,12 @@ Step 2：合规命名（按 profile 选规范）
     （NN 序列两 profile 共用同一月度序号池，不分开计）
   → 缺字段时主动询问用户（诉讼：YYMMNN/原告/与/被告/案由；合同审查：YYMMNN/客户简称/合同类型）
 
-Step 3：建立标准目录结构
-  → 创建 11 个 numbered slots（00-10 + 99）+ 案件分析子目录
-  → 不创建未使用的 slot（不删除项目根 .gitignore 的兜底）
+Step 3：建立标准目录结构（按 matter.yaml `项目类型` 分支）
+  → **诉讼 profile**：创建 11 个 numbered slots（00-10 + 99）+ 02 案件分析子目录
+  → **合同审查 profile**：创建 7 个 numbered slots（00 客户提供 / 01 委托材料 /
+     02 审查报告 / 03 谈判轮次 / 04 红线与交付 / 09 参考与playbook / 99 复盘沉淀），
+     **不创建** 03-我方证据/04-对方证据/05-08/10 等诉讼专属 slot
+  → 两 profile 均不创建超出本 profile 定义的 slot（不删除项目根 .gitignore 的兜底）
 
 Step 4：生成 5 件 root 文件
   → matter.yaml（结构化操作数据；schema 见 references/yaml-schema.md）
@@ -155,6 +171,8 @@ Step 4：生成 5 件 root 文件
 Step 5：材料分类入位
   → 按下表把客户提供的材料移到对应 slot
 
+**诉讼 profile**：
+
 | 材料类型 | 目标 slot |
 |---------|----------|
 | 客户递交的原始材料 | `00 - 客户提供/` |
@@ -164,6 +182,16 @@ Step 5：材料分类入位
 | 法院送达的传票 / 裁定 / 判决 / 调解书 | `07 - 法院法律文书/` |
 | 庭审记录 | `08 - 庭审笔录/` |
 | 参考法条 / 判例 / 模板 | `09 - 参考文件/` |
+
+**合同审查 profile**：
+
+| 材料类型 | 目标 slot |
+|---------|----------|
+| 待审合同原件 / 附件 / OCR | `00 - 客户提供/` |
+| 委托书 / 服务协议（独立委托时）| `01 - 委托材料/` |
+| 对方回应 / 修改稿往来 | `03 - 谈判轮次/` |
+| 同类合同范本 / playbook / 相关法规监管 | `09 - 参考与playbook/` |
+（审查报告/红线版由 ContractReviewer 产出，落 `02 - 审查报告/` 与 `04 - 红线与交付/`）
 ```
 
 ## Mode 2：重整理模式（v1.10.1+）
