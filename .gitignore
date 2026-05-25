@@ -91,6 +91,14 @@ output/
 # 用户偏好文件（个人偏好信息）
 .claude/preferences/
 
+# Claude Code 自动记忆（含个人偏好与 client identifier，禁止入仓，防个人习惯泄漏）
+.claude/memory/
+.claude/projects/
+**/memory/MEMORY.md
+**/memory/feedback_*.md
+**/memory/project_*.md
+**/memory/user_role.md
+
 # 子目录中的 CLAUDE.md 文件（各组件本地配置），仅保留根目录的
 **/CLAUDE.md
 !CLAUDE.md
