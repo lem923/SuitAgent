@@ -64,7 +64,23 @@ Stage 2：Discuss（讨论）
 
 Stage 3：Execute（执行）
   → 调起 docx skill（路径：/mnt/skills/public/docx/SKILL.md）
-  → Track Changes + Comment（作者标注"Claude"，如需个性化在本节末尾改）
+  → **强制按 references/deliverable-format.md §"Word DOCX 红线版生成规则" v1.1+ 执行**
+  → Step A：参数化模板抽取——解包原合同 docx，从首批正文段落抽取
+     PARA_PPR_TEMPLATE（spacing + ind + jc 等）+ RUN_RPR_TEMPLATE（rFonts + sz + kern 等），
+     **禁用 hardcoded 默认字体字号**（不同合同字体差异极大：仿宋_GB2312 / 宋体 / Times New Roman 等）
+  → Step B：双轨制落地：
+     - **EDIT（条款级修订）→ Track Changes**：所有 <w:ins>/<w:del> 内 run 的 rPr
+       必须套用 RUN_RPR_TEMPLATE + 替换 color 为 C00000；新插入段落 pPr 套用 PARA_PPR_TEMPLATE
+     - **NOTE（提示性批注）→ Word Comments**：律师对修订理由的解释 / 整体审查说明 /
+       YELLOW 类纯建议，必须写入 word/comments.xml + 注册 [Content_Types].xml 与
+       _rels/document.xml.rels + 在 document.xml 加 commentRangeStart/End + commentReference 三件套
+     - **绝对禁止把 NOTE 当 w:ins 混在正文里**——这是 v1.0 错误，v1.1+ 视为质量缺陷
+  → Step C：批注锚点（按 deliverable-format.md §C 锚点策略表）：
+     紧邻 EDIT 的 NOTE → 锚到 EDIT 范围；整体说明 → 锚到合同标题；纯建议 → 锚到章节标题
+  → Track Changes 作者：默认 Claude；律所同事使用改为 hhwy-bj 或承办律师标识；
+     comments.xml 的 w:author/w:initials 与 Track Changes 作者一致
+  → Step D：落盘前核验（按 deliverable-format.md §E）：
+     pdftoppm 渲 PDF 目检字体一致 + grep 正文【批注】返回 0 + Content_Types/rels 已注册
   → 输出到 /mnt/user-data/outputs/
   → 同时输出"审查意见书.docx"（仿宋正式版式）+ "红线版.docx"
 
