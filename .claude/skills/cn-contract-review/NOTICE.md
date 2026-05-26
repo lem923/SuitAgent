@@ -25,7 +25,6 @@ depending on origin:
 - `references/contract-types/07-lending-gift/*.md`（2 个文件全部继承）
 - `references/contract-types/08-internet/*.md`（3 个文件全部继承）
 - `references/contract-types/09-marriage-family/*.md`（3 个文件全部继承）
-- `references/contract-types/10-employment/business-outsourcing.md / confidentiality.md / employment-contract.md / internship.md / labor-dispatch.md / non-compete.md / part-time-employment.md / personal-service.md / reemployment.md / training-service.md`（10 个文件继承）
 - `references/contract-types/11-real-estate/*.md`（7 个文件全部继承）
 - `references/contract-types/12-construction/*.md`（6 个文件全部继承）
 - `references/contract-types/13-corporate-investment/*.md`（10 个文件全部继承）
@@ -52,12 +51,6 @@ depending on origin:
 - `references/contract-types/05-ip/licensing-dimensions-a-to-j.md`
 - `references/contract-types/05-ip/licensing-clause-pack.md`
 - `references/contract-types/05-ip/licensing-memory-patterns.md`
-- `references/contract-types/10-employment/labor-employment-main-checklist.md`
-- `references/contract-types/10-employment/labor-service-checklist.md`
-- `references/contract-types/10-employment/labor-noncompete-ip-checklist.md`
-- `references/contract-types/10-employment/labor-termination-checklist.md`
-- `references/contract-types/10-employment/labor-evidence-compliance-checklist.md`
-- `references/contract-types/10-employment/labor-clause-pack.md`
 - `references/contract-types/14-gov-procurement/dev-dimensions-a-to-i.md`
 - `references/contract-types/14-gov-procurement/dev-licensing-j-dimension.md`
 - `references/contract-types/14-gov-procurement/gov-procurement-clause-pack.md`
@@ -105,3 +98,12 @@ depending on origin:
 
 修改本 NOTICE.md 不需要 contract-copilot 上游同意，但**修改"继承自 contract-copilot
 v1.5.1"清单中的文件内容必须保留 CC BY-NC 4.0**。
+
+---
+
+## v1.13.0 变更说明
+
+自 v1.13.0 起，本 skill 不再处理劳动雇佣类合同。原 `references/contract-types/10-employment/` 目录下的 16 个文件中：
+
+- 10 个 contract-copilot 风格条款审查文件（business-outsourcing / confidentiality / employment-contract / internship / labor-dispatch / non-compete / part-time-employment / personal-service / reemployment / training-service）已迁移至 `cn-labor-employment-strategy/references/contract-clauses/`
+- 6 个 cn-contract-review-labor-employment specialized skill 遗留文件（labor-employment-main-checklist / labor-service-checklist / labor-noncompete-ip-checklist / labor-termination-checklist / labor-evidence-compliance-checklist / labor-clause-pack）因其内容已被 cn-labor-employment-strategy 的策略 playbook 深度覆盖，**直接 deprecated 不再迁移**

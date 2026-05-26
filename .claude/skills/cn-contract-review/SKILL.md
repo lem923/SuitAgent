@@ -1,18 +1,20 @@
 ---
 name: cn-contract-review
 description: >
-  中国法合同审查统一技能（unified skill，v1.0+）。覆盖 14 大类合同（通用商事、买卖、租赁、
-  服务、知识产权与技术许可、担保、借贷赠与、互联网协议、婚姻家事、劳动雇佣、房地产、
-  建设工程、公司投资、政企采购程序专项），以分层扫描（宏观/中观/微观）+ 4-stage workflow
-  （Prepare→Review→Discuss→Execute→Learn）+ REDLINE/ORANGE/YELLOW 风险等级 + fallback
-  positions（目标/可签/底线三档）+ playbook 机制为方法论骨架。最终输出符合律所标准的合同
-  审查意见书（7-section Markdown + 可选 Word DOCX 红线版与意见书）。
-  本技能取代旧 cn-contract-review-* 4 个 specialized skill，未来合同审查统一调起本技能。
+  中国法合同审查统一技能（unified skill，v1.0+，v1.13.0 起 13 大类）。覆盖 13 大类合同
+  （通用商事、买卖、租赁、服务、知识产权与技术许可、担保、借贷赠与、互联网协议、
+  婚姻家事、房地产、建设工程、公司投资、政企采购程序专项），以分层扫描（宏观/中观/微观）
+  + 4-stage workflow（Prepare→Review→Discuss→Execute→Learn）+ REDLINE/ORANGE/YELLOW
+  风险等级 + fallback positions（目标/可签/底线三档）+ playbook 机制为方法论骨架。
+  最终输出符合律所标准的合同审查意见书（7-section Markdown + 可选 Word DOCX 红线版与
+  意见书）。本技能取代旧 cn-contract-review-* specialized skill，未来非劳动类合同
+  审查统一调起本技能。**劳动雇佣 / 劳务 / 派遣 / 竞业限制 / 保密 / 培训服务期 / 实习
+  等合同的审查自 v1.13.0 起剥离至 cn-labor-employment-strategy 处理**。
   关键词触发：合同审查、合同审阅、合同修改、红线审查、合同风险评估、签署前检查、合同把关、
   审查意见书、谈判策略、pre-signing、看一下这份合同、这合同有什么问题、合同有没有坑、
-  帮我把把关、审查雇佣 / 劳动 / 竞业 / 保密、审查技术许可 / 专利授权 / 软著许可、
-  审查政府采购 / SI / 委托开发 / 信息化项目合同、审查买卖 / 租赁 / 服务 / 框架 / M&A /
-  股权 / 担保 / 借贷 / 互联网协议 / 婚姻家事 / 房地产 / 建设工程 / 公司投资合同。
+  帮我把把关、审查技术许可 / 专利授权 / 软著许可、审查政府采购 / SI / 委托开发 /
+  信息化项目合同、审查买卖 / 租赁 / 服务 / 框架 / M&A / 股权 / 担保 / 借贷 /
+  互联网协议 / 婚姻家事 / 房地产 / 建设工程 / 公司投资合同。
 license: CC BY-NC 4.0
 ---
 
@@ -42,7 +44,7 @@ Stage 0：Prepare（准备）
   → 读 references/personal-preferences.md（审查人个人偏好；同事 fork 后改为自己）
   → 读取合同（DOCX/PDF/纯文本）
   → 立场确认（甲/乙/中立 + 审查口径：克制/常规/强势）
-  → 嵌套条款扫描（识别有无嵌套许可/劳动/技术等专项类目）
+  → 嵌套条款扫描（识别有无嵌套许可/技术等专项类目；如含劳动用工嵌套，重定向至 cn-labor-employment-strategy）
 
 Stage 1：Review（审查）
   → Step 0：合同画像（9 字段，详见 references/orientation-and-dispatch.md）
@@ -92,18 +94,23 @@ Stage 4：Learn（学习）
 07-lending-gift           借贷与赠与（民间借贷 / 赠与）
 08-internet               互联网协议（用户协议 / 隐私政策 / 订单协议）
 09-marriage-family        婚姻家事（婚前财产 / 离婚 / 遗赠扶养）
-10-employment             劳动雇佣（劳动合同 / 劳务 / 竞业 / 保密 / 培训服务期 / 派遣）
 11-real-estate            房地产（土地出让 / 拆迁补偿 / 联建）
 12-construction           建设工程（施工总承包 / 分包 / 监理 / EPC）
 13-corporate-investment   公司投资（股权转让 / 增资 / 投资协议 / 对赌 / 股东协议）
 14-gov-procurement        政企采购程序（招标 / 联合体 / 财政拨付 / 等保 / 终验，专项流程层）
+
+⚠️ 编号 10（劳动雇佣类）自 v1.13.0 起整体剥离至
+   cn-labor-employment-strategy/references/contract-clauses/
+   编号保留为空位以维持原索引，不再重新编号。
 ```
 
 **路由判定**：
 
 ```text
-IF 合同涉及劳动关系 / 劳务 / 竞业 / 保密 / 培训服务期 / 派遣
-    → 加载 contract-types/10-employment/
+IF 合同涉及劳动关系 / 劳务 / 竞业 / 保密 / 培训服务期 / 派遣 / 实习 / 退休返聘 /
+   非全日制 / 业务外包 / 个人劳务
+    → ⚠️ **不在本 skill 范围**，重定向至 cn-labor-employment-strategy
+       （含 contract-clauses/ 子目录 + 配套 playbook）
 
 ELIF 合同为政府或国企背景的软件开发 / 系统集成 / 信息化采购 / 财政拨付项目
     → 加载 contract-types/14-gov-procurement/（程序与流程层）

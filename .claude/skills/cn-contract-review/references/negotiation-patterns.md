@@ -97,7 +97,7 @@ Stage 1 Step 4（fallback positions 结构化）+ Stage 2（Discuss）调取本�
 ## 与 contract-types/XX-{name}/ 各 *-memory-patterns.md 的关系
 
 各类目下的 `*-memory-patterns.md` 是该类目专属的谈判模式（如 05-ip 下的"无限三要素扫描
-处理"、10-employment 下的"试用期条款合规调整"）。本文件是**跨类目通用**的 10 个高频模式。
+处理"等）。本文件是**跨类目通用**的 10 个高频模式。
 
 调取顺序：
 1. Stage 1 Step 4 / Stage 2 Discuss：先调本文件（通用层）

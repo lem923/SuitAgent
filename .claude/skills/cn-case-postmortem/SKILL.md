@@ -64,13 +64,16 @@ Stage 4：Distill（人 in the loop 沉淀）
   
   → 按 references/memory-distillation.md 提取可复用条目，分发到以下目标
     （v1.12.0 WP1 起 7 个 legal skill 的 memory.md 均已 schema 预建于
-    skill 根目录，**不再是"如有/references 下"——直接定位 `<skill>/memory.md`**）：
+    skill 根目录；v1.13.0 起劳动法域三 skill 加入分发目标，**直接定位 `<skill>/memory.md`**）：
       - `cn-litigation-drafting/memory.md`：起草高频问题 + 可复用结论（按 A-K 文书类型 section）
-      - `cn-contract-review/memory.md`：合同审查高频问题（按 14 类合同 section）
+      - `cn-contract-review/memory.md`：合同审查高频问题（按 13 类合同 section · 劳动雇佣类已剥离至 cn-labor-* 域）
       - `cn-jiubufa-case-analysis/memory.md`：要件归入 / 请求权基础经验（按请求权类型 section）
       - `cn-judgment-analysis/memory.md`：判决书评审 / 救济路径经验（按救济路径 section）
       - `cn-trial-preparation/memory.md`：庭审准备实战经验（按庭审阶段 section）
       - `cn-client-communications/memory.md`：客户沟通措辞口径经验（按文书类型 section）
+      - `cn-labor-employment-strategy/memory.md`：劳动用工策略经验（按场景类型 section · 续签 / 违纪 / 不胜任 / 调岗 / 被迫离职 / 协商解除 / 竞业限制 / 特殊保护期等）
+      - `cn-labor-relationship-determination/memory.md`：劳动关系性质认定经验（按关系类型 section · 劳动 vs 劳务 / 双重劳动关系 / 派遣 / 平台用工等）
+      - `cn-labor-insurance-and-injury/memory.md`：工伤社保策略经验（按险种 / 责任主体 section）
       - `cn-case-postmortem/memory.md`：**复盘方法论自身经验**（5 维度归因 / 分发踩坑，自沉淀）
   → 显式输出"沉淀草稿"到对话内（标注每条 → 目标 skill memory.md 的哪个 section）
   → **等待用户明确确认** 沉淀草稿无 client identifier / 无具体合同金额 / 无客户名
